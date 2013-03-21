@@ -1,0 +1,20 @@
+<%= form_for @shape, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :xmldata, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :xmldata, :class => 'text_area' %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                shapes_path, :class => 'btn' %>
+  </div>
+<% end %>
