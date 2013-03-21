@@ -1,8 +1,9 @@
 class Shape < ActiveRecord::Base
   attr_accessible :name, :xmldata
-  
+
   validates :name, :presence => true
   validates :name, :length => { :minimum => 2 }
+  validates :name, :length => { :maximum => 30 }
   validates :name, :uniqueness => true
   validates :name, :format => { 
   	:with => /\A[a-zA-Z]/,
