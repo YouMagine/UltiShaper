@@ -14,7 +14,7 @@ module UltiShaper
 
     # otherwise heroku fails w/ precomile: could not connect to server: Connection refused
     # http://blog.nathanhumbert.com/2012/01/rails-32-on-heroku-tip.html
-    
+    config.assets.precompile += %w( rails.validations.js )
     config.assets.initialize_on_precompile = false
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

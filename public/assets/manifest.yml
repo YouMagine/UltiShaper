@@ -5,6 +5,8 @@ application.js: application-2ec6b956322be6f07e44ae84c57e22ae.js
 application/index.js: application-2ec6b956322be6f07e44ae84c57e22ae.js
 application.css: application-fe6b35b9d7ca0c4c75ebce9d44949be2.css
 application/index.css: application-fe6b35b9d7ca0c4c75ebce9d44949be2.css
+rails.validations.js: rails.validations-8f15a942c458552fadf7286906a39cb8.js
+rails/index.validations.js: rails.validations-8f15a942c458552fadf7286906a39cb8.js
 jquery.min.map: jquery.min-6c267bfd2b3f36e6edccb2e584934c1c.map
 jquery/index.min.map: jquery.min-6c267bfd2b3f36e6edccb2e584934c1c.map
 fontawesome-webfont.eot: fontawesome-webfont-635909f146e208b3509acdf3b154bf0d.eot
