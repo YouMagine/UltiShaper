@@ -191,7 +191,7 @@ Blockly.JavaScript.shape_cone = function() {
   if(codeLanguage == 'coffeescad0.1') {
     if(center_object) centerStr=',center:[0,0,0]';
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
-    return 'new Cylinder({d1:'+value_diameter1+',d2:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+selectedStr+';';
+    return 'new Cylinder({d2:'+value_diameter1+',d1:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+selectedStr+';';
   }
   if(codeLanguage == 'vol0.1')
     return '';
@@ -223,8 +223,21 @@ Blockly.Language.shape_cone = {
     this.setTooltip('Creates a cone');
   }
 };
-matchPhrases['cone d1=[12],d2=[5],h=[10]'] = function(args){
-  createBlockAtCursor('<xml><block type="shape_cone"><title name="CENTEROBJECT">TRUE</title><value name="diameter1"><block type="math_number"><title name="NUM">12</title></block></value><value name="diameter2"><block type="math_number"><title name="NUM">5</title></block></value><value name="height"><block type="math_number"><title name="NUM">10</title></block></value></block></xml>');
+matchPhrases['cone [d1=12] [d2=5] [h=10]'] = function(args){
+  var d1 = 10, d2 = 12, h = 10, i = 1;
+  if(args && args.length>3) { i = 1;
+    d1 = args[i++];
+    d2 = args[i++];
+    h = args[i++];
+  }
+  if(args && args.length>2) { i = 1;
+    d1 = args[i++];
+    d2 = args[i++];
+  }
+  if(args && args.length>1) { i = 1;
+    d1 = args[i++];
+  }
+  createBlockAtCursor('<xml><block type="shape_cone"><title name="CENTEROBJECT">TRUE</title><value name="diameter1"><block type="math_number"><title name="NUM">'+d1+'</title></block></value><value name="diameter2"><block type="math_number"><title name="NUM">'+d2+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+h+'</title></block></value></block></xml>');
 };
 
 Blockly.JavaScript.assembly_part = function() {
