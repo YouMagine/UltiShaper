@@ -21,7 +21,7 @@ Blockly.JavaScript.input_field_slider = function() {
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
 Blockly.Language.input_field_slider = {
-  category: ucfirst(LANG.inputField),
+  category: ucfirst(getLang('inputField')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(61);
@@ -63,7 +63,7 @@ Blockly.JavaScript.input_field_text = function() {
         return 'sphere(r='+value_radius+');\n';
 };
 Blockly.Language.input_field_text = {
-  category: ucfirst(LANG.inputField),
+  category: ucfirst(getLang('inputField')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(61);

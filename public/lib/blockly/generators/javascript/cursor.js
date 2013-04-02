@@ -20,13 +20,13 @@ Blockly.JavaScript.cursor_rotate = function() {
   else return code; // scad
 };
 Blockly.Language.cursor_rotate = {
-  category: 'Cursor',
+  category: ucfirst(getLang('cursor')),
   helpUrl: 'http://wiki.ultimaker.com/',
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
         // .appendTitle(new Blockly.FieldImage("../webgl/shape_cube.png", 25, 25))
-        .appendTitle(new Blockly.FieldDropdown([[ucfirst(LANG.rotateBy), "rotateBy"], [ucfirst(LANG.rotateTo), "rotateTo"]]), "NAME");
+        .appendTitle(new Blockly.FieldDropdown([[ucfirst(getLang('rotateBy')), "rotateBy"], [ucfirst(getLang('rotateTo')), "rotateTo"]]), "NAME");
     this.appendValueInput("rX")
         .setCheck(Number)
         .appendTitle("rX");
@@ -78,12 +78,12 @@ Blockly.JavaScript.cursor_move = function() {
   else return code; // scad
 };
 Blockly.Language.cursor_move = {
-  category: ucfirst(LANG.cursor),
+  category: ucfirst(getLang('cursor')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
-        .appendTitle(new Blockly.FieldDropdown([[ucfirst(LANG.moveBy), "moveBy"], [ucfirst(LANG.moveTo), "moveTo"]]), "NAME");
+        .appendTitle(new Blockly.FieldDropdown([[ucfirst(getLang('moveBy')), "moveBy"], [ucfirst(getLang('moveTo')), "moveTo"]]), "NAME");
     this.appendValueInput("tX")
         .appendTitle("X");
     this.appendValueInput("tY")
@@ -101,8 +101,8 @@ matchPhrases['move [x=10] [y=0] [z=0]'] = function(args){
   if(args && args.length>3) {var i = 1;
     x = args[i++]; y = args[i++]; z = args[i++];
   }
-  if(args && args.length>1) {var i = 1;
-    x = args[i++];
+  if(args && args.length>1) {
+    x = args[1];
   }
-  createBlockAtCursor('<xml><block type="cursor_move" inline="true" x="8" y="34"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
+  createBlockAtCursor('<xml><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };

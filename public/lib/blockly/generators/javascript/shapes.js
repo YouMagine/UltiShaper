@@ -48,7 +48,7 @@ Blockly.JavaScript.shape_sphere = function() {
     return 'sphere(r='+value_radius+');\n';
 };
 Blockly.Language.shape_sphere = {
-  category: ucfirst(LANG.shape),
+  category: ucfirst(getLang('shape')),
   helpUrl: 'http://wiki.ultimaker.com/',
   init: function() {
     this.setColour(210);
@@ -87,7 +87,7 @@ Blockly.JavaScript.shape_cube = function() {
   return code; //[code, Blockly.JavaScript.ORDER_NONE];
 };
 Blockly.Language.shape_cube = {
-  category: ucfirst(LANG.shape),
+  category: ucfirst(getLang('shape')),
   helpUrl: 'http://wiki.ultimaker.com/',
   init: function() {
     this.setColour(210);
@@ -144,7 +144,7 @@ Blockly.JavaScript.shape_cylinder = function() {
   } else return code;  // scad
 };
 Blockly.Language.shape_cylinder = {
-  category: ucfirst(LANG.shape),
+  category: ucfirst(getLang('shape')),
   helpUrl: 'http://wiki.ultimaker.com/',
   init: function() {
     this.setColour(210);
@@ -198,7 +198,7 @@ Blockly.JavaScript.shape_cone = function() {
   else return code; // scad
 };
 Blockly.Language.shape_cone = {
-  category: ucfirst(LANG.shape),
+  category: ucfirst(getLang('shape')),
   helpUrl: 'http://wiki.ultimaker.com/',
   init: function() {
     this.setColour(210);
@@ -285,7 +285,7 @@ Blockly.JavaScript.assembly_part = function() {
 };
 // Shape Boolean Operators
 Blockly.Language.assembly_part = {
-  category: ucfirst(LANG.assembly),
+  category: ucfirst(getLang('shape')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(65);

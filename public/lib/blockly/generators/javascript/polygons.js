@@ -17,7 +17,7 @@ Blockly.JavaScript.polygons_sketch = function() {
 };
 
 Blockly.Language.polygons_sketch = {
-  category: ucfirst(LANG.polygons),
+  category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(230);
@@ -91,7 +91,7 @@ Blockly.JavaScript.polygons_point = function() {
 };
 
 Blockly.Language.polygons_point = {
-  category: ucfirst(LANG.polygons),
+  category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(230);
@@ -130,7 +130,7 @@ Blockly.JavaScript.polygons_polygon = function() {
 };
 
 Blockly.Language.polygons_polygon = {
-  category: ucfirst(LANG.polygons),
+  category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(230);
@@ -196,7 +196,7 @@ Blockly.JavaScript.polygons_extrude = function() {
   return code; //[code, Blockly.JavaScript.ORDER_NONE];
 };
 Blockly.Language.polygons_extrude = {
-  category: ucfirst(LANG.polygons),
+  category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(230);
@@ -245,7 +245,7 @@ Blockly.JavaScript.polygons_expand = function() {
 };
 
 Blockly.Language.polygons_expand = {
-  category: ucfirst(LANG.polygons),
+  category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(230);

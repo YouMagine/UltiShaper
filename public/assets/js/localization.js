@@ -31,7 +31,8 @@ var LANG_EN_EN = {
     rotateTo: 'rotate to (absolute)',
     moveBy: 'move by',
     rotateBy: 'rotate by',
-    rotate: 'rotate'
+    rotate: 'rotate',
+    switchLangResets: "Switching languages will reset your current design. Are you sure you want to switch?"
 
   };
 var LANG_NL_NL = {
@@ -67,10 +68,18 @@ var LANG_NL_NL = {
     rotateTo: 'roteer naar (absoluut)',
     moveBy: 'verplaats met (relatief)',
     rotateBy: 'roteer met (relatief)',
-    rotate: 'roteren'
+    rotate: 'roteren',
+    switchLangResets: "Wisselen van taal wist je huidige ontwerp. Weet je zeker dat je op Nederlands wilt overschakelen?"
   };
+var LANG_DE_DE = {
+    switchLangResets: "Your current design will be lost. Are you sure you want to switch languages?"
+};
 
-
+function getLang(string){
+    if(typeof LANG[string] === 'string') return LANG[string];
+    console.log("Could not translate",string);
+    return string;
+}
 function ucfirst(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);

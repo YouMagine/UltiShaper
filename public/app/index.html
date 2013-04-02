@@ -17,6 +17,17 @@ var inputFields = [];
 var inputFieldValues = [];
 
 
+re = /l=([^&]*)/g;
+var urlLang = '';
+try
+{
+  urlLang = re.exec(location.search.slice(1))[1];
+  if(urlLang=='NL_NL'){ LANG = LANG_NL_NL;}
+  if(urlLang=='EN_EN'){ LANG = LANG_EN_EN;}
+  if(urlLang=='DE_DE'){ LANG = LANG_DE_DE;}
+} catch (err) {
+  console.log('Error trying to detect best language.',err);
+}
 
 </script>
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
@@ -71,6 +82,13 @@ function init() {
   if(typeof initCli == 'function')
     initCli();
   else console.log("couldn't load CLI.");
+  $("#langDropdown").change(function(o){
+    var newLang = $("#langDropdown").val();
+    if(newLang == 'NL_NL') if(window.confirm(LANG_NL_NL.switchLangResets)) document.location = "/app?l="+newLang;
+    if(newLang == 'EN_EN') if(window.confirm(LANG_EN_EN.switchLangResets)) document.location = "/app?l="+newLang;
+    if(newLang == 'DE_DE') if(window.confirm(LANG_DE_DE.switchLangResets)) document.location = "/app?l="+newLang;  
+  });
+  if(urlLang != '') $("#langDropdown").val(urlLang);
 
   $("#blockly").draggable({ handle: "h5" });
   $("#blockly h5").css({ cursor: "hand" });
@@ -429,6 +447,21 @@ $(window).resize(function() {
       color: white;
       background-color: blue;
     }
+    #langDropdown {width: 100px; position: fixed; top:30px;right:200px}
+/* flags from http://flag-sprites.com/ */
+.flag {width: 16px; height: 11px;background:url(flags.png) no-repeat}
+.flag.flag-ch {background-position: -16px 0}
+.flag.flag-de {background-position: -32px 0}
+.flag.flag-dk {background-position: -48px 0}
+.flag.flag-es {background-position: 0 -11px}
+.flag.flag-fi {background-position: -16px -11px}
+.flag.flag-fr {background-position: -32px -11px}
+.flag.flag-gb {background-position: -48px -11px}
+.flag.flag-it {background-position: 0 -22px}
+.flag.flag-nl {background-position: -16px -22px}
+.flag.flag-no {background-position: -32px -22px}
+.flag.flag-pt {background-position: -48px -22px}
+
   </style>
 </head>
 <body onload="init()">
@@ -447,12 +480,16 @@ $(window).resize(function() {
         <div id="alertmodal" class="modal hide fade">   </div>
         <div id="dialogRegion">
         </div>
+        <select id="langDropdown">
+          <option value="EN_EN">English</option>
+          <option value="DE_DE">German</option>
+          <option value="NL_NL">Dutch</option>
+        </select>
 
   <div id="blockly" class="modal" style="top:750px;width: 100%;height:300px;">
   <table>
     <tr>
       <td><h5><b>Drag-and-Drop 3D Design</b></h5></td>
-      <td><span style="color:grey">(Change your language to: <a href="?l=NL_NL">Nederlands</a>)</span></td>
       <td><div id="quickSearchDiv"><input type='text'></div><div id="qsResults"></div></td>
       <td><a href="#" title="close" onclick="$('#blockly').hide();">x</a></td>
     </tr>
