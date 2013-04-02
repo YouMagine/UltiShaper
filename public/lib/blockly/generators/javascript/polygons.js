@@ -1,3 +1,82 @@
+
+Blockly.JavaScript.polygons_sketch = function() {
+  var code = this.getTitleValue('code') || '[0,0],[10,0],[0,10]';
+  code = code.replace(/\/\*[^\*]*\*\//g,"");
+  code = code.replace(/polygon\(\[/g,""); // remove polygon([ from string
+  code = code.replace(/\]\);?/g,""); // remove ]); from string
+
+  code = 'fromPoints(['+code+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
+
+  if(codeLanguage == 'vol0.1')
+    return '';
+  if(codeLanguage == 'coffeescad0.1') {
+    return code;
+  }
+  else
+  return code; //[code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.Language.polygons_sketch = {
+  category: ucfirst(LANG.polygons),
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(230);
+    this.appendDummyInput()
+        .appendTitle("Sketch");
+    this.appendDummyInput()
+        .appendTitle("coordinate code")
+        .appendTitle(new Blockly.FieldTextInput('[0,0],[10,0],[0,10]',
+        ""), 'code');
+    this.setTooltip('A a polyline from a sketch.');
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+matchPhrases['sketch'] = function(args){
+  console.log('before',args);
+  argsStr = args.join(' ');
+  argsStr = argsStr.replace(/^sketch /,'');
+  argsStr = argsStr.replace('] ,','],');
+  args = argsStr.split(';');
+  console.log('after',args);
+  var arg1 = '';
+  var arg2 = '';
+  var str = '';
+  var curBlock = '';
+  if(!args || args.length===0) {
+    return alert("needs a path");
+  }
+
+  if(args.length === 1) {
+    str = '<block inline="true" type="polygons_extrude">'+
+'        <statement name="shapeToExtrude">'+
+'          <block type="polygons_sketch">'+
+'            <title name="code">'+args[0]+'</title>'+
+'          </block>'+
+'        </statement>'+
+'      </block>';
+  }
+
+  if(args && args.length>1) {
+    for(var i=0; i<args.length;i++) {
+    if(args[i].trim().length===0)
+      continue;
+    var hasNextStr = (i === args.length? "" : "<next>");
+      str = '<block inline="true" type="polygons_extrude">'+
+      '        <statement name="shapeToExtrude">'+
+      '          <block type="polygons_sketch">'+
+      '            <title name="code">'+args[i]+'</title>'+
+      '          </block>'+
+      '        </statement>'+hasNextStr+str+
+      '      </block>';
+    }
+  }
+
+  str = '<xml>'+str+'</xml>';
+  createBlockAtCursor(str);
+};
+
 Blockly.JavaScript.polygons_point = function() {
   var tX = var_to_number(Blockly.JavaScript.valueToCode(this, 'tX', Blockly.JavaScript.ORDER_ATOMIC)) || 0;
   var tY = var_to_number(Blockly.JavaScript.valueToCode(this, 'tY', Blockly.JavaScript.ORDER_ATOMIC)) || 0;
@@ -186,6 +265,8 @@ Blockly.Language.polygons_expand = {
     this.setTooltip('Make a shape, by creating a connected series of lines based on a list of 2D points.');
   }
 };
+
+
 /*
 Blockly.JavaScript.polygons_triangle = function() {
 };
