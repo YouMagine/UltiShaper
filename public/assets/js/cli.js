@@ -9,7 +9,7 @@ var selectedIndex = 0;
 var charNum = 0;
 var argumentIndex = 0; // 0 is cmd, 1 is first argument.
 
-matchPhrases['define name=[myblockname]'] = function(args){
+matchPhrases['define [name=myblockname]'] = function(args){
   var name = 'myblockname';
   console.log(args);
   if(args && args.length>1) {
@@ -129,7 +129,7 @@ function myKeyEvent(e){
   }
   focus = $('#quickSearchDiv input').is(":focus");
   if(!focus) {
-    console.log("arg"+ argumentIndex+': abort. No focus.');
+    // console.log("arg"+ argumentIndex+': abort. No focus.');
     return;
 
   }
@@ -172,7 +172,6 @@ function pruneCli(keyCode){
 }
   for(var phrase in matchingPhrases){
     var firstOccur = phrase.indexOf(myChar.toLowerCase());
-    console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')');
     
     // console.log('phrase: ',phrase,'cmd:',matchPhrases[phrase],' char:',phrase.substring(0,1),' ',firstOccur));
     if(firstOccur == charNum)
@@ -181,10 +180,10 @@ function pruneCli(keyCode){
 
     } else {
         if(argumentIndex > 0) {
-        console.log(argumentIndex+' argument. Not pruning.');
+          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')',argumentIndex+' argument. Not pruning.');
       }
         else {
-          console.log('pruned: '+phrase);
+          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')',argumentIndex+' argument. Pruned!!!!');
           if(keyCode != 13)
             delete matchingPhrases[phrase]; // prune matching phrases
       }
