@@ -16,9 +16,6 @@ var colors = {selected:[0.6,0.5,0.2]};
 var inputFields = [];
 var inputFieldValues = [];
 
-// CLI
-var matchPhrases = [];
-var matchingPhrases = [];
 
 
 </script>
@@ -71,6 +68,10 @@ var prevXML = '';
  * Initialize Blockly
  */
 function init() {
+  if(typeof initCli == 'function')
+    initCli();
+  else console.log("couldn't load CLI.");
+
   $("#blockly").draggable({ handle: "h5" });
   $("#blockly h5").css({ cursor: "hand" });
   // var toolbox = '<xml>';

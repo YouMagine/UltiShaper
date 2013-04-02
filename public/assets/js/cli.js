@@ -21,9 +21,9 @@ matchPhrases['define name=[myblockname]'] = function(args){
 };
 
 
-matchPhrases['clear'] = function() { if(confirm('Are you sure you want to clear the canvas?')) clearWorkspace(); };
-matchPhrases['save'] = function() { saveCode(); };
-matchPhrases['load'] = function() { loadCode(); };
+matchPhrases.clear = function() { if(confirm('Are you sure you want to clear the canvas?')) clearWorkspace(); };
+matchPhrases.save = function() { saveCode(); };
+matchPhrases.load = function() { loadCode(); };
 matchPhrases['number [10]'] = function() {
   createBlockAtCursor('<xml><block type="math_number"><title name="NUM">10</title></block></value>');
 };
@@ -35,11 +35,12 @@ function resetMatches() {
 }
 
 resetMatches();
-document.onload = function() {
-  $('#quickSearchDiv input').on('blur', function () {
-    setTimeout(function(){$('#qsResults').html(' ');},200);
+
+function initCli() {
+  $('#quickSearchDiv input').blur( function () {
+    setTimeout(function(){$('#qsResults').html(' ');},300);
   });
-};
+}
 
 function myKeyEvent(e){
   var keyCode = e.keyCode;
@@ -85,7 +86,7 @@ function myKeyEvent(e){
     case 9: // tab
       // supplement the quicksearch input with the top result
       console.log("trying to supplement argument "+argumentIndex+" with selected result at index",selectedIndex);
-      var i=0;for(phrase in matchingPhrases) {
+      var i=0;for(var phrase in matchingPhrases) {
         if(i==selectedIndex)
         {
           var firstWord = '';
@@ -112,7 +113,7 @@ function myKeyEvent(e){
 
   }
   // start pruning process
-  for(var phrase in matchingPhrases){
+  for(phrase in matchingPhrases){
     var myChar = String.fromCharCode(keyCode).toLowerCase();
     firstOccur = phrase.indexOf(myChar.toLowerCase());
     console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')');
