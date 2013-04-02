@@ -92,6 +92,8 @@ function init() {
 
   $("#blockly").draggable({ handle: "h5" });
   $("#blockly h5").css({ cursor: "hand" });
+  $('#qsResults').css({left: $('#quickSearchDiv').position().left,'min-width': $('#quickSearchDiv').width()}
+    );
   // var toolbox = '<xml>';
   //   toolbox += '  <block type="controls_if"></block>';
   //   toolbox += '  <block type="controls_repeat"></block>';
@@ -156,7 +158,10 @@ function myUpdateFunction() {
   cursor_rot=[0,0,0];
   cursor_move=[0,0,0];
   var myVars;
-  codeLanguage = langDropbox.options[langDropbox.selectedIndex].value;
+  codeLanguage = $('#langDropbox').val();
+  if(typeof codeLanguage != 'string') 
+    codeLanguage = 'coffeescad0.1';
+
     // if(!codeLanguage) 
     // codeLanguage = 'scad';
     var code;
@@ -412,6 +417,7 @@ $(window).resize(function() {
   $('#blockly').css('top',$(window).height()-115);
   $('#blockly').css('height',360);
   $('#blockly').css('left',$(window).width()/2-200);
+  $('#qsResults').css('left',$('#quickSearchDiv').position().left);
 });
 
   </script>
@@ -434,14 +440,19 @@ $(window).resize(function() {
     }
     #qsResults {
       z-index: 99;
-      top: 0px;
-      left:0px;
-      position: relative;
+      top: 27px;
+      left:180px;
+      position: absolute;
+      background-color: #fff;
+      border: 1px #aaa solid;
+      border-radius: 4px;
+      padding: 4px;
     }
     .qsItem {
       background-color: white;
       width: 100%;
       cursor: hand;
+      min-width: 240px;
     }
     .qsSelected {
       color: white;
@@ -490,7 +501,7 @@ $(window).resize(function() {
   <table>
     <tr>
       <td><h5><b>Drag-and-Drop 3D Design</b></h5></td>
-      <td><div id="quickSearchDiv"><input type='text'></div><div id="qsResults"></div></td>
+      <td><div id="quickSearchDiv"><input type="text" style="color: grey;" title="Quick commands (/)" value="Quick commands (/)" autocomplete="off" onfocus="if(this.value=='Quick commands (/)'){this.value='';$(this).css('color','black');}" onblur="if(this.value==''){this.value='Quick commands (/)';$(this).css('color','grey');}"></div><div id="qsResults"></div></td>
       <td><a href="#" title="close" onclick="$('#blockly').hide();">x</a></td>
     </tr>
   </table>
@@ -499,11 +510,12 @@ $(window).resize(function() {
   <div id="svgDiv" style="width: 100%"></div>
   <textarea id="codearea" rows=10 style="width:500px" class="hide"></textarea>
   <table><tr><td>
-  <select id="lang" onchange="myUpdateFunction();">
+<!--  <select id="lang" onchange="myUpdateFunction();">
     <option value="coffeescad0.1">CoffeeSCAD</option>
     <option value="vol0.1">Uformia .vol</option>
     <option value="scad">OpenSCAD</option>
   </select>
+-->
   <!--<input type="button" onclick="runMe();" value="Run!">-->
   <!--<input type="button" onclick="getXML();" value="Get blocky XML!">-->
   <input type="button" onclick="if(typeof hist !='undefined') hist.undo();" value="Undo">
