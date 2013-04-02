@@ -112,7 +112,7 @@ function myKeyEvent(e){
 
   }
   // start pruning process
-  for(phrase in matchingPhrases){
+  for(var phrase in matchingPhrases){
     var myChar = String.fromCharCode(keyCode).toLowerCase();
     firstOccur = phrase.indexOf(myChar.toLowerCase());
     console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')');
@@ -138,6 +138,7 @@ function myKeyEvent(e){
       resetMatches();
       $('#quickSearchDiv input').focus();
       setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
+      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},50);
       break;
     case 27: // escape
       charNum = 0;
