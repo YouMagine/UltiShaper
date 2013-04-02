@@ -13,13 +13,6 @@
 
 ActiveRecord::Schema.define(:version => 20130402150308) do
 
-  create_table "languages", :force => true do |t|
-    t.string   "shorthand"
-    t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "shapes", :force => true do |t|
     t.string   "name"
     t.text     "xmldata"

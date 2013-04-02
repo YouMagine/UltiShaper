@@ -26,10 +26,14 @@ try
   if(urlLang=='EN_EN'){ LANG = LANG_EN_EN;}
   if(urlLang=='DE_DE'){ LANG = LANG_DE_DE;}
 } catch (err) {
-  console.log('Error trying to detect best language.',err);
+  console.log('Error trying to detect best language. Defaulting to English.',err);
 }
+if(typeof urlLang !='string' || urlLang == '') 
+  urlLang = 'EN_EN';
 
 </script>
+  <script type="text/javascript" src="/translations.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="assets/js/history.js"></script><!-- Undo/Redo -->
   <script type="text/javascript" src="assets/js/cli.js"></script><!-- Undo/Redo -->
@@ -48,7 +52,6 @@ try
   <script type="text/javascript" src="lib/blockly/generators/javascript/polygons.js"></script>
   <script type="text/javascript" src="lib/blockly/generators/javascript/inputfields.js"></script>
   <script type="text/javascript" src="lib/blockly/generators/javascript/vars.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <!-- CoffeeSCAD -->
   <script data-main="lib/CoffeeSCad/app/config" src="lib/CoffeeSCad/assets/js/libs/require.min.js"></script>
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/bootstrap.css">
@@ -74,11 +77,13 @@ var autoSaveInterval = 2000;
 var app;
 var prevXML = '';
 
-
 /**
  * Initialize Blockly
  */
 function init() {
+
+  // get translations from the DB
+
   if(typeof initCli == 'function')
     initCli();
   else console.log("couldn't load CLI.");
@@ -108,18 +113,11 @@ function init() {
   }
   // Blockly.Language = newLanguage;
 
-  var startBlocks = $('#startBlocks').html();
-
+  
   Blockly.inject(document.getElementById('svgDiv'),{
-    path: '../../', toolbox: '<xml><block type="math_number"><title name="NUM">30</title></block></xml>' //document.getElementById('toolbox')
+    path: '../../'
   });
-//alert(startBlocks);
-  // Load the editor with a starting block.
-  // console.log("loading ",startBlocks);
-  var xml = Blockly.Xml.textToDom("<xml>"+startBlocks+"</xml>");
-  // ERIK: removed seats block.
-  Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
-  // seatsBlock = Blockly.mainWorkspace.getTopBlocks(false)[0];
+
   Blockly.addChangeListener(myUpdateFunction);
   Blockly.bindEvent_(Blockly.mainWorkspace.getCanvas(),
         'blocklySelectChange', null, function() {setTimeout(myUpdateFunction,1)});
@@ -127,7 +125,6 @@ function init() {
    // return 'Leaving this page will result in the loss of your work.';
   // };
   window.setTimeout(function(){
-//  loadCode(true);
   $('#inputPane').hide();
 
     myUpdateFunction();
@@ -473,7 +470,7 @@ $(window).resize(function() {
 .flag.flag-nl {background-position: -16px -22px}
 .flag.flag-no {background-position: -32px -22px}
 .flag.flag-pt {background-position: -48px -22px}
-
+#blockly {top:750px;width: 100%;height:300px;}
   </style>
 </head>
 <body onload="init()">
@@ -498,7 +495,7 @@ $(window).resize(function() {
           <option value="NL_NL">Dutch</option>
         </select>
 
-  <div id="blockly" class="modal" style="top:750px;width: 100%;height:300px;">
+  <div id="blockly" class="modal">
   <table>
     <tr>
       <td><h5><b>Drag-and-Drop 3D Design</b></h5></td>
