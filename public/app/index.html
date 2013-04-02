@@ -91,6 +91,7 @@ function init() {
   if(urlLang != '') $("#langDropdown").val(urlLang);
 
   $("#blockly").draggable({ handle: "h5" });
+  $("#blockly").css({ top: $(window).height() - $("#blockly").height() });
   $("#blockly h5").css({ cursor: "hand" });
   $('#qsResults').css({left: $('#quickSearchDiv').position().left,'min-width': $('#quickSearchDiv').width()}
     );

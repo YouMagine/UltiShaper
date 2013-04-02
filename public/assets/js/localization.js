@@ -78,6 +78,11 @@ var LANG_DE_DE = {
 function getLang(string){
     if(typeof LANG[string] === 'string') return LANG[string];
     console.log("Could not translate",string);
+    $.post('translations.json', { translation: {fromtext: string, translation: string } })
+    .done(function(data) {
+    console.log("Data Loaded: " , data);
+    });
+
     return string;
 }
 function ucfirst(string)
