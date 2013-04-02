@@ -1,0 +1,28 @@
+<%= form_for @translation, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :fromtext, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :fromtext, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :translation, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :translation, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :language, :class => 'control-label' %>
+    <div class="controls">
+<%=f.select :language, options_for_select([["English","EN_EN"],["Deutsch","DE_DE"],["Dutch","NL_NL"]],@translation.language)
+
+%>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                translations_path, :class => 'btn' %>
+  </div>
+<% end %>

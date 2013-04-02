@@ -1,6 +1,11 @@
 UltiShaper::Application.routes.draw do
+
+  resources :translations
+
+  match 'translations_for/:language' => 'translations#index'
+
   resources :shapes
-root :to => redirect("/app")
+  root :to => redirect("/app")
 
 # match ':controller(/:action/all)(.:format)'
 

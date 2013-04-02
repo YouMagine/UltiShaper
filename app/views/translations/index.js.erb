@@ -1,0 +1,4 @@
+<%- model_class = Translation -%>
+<% @translations.each do |translation| %>
+LANG_<%= raw translation.language %>['<%= json_escape translation.fromtext %>'] = '<%= json_escape translation.translation %>';
+<% end %>
