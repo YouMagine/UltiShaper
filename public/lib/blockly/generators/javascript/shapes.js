@@ -99,7 +99,7 @@ Blockly.Language.shape_cube = {
         .appendTitle(LANG.width);
     this.appendValueInput("depth")
         .setCheck(Number)
-        .appendTitle(LANG.depth);
+        .appendTitle(LANG['depth']);
     this.appendValueInput("height")
         .setCheck(Number)
         .appendTitle(LANG.height);
