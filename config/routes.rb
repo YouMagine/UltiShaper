@@ -2,6 +2,8 @@ UltiShaper::Application.routes.draw do
   resources :shapes
 root :to => redirect("/app")
 
+# match ':controller(/:action/all)(.:format)'
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
