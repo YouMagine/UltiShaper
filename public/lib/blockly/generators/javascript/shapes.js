@@ -114,14 +114,14 @@ Blockly.Language.shape_cube = {
 };
 matchPhrases['cube w=[10],d=[10],h=[10]'] = function(args){
   var x = 10, y = 10, z = 10, i = 1;
-  if(args && args.length>3) { i = 1;
-    x = args[i++]; y = args[i++]; z = args[i++];
+  if(args && args.length>1) { i = 1;
+    x = args[i]; y = args[i]; z = args[i];
   }
   if(args && args.length>2) { i = 1;
     x = args[i++]; y = args[i++];
   }
-  if(args && args.length>1) { i = 1;
-    x = args[i]; y = args[i]; z = args[i];
+  if(args && args.length>3) { i = 1;
+    x = args[i++]; y = args[i++]; z = args[i++];
   }
   createBlockAtCursor('<xml><block type="shape_cube"><title name="CENTEROBJECT">TRUE</title><value name="width"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="depth"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+z+'</title></block></value>');
 };
@@ -168,11 +168,11 @@ Blockly.Language.shape_cylinder = {
 };
 matchPhrases['cylinder [d=10] [h=10]'] = function(args){
   var d = 10, h = 10, i = 1;
-  if(args && args.length>2) { i = 1;
-    d = args[i++]; h = args[i++];
-  }
   if(args && args.length>1) { i = 1;
     d = args[i++];
+  }
+  if(args && args.length>2) { i = 1;
+    d = args[i++]; h = args[i++];
   }
   createBlockAtCursor('<xml><block type="shape_cylinder"><value name="diameter1"><block type="math_number"><title name="NUM">'+d+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+h+'</title></block></value></block></xml>');
 };
