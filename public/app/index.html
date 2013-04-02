@@ -12,16 +12,19 @@ var cursor_trans=[0,0,0];
 var myVarNames = [];
 var myVarValues = [];
 var colors = {selected:[0.6,0.5,0.2]};
-var matchPhrases = [];
-var matchingPhrases = [];
 
 var inputFields = [];
 var inputFieldValues = [];
+
+// CLI
+var matchPhrases = [];
+var matchingPhrases = [];
 
 
 </script>
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="assets/js/history.js"></script><!-- Undo/Redo -->
+  <script type="text/javascript" src="assets/js/cli.js"></script><!-- Undo/Redo -->
   <script type="text/javascript" src="lib/blockly/language/en/_messages.js"></script>
   <script type="text/javascript" src="lib/blockly/language/common/math.js"></script>
 <!--  <script type="text/javascript" src="lib/blockly/language/common/logic.js"></script>-->
@@ -56,7 +59,7 @@ var inputFieldValues = [];
 
 // var codeLanguage = 'scad';
 var codeLanguage = 'vol0.1';
-var storageApiEndpoint = '/guidemo/storage.php';
+var storageApiEndpoint = '/shapes/';
 var autoSave = false;
 var autoSaveInitial = true;
 var autoSaveInterval = 2000;
@@ -109,9 +112,10 @@ function init() {
     $('div.ui-dialog a.ui-dialog-titlebar-close').click();// close all other windows.
   }, 1500);
   window.setInterval(doAutoSave,autoSaveInterval);
-  loadInitial(1); // load defines, etc.
+  loadMatches('shapes'); // load defines, etc.
 
-}
+} // end of function init
+
 function createBlockAtCursor(xmlStr){
   try {
     var xml = Blockly.Xml.textToDom(xmlStr);      
@@ -120,222 +124,8 @@ function createBlockAtCursor(xmlStr){
 
   }
 }
-var keyLog = [];
-var prevKey;
-var selectedIndex = 0;
-var charNum = 0;
-var argumentIndex = 0; // 0 is cmd, 1 is first argument.
-
-matchPhrases['define name=[myblockname]'] = function(args){
-  var name = 'myblockname';
-  console.log(args);
-  if(args && args.length>1) {
-    name = args[1];
-  }
-  xml = getXML();
-  saveCode(name,'define');
-  setTimeout(function(){loadInitial();},1000); // reload modules. Wait a second to make sure its propagated on the server
-};
 
 
-matchPhrases['clear'] = function() { if(confirm('Are you sure you want to clear the canvas?')) clearWorkspace(); };
-matchPhrases['save'] = function() { saveCode(); };
-matchPhrases['load'] = function() { loadCode(); };
-matchPhrases['number [10]'] = function() {
-  createBlockAtCursor('<xml><block type="math_number"><title name="NUM">10</title></block></value>');
-};
-
-function resetMatches() {
-  for (i in matchPhrases) { // copy match phrases
-   matchingPhrases[i] = matchPhrases[i];
-  }
-}
-
-resetMatches();
-$(function() {
-  $('#quickSearchDiv input').on('blur', function () {
-    setTimeout(function(){$('#qsResults').html(' ');},200);
-  });
-});
-
-function myKeyEvent(e){
-  var keyCode = e.keyCode;
-  // var prevKey;
-  keyLog.push(e);
-  if(!e.keyCode) keyCode = e.which;
-  charNum = $('#quickSearchDiv input').val().length;
-  argumentIndex = ($('#quickSearchDiv input').val().match(/ +/g)||[]).length;
-  switch(keyCode) {
-    case 90:// Ctrl-Z / cmd-Z
-      if(e.metaKey || e.ctrlKey) {
-        if(e.shiftKey) // redo
-        {
-          console.log("Redo()");
-          hist && hist.redo();
-        }
-        else {
-          console.log("Undo()");
-          hist && hist.undo();
-        }
-        return updateQuickSearchHtml();
-      }
-    break;
-    case 40://arrow down
-      selectedIndex++;
-      return updateQuickSearchHtml();
-    break;
-    case 38://arrow down
-      selectedIndex--;
-      return updateQuickSearchHtml();
-    break;
-    case 32:// spacebar
-      return updateQuickSearchHtml();
-    break;
-    case 51:// a # sign, for numbers
-      if(e.shiftKey) {
-        var num = prompt("Enter a number to create a block?");
-        console.log(num,Number(num));
-        createBlockAtCursor('<xml><block type="math_number"><title name="NUM">'+Number(num)+'</title></block></value>');
-        return;
-      }
-    break;
-    case 191:
-    $('#quickSearchDiv input').focus();
-    break;
-    case 9: // tab
-      // supplement the quicksearch input with the top result
-      console.log("trying to supplement argument "+argumentIndex+" with selected result at index",selectedIndex);
-      var i=0;for(phrase in matchingPhrases) {
-        if(i==selectedIndex)
-        {
-          var firstWord = '';
-          firstWord = $('#quickSearchDiv input').attr('value');
-          for(ii=firstWord.length ; ii<phrase.length ; ii++) {
-            if(phrase.charAt(ii) == ' ') break;
-            firstWord += phrase.charAt(ii);
-          }
-          $('#quickSearchDiv input').attr('value',firstWord+' ');
-          break;
-        }
-        i++;
-      }
-      // regain focus on input field
-      setTimeout(function(){$('#quickSearchDiv input').focus()},10);
-      argumentIndex++; // entering next argument.
-
-      return;
-    break;
-  }
-  focus = $('#quickSearchDiv input').is(":focus");
-  if(!focus) {
-    console.log("arg"+ argumentIndex+': abort. No focus.');
-    return;
-
-  }
-  // start pruning process
-  for(phrase in matchingPhrases){
-    var myChar = String.fromCharCode(keyCode).toLowerCase();
-    firstOccur = phrase.indexOf(myChar.toLowerCase());
-    console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')');
-    
-    // console.log('phrase: ',phrase,'cmd:',matchPhrases[phrase],' char:',phrase.substring(0,1),' ',firstOccur));
-    if(firstOccur == charNum)
-    {
-      selectedIndex = 0;
-
-    } else {
-        if(argumentIndex > 0) {
-        console.log(argumentIndex+' argument. Not pruning.');
-      }
-        else {
-          console.log('pruned: '+phrase);
-          if(keyCode != 13)
-            delete matchingPhrases[phrase]; // prune matching phrases
-      }
-    }
-  }
-  switch(keyCode) {
-    case 191: // slash forward (/)
-      resetMatches();
-      $('#quickSearchDiv input').focus();
-      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
-      break;
-    case 27: // escape
-      charNum = 0;
-      resetMatches();
-      $('#quickSearchDiv input').blur();
-      $('#qsResults').html(' ');
-    break;
-    case 8: // backspace
-      // FIXME: should repeat the pruning process...
-      resetMatches();
-    break;
-    case 13: // enter
-      runCmd();
-    break;
-    default:
-      console.log("key:",keyCode,e,'arg',argumentIndex);
-      // var s = "";
-      // for (i in matchingPhrases) {
-      //    s += i + ", ";
-      // }
-      // console.log('phrases left: '+s);
-    break;
-  }
-  updateQuickSearchHtml();
-
-    // prevKey = e;
-}
-function runCmd(){
-    var i=0;
-    console.log("Enter. Cmd: "+$('#quickSearchDiv input').attr('value'));
-    setTimeout(function(){$('#qsResults').html(' ');},10);
-    $('#quickSearchDiv input').blur();
-    for (phrase in matchingPhrases) {
-      if(i==selectedIndex)
-      {
-        console.log('performing match # '+selectedIndex + ': '+phrase);
-        var args = ($('#quickSearchDiv input').attr('value') + '').split(' ');
-        if(typeof matchingPhrases[phrase] == 'function')
-          matchingPhrases[phrase].call(null,args);
-        if(typeof matchingPhrases[phrase] == 'string')
-          createBlockAtCursor(matchingPhrases[phrase]);
-
-      break;
-      }
-      i++;
-    }
-    $('#quickSearchDiv input').attr('value','');
-    resetMatches();
-    // $('#qsResults').html(' ');
-}
-function updateQuickSearchHtml() {
-  var resultHtml = '';
-  var itemNr = 0;
-  // console.log($('#quickSearchDiv input').attr('value').length);
-  // if($('#quickSearchDiv input').attr('value').length == 0) { $('#qsResults').html(' '); return; }
-  var myIndex=0;
-  for (i in matchingPhrases) {
-    var iBold = '';
-    var iNormal = '';
-    iBold = i.substring(0,charNum+1);
-    iNormal = i.substring(charNum+1);
-    resultHtml += '<span myIndex="'+(myIndex++)+'" class="qsItem'+((selectedIndex==itemNr) ? ' qsSelected': '') +'"><b>' +iBold + '</b>' + iNormal + "</span><br>";
-    itemNr++;
-  }
-  $('#qsResults').html(resultHtml); 
-  $('#qsResults .qsItem').on('click',function(){
-    selectedIndex = $(this).attr('myIndex');
-    $('#quickSearchDiv input').attr('value',$(this).val());// FIXME: get value from matchingPhrases, not from HTML element.
-    runCmd();
-  });
-  $('#qsResults .qsItem').on('hover',function(){
-    $('.qsSelected').removeClass('qsSelected');
-    $(this).addClass('qsSelected');
-    selectedIndex = $(this).attr('myIndex');
-  });
-}
-window.onkeydown = myKeyEvent;
 var numUpdates = 0;
 function myUpdateFunction() {
   // console.log('myUpdateFunction() ran '+(numUpdates++)+' times');
@@ -410,6 +200,29 @@ function getXML() {
 function loadUpXML(xmlData) {
   Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xmlData);
 }
+function updateDefine(id,name){
+  var xml = getXML();
+  jQuery.ajax({
+    url: '/shapes/'+id+'.json',
+    type: 'PUT',
+    data: { shape: {name: name, xmldata: xml } },
+    success: function(data) {
+      alert("" + data);
+      }
+  });
+}
+
+function saveDefine(name){
+  var xml = getXML();
+  jQuery.ajax({
+    url: '/shapes.json',
+    type: 'POST',
+    data: {shape: {name: name, xmldata: xml } },
+    success: function(data) {
+      alert("" + data);
+      }
+  });
+}
 
 function saveCode(name,saveType) {
   if(!name)
@@ -424,7 +237,29 @@ function saveCode(name,saveType) {
 });
 }
 
+function loadMatches(type) {
+  if(!type) 
+    type = 'shapes';
+  //first load shapes
+  jQuery.get('/'+type+'/all.json', { },
+    function(data){
+      console.log('loadShapes('+type+'):',data);
+        try {
+          // defines = data.global_defines;
+          for(defName in data) {
+            console.log('loadShapes('+type+'):',data[defName]);
+            matchPhrases[data[defName].name] = data[defName];
+          }
+        } catch (e) {
+          alert("Error loading "+type+" data.");
+          return;
+        }
+      // window.setTimeout('autoSave = '+tmpAutosave+';',1000);
+    }, "json");
+}
+
 function loadCode(initialLoad,name,loadType) {
+      console.log('loadCode()');
   // var tmpAutosave = autoSave;
   // autoSave = false;
   if(!name)
@@ -433,7 +268,7 @@ function loadCode(initialLoad,name,loadType) {
     loadType = 'workspace'; // otherwise, it could be a definition (e.g. define cube)
   if(initialLoad) 
     autoSave = autoSaveInitial;
-  jQuery.post(storageApiEndpoint, { "loadData": "1", type: loadType, name: name },
+  jQuery.get('/shapes/all.json', { "loadData": "1", type: loadType, name: name },
     function(data){
       console.log(data);
       // Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, data.data);  
@@ -475,6 +310,7 @@ function changeAutoSave(changeTo) {
   autoSave = (changeTo == '1');
 }
 
+/* depricated
 function runMe() {
   return false;
   window.LoopTrap = 1000;
@@ -489,7 +325,7 @@ function runMe() {
     alert(e);
   }
 }
-
+*/
 
 function blockIsSelected(block,typeOfCheck) {
   var isSelected = false;
@@ -556,7 +392,7 @@ function var_to_number(varStr){
 $(window).resize(function() {
   $('#blockly').css('top',$(window).height()-115);
   $('#blockly').css('height',360);
-  $('#blockly').css('left',$(window).width()/2-200);i
+  $('#blockly').css('left',$(window).width()/2-200);
 });
 
   </script>
