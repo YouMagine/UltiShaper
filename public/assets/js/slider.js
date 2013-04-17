@@ -33,11 +33,12 @@
  *     called when the slider is moved.  The current value is passed.
  * @constructor
  */
-var Slider = function(x, y, width, svgParent, opt_changeFunc) {
+var Slider = function(x, y, width, svgParent, opt_changeFunc,uuid) {
   this.KNOB_Y_ = y - 12;
   this.KNOB_MIN_X_ = x + 8;
   this.KNOB_MAX_X_ = x + width - 8;
   this.value_ = 0.5;
+  this.uuid_ = uuid;
   this.changeFunc_ = opt_changeFunc;
 
   // Draw the slider.
@@ -151,7 +152,7 @@ Slider.knobMouseMove_ = function(e) {
 
   thisSlider.value_ = 1 - (x - thisSlider.KNOB_MIN_X_) /
       (thisSlider.KNOB_MAX_X_ - thisSlider.KNOB_MIN_X_);
-  thisSlider.changeFunc_ && thisSlider.changeFunc_(thisSlider.value_);
+  thisSlider.changeFunc_ && thisSlider.changeFunc_(thisSlider.value_,thisSlider.uuid_);
 };
 
 /**

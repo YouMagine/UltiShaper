@@ -29,30 +29,29 @@ function MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement) {
 }
 
 function InputManager() {
-    this.mySliderInputs = [];
+    this.myInputs = [];
 
     this.addSlider = function (sliderInput) {
-        this.mySliderInputs.push(sliderInput);
+        this.myInputs.push(sliderInput);
+        this.numFields++;
         return sliderInput.uuid;
         // return a 'uuid'
     };
     this.getInputByUUID = function (uuidQuery) {
-        for(var i=0;this.mySliderInputs.length > i;i++){
-            if(this.mySliderInputs[i].uuid == uuidQuery) {
-                // console.log('Found: ',this.mySliderInputs[i]);
-                return this.mySliderInputs[i];
+        for(var i=0;this.myInputs.length > i;i++){
+            if(this.myInputs[i].uuid == uuidQuery) {
+                // console.log('Found: ',this.myInputs[i]);
+                return this.myInputs[i];
             }
         }
         // console.log('Input with UUID '+uuidQuery+' was not found.');
         return null;
     };
-    this.getInput = function (nr) {
-        if(this.mySliderInputs.length >= nr)
-            return this.mySliderInputs[nr]; // temporary method, searches just in sliders....
-        return false;
+    this.getNumFields = function () {
+        return this.myInputs.length;
     };
     this.list = function () {
-        console.log(this.mySliderInputs);
+        return(this.myInputs);
     };
 }
 
@@ -67,12 +66,9 @@ Blockly.JavaScript.input_field_slider = function() {
     var maxVal = this.getTitleValue('maxVal') || 42;
     var stepIncrement = this.getTitleValue('stepIncrement') || 1;
     var code = '';
-    var val = 42;
+    var val = 42;//
     setTimeout(function(){$('#inputPane').show();},200);
 
-    planeSvg.initSlider(0);
-    planeSvg.setText('row1Text',sliderName);
-    // planeSvg.setText('row2Text',sliderName);
     // create a new slider:
     var slider = new MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement);
     slider.setUUID(uuid);
@@ -84,6 +80,29 @@ Blockly.JavaScript.input_field_slider = function() {
         slider = inputManager.getInputByUUID(uuid);
     }
     val = slider.val;
+
+        // Determine row number for this field
+        allFields = inputManager.list();
+        console.log("Going to create the sliders...",'allFields',allFields,'uuid',uuid);
+        var fieldNr;
+        for(fieldNr = 0; fieldNr < allFields.length ; fieldNr++)
+        {
+            if(allFields[fieldNr].uuid == uuid) {
+                console.log('breaking on' +uuid,'field',fieldNr);
+              break;
+            }
+        }
+
+        if(fieldNr === 0) {
+            planeSvg.initSlider(0,uuid);
+            console.log('setting row1Text to ',sliderName+' '+uuid,'fieldNr',fieldNr);
+            planeSvg.setText('row1Text',sliderName);
+        }
+        if(fieldNr === 1) {
+            planeSvg.initSlider(1,uuid);
+            console.log('setting row2Text to ',sliderName+' '+uuid,'fieldNr',fieldNr);
+            planeSvg.setText('row2Text',sliderName);
+        }
 
     code = ""+val;
     return [code, Blockly.JavaScript.ORDER_NONE];
@@ -101,11 +120,13 @@ Blockly.Language.input_field_slider = {
     this.appendDummyInput()
     .appendTitle(uuidField, "uuid");
     // todo: setDisabled on block to make it immutable.
+    inputSequencenr = ' '+ (1 + inputManager.getNumFields());
+
     this.appendDummyInput()
         .appendTitle(new Blockly.FieldDropdown([["Horizontal slider", "horSlider"], ["Vertical slider", "vertSlider"], ["Depth slider", "depthSlider"], ["Hidden slider", "hiddenSlider"]]), "sliderType");
     this.appendDummyInput()
         .appendTitle("label")
-        .appendTitle(new Blockly.FieldTextInput("Input:"), "sliderName");
+        .appendTitle(new Blockly.FieldTextInput("Input"+inputSequencenr+":"), "sliderName");
     this.appendDummyInput()
         .appendTitle("min")
         .appendTitle(new Blockly.FieldTextInput("0"), "minVal");

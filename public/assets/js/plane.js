@@ -32,15 +32,17 @@ var SVG = document.getElementById('plane');
  * Redraw the rows when the slider has moved.
  * @param {number} value New slider position.
  */
-function sliderChange(value) {
+function sliderChange(value,uuid) {
   value = 1 - value;
   // var newRows = Math.round((1 - value) * 410 / 20);
-  var slider = parent.inputManager.getInput(0);
+  var slider = parent.inputManager.getInputByUUID(uuid);
   var sliderRange = parseFloat(slider.maxVal) - parseFloat(slider.minVal); // 15 -- 15 = 30
   var newRows = (Math.round(value * sliderRange / slider.stepIncrement) * slider.stepIncrement + parseFloat(slider.minVal));
   slider.setVal(newRows);
-  if(newRows != slider.lastVal)
+  if(newRows != slider.lastVal) {
+    console.log("Changed ",slider.sliderName,'from',slider.lastVal,'to',slider.val);
     parent.myUpdateFunction();
+  }
 }
 
 /**
@@ -62,15 +64,17 @@ var rowSlider;
 var rowSlider2;
 
 
-function initSlider(sliderNr) {
+function initSlider(sliderNr,uuid) {
   var h = sliderNr * 30 + 20;
+  console.log('init slider '+sliderNr+' with uuid '+uuid+' and height '+h);
   if((sliderNr === 0) && (typeof rowSlider === 'undefined')) {
-    rowSlider = new Slider(90, h, 425, SVG, sliderChange);
+    //                    (x, y, width, svgParent, opt_changeFunc,uuid)
+    rowSlider = new Slider(90, h, 425, SVG, sliderChange,uuid); 
     rowSlider.setValue(1.0);
   }
   if((sliderNr === 1) && (typeof rowSlider2 === 'undefined')) {
-    rowSlider2 = new Slider(90, h, 425, SVG, sliderChange);
-    rowSlider2.setValue(0.1);
+    rowSlider2 = new Slider(90, h, 425, SVG, sliderChange,uuid);
+    rowSlider2.setValue(1.0);
   }
 }
 
