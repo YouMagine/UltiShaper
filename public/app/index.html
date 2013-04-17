@@ -23,7 +23,9 @@ re = /l=([^&]*)/g;
 var urlLang = '';
 try
 {
-  urlLang = re.exec(location.search.slice(1))[1];
+  if(location.search)
+    urlLang = re.exec(location.search.slice(1))[1];
+  else urlLang = 'EN_EN';
   if(urlLang=='NL_NL'){ LANG = LANG_NL_NL;}
   if(urlLang=='EN_EN'){ LANG = LANG_EN_EN;}
   if(urlLang=='DE_DE'){ LANG = LANG_DE_DE;}
