@@ -145,6 +145,20 @@ var numUpdates = 0;
 function myUpdateFunction() {
   // console.log('myUpdateFunction() ran '+(numUpdates++)+' times');
   var xml = getXML();
+  if(typeof inputManager === 'object') {
+    inputs = inputManager.list();
+        for(var i=0;inputs.length > i;i++){
+            if(xml.indexOf(this.inputs[i].uuid) === -1) {
+                console.log(inputManager.list());
+                console.log('Was : ',this.inputs[i], 'removed?');
+                $("#input"+this.inputs[i].uuid,planeSvg.document).remove();
+                planeSvg.setText('row1Text','');
+                planeSvg.setText('row2Text','');
+                inputs.splice(i,1);
+                console.log(inputManager.list());
+            }
+        }    
+  }
 
   if(typeof hist !='undefined') hist.addEntry(xml);
 

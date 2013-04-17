@@ -53,6 +53,7 @@ function InputManager() {
     this.list = function () {
         return(this.myInputs);
     };
+    this.clear = function() { this.myInputs = []; };
 }
 
 var inputManager = new InputManager();
@@ -78,6 +79,7 @@ Blockly.JavaScript.input_field_slider = function() {
     } else {
         // uuid was found. Slider was created before. Use that one.
         slider = inputManager.getInputByUUID(uuid);
+        slider.update({sliderType:sliderType,sliderName:sliderName,minVal:minVal,maxVal:maxVal,stepIncrement:stepIncrement});
     }
     val = slider.val;
 

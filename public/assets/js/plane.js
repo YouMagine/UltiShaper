@@ -36,6 +36,7 @@ function sliderChange(value,uuid) {
   value = 1 - value;
   // var newRows = Math.round((1 - value) * 410 / 20);
   var slider = parent.inputManager.getInputByUUID(uuid);
+  if (slider === null) { console.log('uuid',uuid,'doesn\'t exist (anymore).');return; }
   var sliderRange = parseFloat(slider.maxVal) - parseFloat(slider.minVal); // 15 -- 15 = 30
   var newRows = (Math.round(value * sliderRange / slider.stepIncrement) * slider.stepIncrement + parseFloat(slider.minVal));
   slider.setVal(newRows);
@@ -67,12 +68,15 @@ var rowSlider2;
 function initSlider(sliderNr,uuid) {
   var h = sliderNr * 30 + 20;
   console.log('init slider '+sliderNr+' with uuid '+uuid+' and height '+h);
-  if((sliderNr === 0) && (typeof rowSlider === 'undefined')) {
+    var sliderGone = false;
+    if(!document.getElementById('input'+uuid))
+      sliderGone = true;
+  if((sliderNr === 0) && (sliderGone)) {
     //                    (x, y, width, svgParent, opt_changeFunc,uuid)
     rowSlider = new Slider(90, h, 425, SVG, sliderChange,uuid); 
     rowSlider.setValue(1.0);
   }
-  if((sliderNr === 1) && (typeof rowSlider2 === 'undefined')) {
+  if((sliderNr === 1) && (sliderGone)) {
     rowSlider2 = new Slider(90, h, 425, SVG, sliderChange,uuid);
     rowSlider2.setValue(1.0);
   }

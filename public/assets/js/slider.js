@@ -48,18 +48,21 @@ var Slider = function(x, y, width, svgParent, opt_changeFunc,uuid) {
       transform="translate(67, 23)"
       d="m 8,0 l -8,8 v 12 h 16 v -12 z" />
   */
+  var group = document.createElementNS(Slider.SVG_NS_, 'g');
+  group.setAttribute('id', 'input'+uuid);
   var track = document.createElementNS(Slider.SVG_NS_, 'line');
   track.setAttribute('class', 'sliderTrack');
   track.setAttribute('x1', x);
   track.setAttribute('y1', y);
   track.setAttribute('x2', x + width);
   track.setAttribute('y2', y);
-  svgParent.appendChild(track);
+  group.appendChild(track);
   this.track_ = track;
   var knob = document.createElementNS(Slider.SVG_NS_, 'path');
   knob.setAttribute('class', 'sliderKnob');
   knob.setAttribute('d', 'm 0,0 l -8,8 v 12 h 16 v -12 z');
-  svgParent.appendChild(knob);
+  group.appendChild(knob);
+  svgParent.appendChild(group);
   this.knob_ = knob;
   this.setValue(0.5);
 
