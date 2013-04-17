@@ -9,15 +9,7 @@ LANG = LANG_EN_EN;
 
 var cursor_rot=[0,0,0];
 var cursor_trans=[0,0,0];
-var myVarNames = [];
-var myVarValues = [];
-var colors = {selected:[0.6,0.5,0.2]};
-// var myVarValues = [];
 var colors = {selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255]};
-
-var inputFields = [];
-var inputFieldValues = [];
-
 
 re = /l=([^&]*)/g;
 var urlLang = '';
@@ -41,8 +33,9 @@ if(typeof urlLang !='string' || urlLang == '')
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="assets/js/utils.js"></script><!-- Various utilities -->
   <script type="text/javascript" src="assets/js/history.js"></script><!-- Undo/Redo -->
-  <script type="text/javascript" src="assets/js/cli.js"></script><!-- Undo/Redo -->
+  <script type="text/javascript" src="assets/js/cli.js"></script><!-- Command line interface -->
   <script type="text/javascript" src="lib/blockly/language/en/_messages.js"></script>
   <script type="text/javascript" src="lib/blockly/language/common/math.js"></script>
 <!--  <script type="text/javascript" src="lib/blockly/language/common/logic.js"></script>-->

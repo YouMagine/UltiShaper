@@ -1,4 +1,5 @@
 function MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement) {
+    this.uuid = uuid();
     this.sliderType = sliderType;
     this.sliderName = sliderName;
     this.val = val;
@@ -15,15 +16,51 @@ function MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement) {
         return this;
     };
     this.setVal = function (val) {
+        this.lastVal = this.val; // remember last value
         this.val = Math.max(Math.min(val,this.maxVal),this.minVal);
         return this;
+    };
+    this.setUUID = function (val) {
+        this.uuid = val;
     };
     this.toString = function () {
         return 'Slider with name '+this.sliderName+' and value '+this.val;
     };
 }
 
+function InputManager() {
+    this.mySliderInputs = [];
+
+    this.addSlider = function (sliderInput) {
+        this.mySliderInputs.push(sliderInput);
+        return sliderInput.uuid;
+        // return a 'uuid'
+    };
+    this.getInputByUUID = function (uuidQuery) {
+        for(var i=0;this.mySliderInputs.length > i;i++){
+            if(this.mySliderInputs[i].uuid == uuidQuery) {
+                // console.log('Found: ',this.mySliderInputs[i]);
+                return this.mySliderInputs[i];
+            }
+        }
+        // console.log('Input with UUID '+uuidQuery+' was not found.');
+        return null;
+    };
+    this.getInput = function (nr) {
+        if(this.mySliderInputs.length >= nr)
+            return this.mySliderInputs[nr]; // temporary method, searches just in sliders....
+        return false;
+    };
+    this.list = function () {
+        console.log(this.mySliderInputs);
+    };
+}
+
+var inputManager = new InputManager();
+
+
 Blockly.JavaScript.input_field_slider = function() {
+    var uuid = this.getTitleValue('uuid');
     var sliderType = this.getTitleValue('sliderType') || "Unspecified";
     var sliderName = this.getTitleValue('sliderName') || "Value:";
     var minVal = this.getTitleValue('minVal') || -42;
@@ -31,33 +68,39 @@ Blockly.JavaScript.input_field_slider = function() {
     var stepIncrement = this.getTitleValue('stepIncrement') || 1;
     var code = '';
     var val = 42;
-    // inputFields = $(".inputFields");
     setTimeout(function(){$('#inputPane').show();},200);
 
     planeSvg.initSlider(0);
-    //planeSvg.setText('row1stText', 'Rows: ' + rows1st);
     planeSvg.setText('row1Text',sliderName);
-    planeSvg.setText('row2Text',sliderName);
-    if(typeof inputFieldValues[0] !== null)
-    {
-        val = inputFieldValues[0];
+    // planeSvg.setText('row2Text',sliderName);
+    // create a new slider:
+    var slider = new MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement);
+    slider.setUUID(uuid);
+    if(inputManager.getInputByUUID(uuid) === null) {
+        // console.log('uuid not found... adding the slider to inputs.');
+        inputManager.addSlider(slider);
+    } else {
+        // uuid was found. Slider was created before. Use that one.
+        slider = inputManager.getInputByUUID(uuid);
     }
-    // if(inputFields[0]
-    if(typeof mySliderInputs[0] != 'object')
-        mySliderInputs[0] = new MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement);
-    else {
-        mySliderInputs[0].update({sliderName:sliderName,minVal:minVal,maxVal: maxVal,stepIncrement:stepIncrement});
-        val = mySliderInputs[0].val;
-    }
-    console.log(mySliderInputs[0]);
+    val = slider.val;
+
     code = ""+val;
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
+var rootEl;
+
 Blockly.Language.input_field_slider = {
   category: ucfirst(getLang('inputField')),
   helpUrl: 'http://www.example.com/',
   init: function() {
     this.setColour(61);
+    var uuidField = new Blockly.HiddenField(uuid());
+    // uuidField.setVisible(false);
+    // rootEl = uuidField.getRootElement();
+    this.appendDummyInput()
+    .appendTitle(uuidField, "uuid");
+    // todo: setDisabled on block to make it immutable.
     this.appendDummyInput()
         .appendTitle(new Blockly.FieldDropdown([["Horizontal slider", "horSlider"], ["Vertical slider", "vertSlider"], ["Depth slider", "depthSlider"], ["Hidden slider", "hiddenSlider"]]), "sliderType");
     this.appendDummyInput()
