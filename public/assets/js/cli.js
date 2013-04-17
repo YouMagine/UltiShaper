@@ -45,7 +45,6 @@ function initCli() {
   $('#quickSearchDiv input').blur( function () {
 
     setTimeout(function(){$('#qsResults').html(' ');$('#qsResults').hide();},300);
-    
   });
 }
 

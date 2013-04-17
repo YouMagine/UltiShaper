@@ -74,16 +74,13 @@ var storageApiEndpoint = '/shapes/';
 var autoSave = false;
 var autoSaveInitial = true;
 var autoSaveInterval = 2000;
-var app;
+var app2;
 var prevXML = '';
 
 /**
  * Initialize Blockly
  */
 function init() {
-
-  // get translations from the DB
-
   if(typeof initCli == 'function')
     initCli();
   else console.log("couldn't load CLI.");
@@ -96,7 +93,7 @@ function init() {
   if(urlLang != '') $("#langDropdown").val(urlLang);
 
   $("#blockly").draggable({ handle: "h5" });
-  $("#blockly").css({ top: $(window).height() - $("#blockly").height() });
+  // $("#blockly").css({ top: $(window).height() - $("#blockly").height() });
   $("#blockly h5").css({ cursor: "hand" });
   $('#qsResults').css({left: $('#quickSearchDiv').position().left,'min-width': $('#quickSearchDiv').width()}
     );
@@ -114,9 +111,7 @@ function init() {
   // Blockly.Language = newLanguage;
 
   
-  Blockly.inject(document.getElementById('svgDiv'),{
-    path: '../../'
-  });
+  Blockly.inject(document.getElementById('svgDiv'),{ path: '../../' });
 
   Blockly.addChangeListener(myUpdateFunction);
   Blockly.bindEvent_(Blockly.mainWorkspace.getCanvas(),
@@ -124,8 +119,10 @@ function init() {
   // window.onbeforeunload = function() {
    // return 'Leaving this page will result in the loss of your work.';
   // };
+
   window.setTimeout(function(){
   $('#inputPane').hide();
+    createBlockAtCursor('<xml><block type="shape_sphere" inline="true" x="2" y="-4"><value name="radius"><block type="input_field_slider"><title name="sliderType">horSlider</title><title name="sliderName">Input:</title><title name="minVal">3</title><title name="maxVal">40</title><title name="stepIncrement">1</title></block></value></block></xml>');
 
     myUpdateFunction();
     $('div.ui-dialog a.ui-dialog-titlebar-close').click();// close all other windows.
@@ -160,18 +157,12 @@ function myUpdateFunction() {
   if(typeof codeLanguage != 'string') 
     codeLanguage = 'coffeescad0.1';
 
-    // if(!codeLanguage) 
-    // codeLanguage = 'scad';
     var code;
     if(codeLanguage == 'coffeescad0.1') {
       var variables = Blockly.Variables.allVariables();
-      console.log(variables);
-      // for (var x = 0; x < variables.length; x++) {
-      // console.log(Blockly.JavaScript.variableDB_.getName(variables[x],
-          // Blockly.Variables.NAME_TYPE));
-      // }
+
       code = Blockly.Generator.workspaceToCode('JavaScript');
-      //Blockly.JavaScript.definitions_['variables'] = defvars.join('\n');
+
       joinShapesList = code.split(';');
       var pre =''; var post='';
       while(joinShapesList.length > 2) {
@@ -195,10 +186,9 @@ function myUpdateFunction() {
       code = Blockly.Generator.workspaceToCode('JavaScript');
       code = "$fs=0.4;\n$fa=5;\n"+code;
     }
-
     document.getElementById('codearea').value = code;
-    if(app && app.loadCode)
-      app.loadCode(code);
+    if(app2 && app2.loadCode)
+      app2.loadCode(code);
 }
 
 function doAutoSave() {
@@ -265,17 +255,19 @@ function loadMatches(type) {
   //first load shapes
   jQuery.get('/'+type+'/all.json', { },
     function(data){
-      console.log('loadShapes('+type+'):',data);
+        var shapeArr = [];
         try {
           // defines = data.global_defines;
           for(defName in data) {
-            console.log('loadShapes('+type+'):',data[defName]);
+            // console.log('loadShapes('+type+'):',data[defName]);
             matchPhrases[data[defName].name] = data[defName];
+            shapeArr.push(data[defName].name);
           }
         } catch (e) {
           alert("Error loading "+type+" data.");
           return;
         }
+      console.log('loadShapes('+type+'): '+shapeArr.join(', ')+':',data);
       // window.setTimeout('autoSave = '+tmpAutosave+';',1000);
     }, "json");
 }
@@ -414,8 +406,16 @@ function var_to_number(varStr){
 $(window).resize(function() {
   $('#blockly').css('top',$(window).height()-115);
   $('#blockly').css('height',360);
-  $('#blockly').css('left',$(window).width()/2-200);
+  $('#blockly').css('right',$(window).width());
+  // $('#blockly').css('width',$(window).width()-20);
+  // $('#blockly.modal').css('width','');
+  // $('#blockly').css('left',$(window).width()/2-100);
+  $('#blockly').css('width',$(window).width()-20);
+  // $('#blockly').css('width',$(window).width()-40);
   $('#qsResults').css('left',$('#quickSearchDiv').position().left);
+  if (navigator.userAgent.indexOf("Firefox")!=-1) 
+    // $('#blockly').css('top',$(window).height()-$('#blockly').height()/2+500);
+    $('#blockly').css('top',$(document).height()-$('#blockly').height()/2+60);
 });
 
   </script>
@@ -424,13 +424,18 @@ $(window).resize(function() {
       background-color: white;
       font-family: sans-serif;
     }
+    #blockly {top:750px;width: 500px;height:300px;
+      left: 287px;
+
+      position: absolute;}
+    #blockly.modal {}
     h1 {
       font-weight: normal;
       font-size: 140%;
     }
     #svgDiv {
       height: 280px;
-      width: 100%;
+      width: 95%;
       border: 1px solid #ccc;
     }
     .hide {
@@ -470,7 +475,6 @@ $(window).resize(function() {
 .flag.flag-nl {background-position: -16px -22px}
 .flag.flag-no {background-position: -32px -22px}
 .flag.flag-pt {background-position: -48px -22px}
-#blockly {top:750px;width: 100%;height:300px;}
   </style>
 </head>
 <body onload="init()">
