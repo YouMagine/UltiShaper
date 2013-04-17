@@ -11,18 +11,6 @@
    viewBox="0 0 600 90">
   <defs>
     <style type="text/css"><![CDATA[
-      #fuselage {
-        fill: #fff;
-        stroke: #000;
-      }
-      #wing, #tail {
-        fill: #ddd;
-        stroke: #444;
-      }
-      .crew {
-        fill: #f44;
-        stroke: #000;
-      }
       .seat1st {
         fill: #88f;
         stroke: #000;
@@ -100,15 +88,6 @@
       <stop offset="100%" style="stop-color:#fff;stop-opacity:1" />
     </linearGradient>
   </defs>
-<!--  <path
-      d="M 404,1 373,15 230,244 230,297 373,524 404,542 330,351 330,189 z"
-      id="wing" />
-  <path
-      d="m 577,269 22,-93 -27,6 -44,88 44,88 27,6 z"
-      id="tail" />
-   <path
-      d="m 483,296 h -407 c -38,0 -75,-13 -75,-26 c 0,-13 38,-26 75,-26 h 407 l 94,24 z"
-      id="fuselage" /> -->
   <rect
      width="610"
      height="100"
@@ -121,18 +100,9 @@
      x="-5"
      y="298"
      fill="url(#grad2)" />
-  <text id="row1stText" x="55" y="380"></text>
-  <text id="row2ndText" x="350" y="380"></text>
-  <text id="seatText" x="55" y="210"></text>
-  <rect
-      id="crew_right" class="crew"
-      width="10" height="10"
-      x="35" y="256" />
-  <rect
-      id="crew_left" class="crew"
-      width="10" height="10"
-      x="35" y="274" />
-
+  <text id="row1Text" x="5" y="24"></text>
+  <text id="row2Text" x="5" y="54"></text>
+  <text id="seatText" x="55" y="24"></text>
   <script type="text/ecmascript" xlink:href="js/slider.js"/>
   <script type="text/ecmascript" xlink:href="js/plane.js"/>
 </svg>
