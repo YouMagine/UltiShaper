@@ -41,7 +41,7 @@ Blockly.JavaScript.shape_sphere = function() {
   if(codeLanguage == 'vol0.1')
     return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX="'+value_radius+'" radiusY="'+value_radius+'" radiusZ="'+value_radius+'"></uformia.base.Sphere.20110605>';
   if(codeLanguage == 'coffeescad0.1') {
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     return 'new Sphere({d:'+value_radius+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';\n';
   }
   else
@@ -79,7 +79,7 @@ Blockly.JavaScript.shape_cube = function() {
   if(codeLanguage == 'vol0.1')
     return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX<uformia.base.Box.20110605 Name="43a (1)" centerX="0" centerY="0" centerZ="0" dimensionX="'+value_width+'" dimensionY="'+value_depth+'" dimensionZ="'+value_height+'"></uformia.base.Box.20110605>';
   if(codeLanguage == 'coffeescad0.1') {
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     if(center_object) centerStr=',center:[0,0,0]';
     return 'new Cube({size:['+value_width+','+value_depth+','+value_height+']'+centerStr+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';\n';
   }
@@ -138,7 +138,7 @@ Blockly.JavaScript.shape_cylinder = function() {
   if(codeLanguage == 'vol0.1')
     return '';
   if(codeLanguage == 'coffeescad0.1') {
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     // if(center_object) centerStr=',center:[0,0,0]';
     return 'new Cylinder({d:'+value_diameter1+',h:'+value_height+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';';
   } else return code;  // scad
@@ -190,7 +190,7 @@ Blockly.JavaScript.shape_cone = function() {
   // todo: change order_none to the correct strength.
   if(codeLanguage == 'coffeescad0.1') {
     if(center_object) centerStr=',center:[0,0,0]';
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     return 'new Cylinder({d2:'+value_diameter1+',d1:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+selectedStr+';';
   }
   if(codeLanguage == 'vol0.1')
@@ -250,7 +250,7 @@ Blockly.JavaScript.assembly_part = function() {
     return ''; // put blend bools here
   if(codeLanguage == 'coffeescad0.1') {
     code = '';
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     var coffeescadOperation = '';
     switch(booleanType){
       case 'union':

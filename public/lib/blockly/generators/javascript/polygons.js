@@ -185,7 +185,7 @@ Blockly.JavaScript.polygons_extrude = function() {
   var extrudeY = var_to_number(Blockly.JavaScript.valueToCode(this, 'extrudeY', Blockly.JavaScript.ORDER_NONE)) || 0;
   var extrudeZ = var_to_number(Blockly.JavaScript.valueToCode(this, 'extrudeZ', Blockly.JavaScript.ORDER_NONE)) || 10;
   var code = '';
-  var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '';
+  var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
   code = polyline+'.extrude({offset:['+extrudeX+','+extrudeY+','+extrudeZ+']})'+selectedStr+';';
   if(codeLanguage == 'vol0.1')
     return '';
