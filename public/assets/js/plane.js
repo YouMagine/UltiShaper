@@ -23,8 +23,6 @@
  */
 'use strict';
 
-var rows1st = 0;
-var rows2nd = 0;
 var SVG = document.getElementById('plane');
 
 // TODO: only do updatefunction if the slider output value actually changed.
@@ -53,19 +51,13 @@ function initSlider(sliderNr,uuid,sliderLabel) {
   var sliderObj;
   console.log('init sliderObj '+sliderNr+' with uuid '+uuid+' and height '+h);
   var sliderObjGone = false;
-  if(!document.getElementById('input'+uuid))
-      sliderObjGone = true;
-  if((sliderNr === 0) && (sliderObjGone)) {
+  if(!document.getElementById('input'+uuid)) {
     //                    (x, y, width, svgParent, opt_changeFunc,uuid)
     sliderObj = new Slider(90, h, 425, SVG, sliderChange,uuid); 
     sliderObj.setValue(1.0);
     sliderObj.setLabel(sliderLabel,h+2);
   }
-  if((sliderNr === 1) && (sliderObjGone)) {
-    sliderObj = new Slider(90, h, 425, SVG, sliderChange,uuid);
-    sliderObj.setValue(1.0);
-    sliderObj.setLabel(sliderLabel,h+2);
-  }
+
   return sliderObj;
 }
 

@@ -67,7 +67,7 @@ Blockly.JavaScript.input_field_slider = function() {
     var maxVal = this.getTitleValue('maxVal') || 42;
     var stepIncrement = this.getTitleValue('stepIncrement') || 1;
     var code = '';
-    var val = 42;//
+    var val = 20;//
     setTimeout(function(){$('#inputPane').show();},200);
 
     // create a new slider:
@@ -100,6 +100,7 @@ Blockly.JavaScript.input_field_slider = function() {
         console.log('initSlider returned ',sliderObj);
     }
     slider.sliderObj.setLabel(sliderLabel);
+    slider.sliderObj.setValueText(val);
 
     code = ""+val;
     return [code, Blockly.JavaScript.ORDER_NONE];
@@ -129,7 +130,7 @@ Blockly.Language.input_field_slider = {
         .appendTitle(new Blockly.FieldTextInput("0"), "minVal");
     this.appendDummyInput()
         .appendTitle("max")
-        .appendTitle(new Blockly.FieldTextInput("21"), "maxVal");
+        .appendTitle(new Blockly.FieldTextInput("20"), "maxVal");
     this.appendDummyInput()
         .appendTitle("step size")
         .appendTitle(new Blockly.FieldTextInput("1"), "stepIncrement");
