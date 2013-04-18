@@ -40,6 +40,7 @@ function sliderChange(value,uuid) {
   var sliderRange = parseFloat(slider.maxVal) - parseFloat(slider.minVal); // 15 -- 15 = 30
   var newRows = (Math.round(value * sliderRange / slider.stepIncrement) * slider.stepIncrement + parseFloat(slider.minVal));
   slider.setVal(newRows);
+  slider.sliderObj.setValueText(newRows);
   if(newRows != slider.lastVal) {
     console.log("Changed ",slider.sliderName,'from',slider.lastVal,'to',slider.val);
     parent.myUpdateFunction();
@@ -53,23 +54,23 @@ function sliderChange(value,uuid) {
 
 function initSlider(sliderNr,uuid,sliderLabel) {
   var h = sliderNr * 30 + 20;
-  var slider;
-  console.log('init slider '+sliderNr+' with uuid '+uuid+' and height '+h);
-  var sliderGone = false;
+  var sliderObj;
+  console.log('init sliderObj '+sliderNr+' with uuid '+uuid+' and height '+h);
+  var sliderObjGone = false;
   if(!document.getElementById('input'+uuid))
-      sliderGone = true;
-  if((sliderNr === 0) && (sliderGone)) {
+      sliderObjGone = true;
+  if((sliderNr === 0) && (sliderObjGone)) {
     //                    (x, y, width, svgParent, opt_changeFunc,uuid)
-    slider = new Slider(90, h, 425, SVG, sliderChange,uuid); 
-    slider.setValue(1.0);
-    slider.setLabel(sliderLabel,h+2);
+    sliderObj = new Slider(90, h, 425, SVG, sliderChange,uuid); 
+    sliderObj.setValue(1.0);
+    sliderObj.setLabel(sliderLabel,h+2);
   }
-  if((sliderNr === 1) && (sliderGone)) {
-    slider = new Slider(90, h, 425, SVG, sliderChange,uuid);
-    slider.setValue(1.0);
-    slider.setLabel(sliderLabel,h+2);
+  if((sliderNr === 1) && (sliderObjGone)) {
+    sliderObj = new Slider(90, h, 425, SVG, sliderChange,uuid);
+    sliderObj.setValue(1.0);
+    sliderObj.setLabel(sliderLabel,h+2);
   }
-  return slider;
+  return sliderObj;
 }
 
 if (parent.planeLoaded) {

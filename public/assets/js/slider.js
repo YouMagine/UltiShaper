@@ -51,12 +51,14 @@ var Slider = function(x, y, width, svgParent, opt_changeFunc,uuid) {
   var group = document.createElementNS(Slider.SVG_NS_, 'g');
   group.setAttribute('id', 'input'+uuid);
 
-  this.text_ = document.createElementNS(Slider.SVG_NS_, 'text');
-  this.text_.setAttribute('class','titleText');
-  this.text_.setAttribute('transform','translate(5,24)');
-  this.text_.textContent = ('initialtext');
-  group.appendChild(this.text_);
-  //  <text id="row1Text" x="5" y="24"></text>
+  this.label_ = document.createElementNS(Slider.SVG_NS_, 'text');
+  this.label_.setAttribute('class','titleText');
+  group.appendChild(this.label_);
+
+  this.valueText_ = document.createElementNS(Slider.SVG_NS_, 'text');
+  this.valueText_.setAttribute('class','valueText');
+  this.valueText_.setAttribute('transform','translate(250,24)');
+  group.appendChild(this.valueText_);
 
   var track = document.createElementNS(Slider.SVG_NS_, 'line');
   track.setAttribute('class', 'sliderTrack');
@@ -99,9 +101,16 @@ Slider.startKnobX_ = 0;
 
 Slider.prototype.setLabel = function(s,h) {
   if(h) {
-    this.text_.setAttribute('transform','translate(5,'+Number(h)+')');
+    this.label_.setAttribute('transform','translate(5,'+Number(h)+')');
   }
-  this.text_.textContent = s;
+  this.label_.textContent = s;
+};
+
+Slider.prototype.setValueText = function(s,h) {
+  if(typeof this.knobX_ === 'undefined') 
+    this.knobX_ = this.KNOB_MIN_X_;
+  this.valueText_.setAttribute('transform','translate('+this.knobX_+','+(this.KNOB_Y_+31)+')');
+  this.valueText_.textContent = s;
 };
 
 /**
@@ -168,7 +177,9 @@ Slider.knobMouseMove_ = function(e) {
   x = Math.min(Math.max(x, thisSlider.KNOB_MIN_X_), thisSlider.KNOB_MAX_X_);
   thisSlider.knob_.setAttribute('transform',
       'translate(' + x + ',' + thisSlider.KNOB_Y_ + ')');
-
+  thisSlider.knobX_ = x;
+  // this.valueText_.setAttribute('transform','translate('+thisSlider.knobX_+','+(thisSlider.KNOB_Y_+18)+')');
+ 
   thisSlider.value_ = 1 - (x - thisSlider.KNOB_MIN_X_) /
       (thisSlider.KNOB_MAX_X_ - thisSlider.KNOB_MIN_X_);
   thisSlider.changeFunc_ && thisSlider.changeFunc_(thisSlider.value_,thisSlider.uuid_);
@@ -192,6 +203,8 @@ Slider.prototype.setValue = function(value) {
       (this.KNOB_MAX_X_ - this.KNOB_MIN_X_) * this.value_;
   this.knob_.setAttribute('transform',
       'translate(' + x + ',' + this.KNOB_Y_ + ')');
+
+  this.knobX_ = x;
 };
 
 /**

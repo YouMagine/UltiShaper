@@ -38,6 +38,11 @@
         font-size: 11pt;
         fill: #444;
       }
+      .valueText { 
+      font-size: 9pt; 
+      text-anchor: middle;
+      font-weight: bold;
+      }
     ]]></style>
     <g id="row1st">
       <rect
