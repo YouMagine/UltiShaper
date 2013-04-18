@@ -178,3 +178,20 @@ Blockly.Language.input_field_text = {
     this.setTooltip('');
   }
 };
+
+/// REQUIRED????
+Blockly.JavaScript = Blockly.Generator.get('JavaScript');
+
+/**
+ * The SVG's window.
+ * @type Window
+ */
+var planeSvg = null;
+
+/**
+ * Callback when the plane's SVG image has loaded.
+ * @param {!Window} w The image's window.
+ */
+function planeLoaded(w) {
+  planeSvg = w;
+}
