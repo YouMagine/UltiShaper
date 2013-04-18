@@ -47,10 +47,6 @@ function sliderChange(value,uuid) {
   }
 }
 
-// Initialize the slider.
-// var rowSlider;
-// var rowSlider2;
-
 
 function initSlider(sliderNr,uuid,sliderLabel) {
   var h = sliderNr * 30 + 20;

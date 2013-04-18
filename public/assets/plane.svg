@@ -44,46 +44,7 @@
       font-weight: bold;
       }
     ]]></style>
-    <g id="row1st">
-      <rect
-         class="seat1st"
-         width="10" height="10"
-         x="75" y="245" />
-      <rect
-         class="seat1st"
-         width="10" height="10"
-         x="75" y="256" />
-      <rect
-         class="seat1st"
-         width="10" height="10"
-         x="75" y="274" />
-      <rect
-         class="seat1st"
-         width="10" height="10"
-         x="75" y="285" />
-    </g>
-    <g id="row2nd">
-      <rect
-         class="seat2nd"
-         width="10" height="8"
-         x="75" y="245" />
-      <rect
-         class="seat2nd"
-         width="10" height="8"
-         x="75" y="253" />
-      <rect
-         class="seat2nd"
-         width="10" height="8"
-         x="75" y="271" />
-      <rect
-         class="seat2nd"
-         width="10" height="8"
-         x="75" y="279" />
-      <rect
-         class="seat2nd"
-         width="10" height="8"
-         x="75" y="287" />
-    </g>
+
     <linearGradient id="grad1" x1="0%" y1="100%" x2="0%" y2="0%">
       <stop offset="0%" style="stop-color:#fff;stop-opacity:0" />
       <stop offset="100%" style="stop-color:#fff;stop-opacity:1" />
@@ -105,9 +66,6 @@
      x="-5"
      y="298"
      fill="url(#grad2)" />
-  <text id="row1Text" x="5" y="24"></text>
-  <text id="row2Text" x="5" y="54"></text>
-  <text id="seatText" x="55" y="24"></text>
   <script type="text/ecmascript" xlink:href="js/slider.js"/>
   <script type="text/ecmascript" xlink:href="js/plane.js"/>
 </svg>
