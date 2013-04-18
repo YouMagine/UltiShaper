@@ -152,8 +152,6 @@ function myUpdateFunction() {
                 console.log(inputManager.list());
                 console.log('Was : ',this.inputs[i], 'removed?');
                 $("#input"+this.inputs[i].uuid,planeSvg.document).remove();
-                planeSvg.setText('row1Text','');
-                planeSvg.setText('row2Text','');
                 inputs.splice(i,1);
                 console.log(inputManager.list());
             }
@@ -398,7 +396,6 @@ function blockIsShape (o) {
 }
 
 function clearWorkspace() {
-
   // Blockly.mainWorkspace.getTopBlocks(false)[0].dispose();
   // FIXME: shouldn't have to clear twice.
   var n=0;

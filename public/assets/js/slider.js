@@ -50,6 +50,14 @@ var Slider = function(x, y, width, svgParent, opt_changeFunc,uuid) {
   */
   var group = document.createElementNS(Slider.SVG_NS_, 'g');
   group.setAttribute('id', 'input'+uuid);
+
+  this.text_ = document.createElementNS(Slider.SVG_NS_, 'text');
+  this.text_.setAttribute('class','titleText');
+  this.text_.setAttribute('transform','translate(5,24)');
+  this.text_.textContent = ('initialtext');
+  group.appendChild(this.text_);
+  //  <text id="row1Text" x="5" y="24"></text>
+
   var track = document.createElementNS(Slider.SVG_NS_, 'line');
   track.setAttribute('class', 'sliderTrack');
   track.setAttribute('x1', x);
@@ -64,6 +72,7 @@ var Slider = function(x, y, width, svgParent, opt_changeFunc,uuid) {
   group.appendChild(knob);
   svgParent.appendChild(group);
   this.knob_ = knob;
+  this.group_ = group;
   this.setValue(0.5);
 
   // Find the root SVG object.
@@ -87,6 +96,13 @@ Slider.SVG_NS_ = 'http://www.w3.org/2000/svg';
 Slider.activeSlider_ = null;
 Slider.startMouseX_ = 0;
 Slider.startKnobX_ = 0;
+
+Slider.prototype.setLabel = function(s,h) {
+  if(h) {
+    this.text_.setAttribute('transform','translate(5,'+Number(h)+')');
+  }
+  this.text_.textContent = s;
+};
 
 /**
  * Start a drag when clicking down on the knob.

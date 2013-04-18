@@ -46,40 +46,30 @@ function sliderChange(value,uuid) {
   }
 }
 
-/**
- * Change the text of a label.
- * @param {string} id ID of element to change.
- * @param {string} text New text.
- */
-function setText(id, text) {
-  var el = document.getElementById(id);
-  while (el.firstChild) {
-    el.removeChild(el.firstChild);
-  }
-  el.appendChild(document.createTextNode(text));
-  //attr: style font-weight: bold;
-}
-
 // Initialize the slider.
-var rowSlider;
-var rowSlider2;
+// var rowSlider;
+// var rowSlider2;
 
 
-function initSlider(sliderNr,uuid) {
+function initSlider(sliderNr,uuid,sliderLabel) {
   var h = sliderNr * 30 + 20;
+  var slider;
   console.log('init slider '+sliderNr+' with uuid '+uuid+' and height '+h);
-    var sliderGone = false;
-    if(!document.getElementById('input'+uuid))
+  var sliderGone = false;
+  if(!document.getElementById('input'+uuid))
       sliderGone = true;
   if((sliderNr === 0) && (sliderGone)) {
     //                    (x, y, width, svgParent, opt_changeFunc,uuid)
-    rowSlider = new Slider(90, h, 425, SVG, sliderChange,uuid); 
-    rowSlider.setValue(1.0);
+    slider = new Slider(90, h, 425, SVG, sliderChange,uuid); 
+    slider.setValue(1.0);
+    slider.setLabel(sliderLabel,h+2);
   }
   if((sliderNr === 1) && (sliderGone)) {
-    rowSlider2 = new Slider(90, h, 425, SVG, sliderChange,uuid);
-    rowSlider2.setValue(1.0);
+    slider = new Slider(90, h, 425, SVG, sliderChange,uuid);
+    slider.setValue(1.0);
+    slider.setLabel(sliderLabel,h+2);
   }
+  return slider;
 }
 
 if (parent.planeLoaded) {

@@ -83,28 +83,23 @@ Blockly.JavaScript.input_field_slider = function() {
     }
     val = slider.val;
 
-        // Determine row number for this field
-        allFields = inputManager.list();
-        console.log("Going to create the sliders...",'allFields',allFields,'uuid',uuid);
-        var fieldNr;
-        for(fieldNr = 0; fieldNr < allFields.length ; fieldNr++)
-        {
-            if(allFields[fieldNr].uuid == uuid) {
-                console.log('breaking on' +uuid,'field',fieldNr);
-              break;
-            }
+    // Determine row number for this field
+    allFields = inputManager.list();
+    console.log("Going to create the sliders...",'allFields',allFields,'uuid',uuid);
+    var fieldNr;
+    for(fieldNr = 0; fieldNr < allFields.length ; fieldNr++)
+    {
+        if(allFields[fieldNr].uuid == uuid) {
+            console.log('breaking on' +uuid,'field',fieldNr);
+          break;
         }
-
-        if(fieldNr === 0) {
-            planeSvg.initSlider(0,uuid);
-            console.log('setting row1Text to ',sliderName+' '+uuid,'fieldNr',fieldNr);
-            planeSvg.setText('row1Text',sliderName);
-        }
-        if(fieldNr === 1) {
-            planeSvg.initSlider(1,uuid);
-            console.log('setting row2Text to ',sliderName+' '+uuid,'fieldNr',fieldNr);
-            planeSvg.setText('row2Text',sliderName);
-        }
+    }
+    var sliderObj = planeSvg.initSlider(fieldNr,uuid,sliderLabel);
+    if(sliderObj) {
+        slider.sliderObj = sliderObj;
+        console.log('initSlider returned ',sliderObj);
+    }
+    slider.sliderObj.setLabel(sliderLabel);
 
     code = ""+val;
     return [code, Blockly.JavaScript.ORDER_NONE];
