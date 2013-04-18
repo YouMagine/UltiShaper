@@ -30,6 +30,75 @@ check http://www.k-3d.org/wiki/User_Documentation
 AST van openscad gebruiken
 */
 
+Blockly.JavaScript.assembly_part = function() {
+  var name = this.getTitleValue('PARTNAME');
+  var addShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESADD');
+  var removeShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESREMOVE');
+  var booleanType = this.getTitleValue('booleanType');
+  code = '//part block: '+name+'\n'+booleanType+'() {\n//Add\nunion(){\n'+addShapes+'\n}\n//Remove\n'+removeShapes+'\n}';
+  if(codeLanguage == 'vol0.1')
+    return ''; // put blend bools here
+  if(codeLanguage == 'coffeescad0.1') {
+    code = '';
+    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
+    var coffeescadOperation = '';
+    switch(booleanType){
+      case 'union':
+        coffeescadOperation = 'union';break;
+      case 'difference':
+        coffeescadOperation = 'subtract';break;
+      case 'intersection':
+        coffeescadOperation = 'intersect';break;
+    }
+    addShapesList = addShapes.split(';');
+    var pre =''; var post='';
+    while(addShapesList.length > 2) {
+      var str = addShapesList.shift();
+      if(str.substring(0,4)=='var ')
+        continue; // skip variable assignments
+      pre += str.trim()+".union("; post += ")";
+    }
+    codeAdd = pre+addShapesList.shift().trim()+post;
+    removeShapesList = removeShapes.split(';');
+    pre =''; post='';
+    while(removeShapesList.length > 2) {
+      pre += removeShapesList.shift().trim()+".union("; post += ")";
+    }
+    codeRemove = pre+removeShapesList.shift().trim()+post;
+    // console.log({add: codeAdd, remove: codeRemove, length: removeShapesList.length});
+    if(codeRemove.trim() === '')
+      return codeAdd.trim()+selectedStr+';'; // if there's nothing to bool with, don't bool.
+    else
+      return codeAdd+"."+coffeescadOperation+"("+codeRemove+")"+selectedStr+";";
+  }
+  else return code; // scad
+};
+// Shape Boolean Operators
+Blockly.Language.assembly_part = {
+  category: ucfirst(getLang('assembly')),
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(65);
+    this.appendDummyInput()
+        .appendTitle("Part").appendTitle(new Blockly.FieldTextInput('Part name 1'), 'PARTNAME');
+    this.appendStatementInput("SHAPESADD")
+        // .setCheck(["Shape", "Assembly"])
+        .appendTitle("Base part(s)");
+// this.appendStatementInput("boolType")
+    this.appendStatementInput("SHAPESREMOVE")
+        .appendTitle(new Blockly.FieldDropdown([["Subtract", "difference"], ["Combine", "union"], ["Overlapping", "intersection"]]), "booleanType")
+        // .setCheck(["Shape", "Assembly"])
+        .appendTitle("part(s)");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    // this.setPreviousStatement(true, ["Shape", "Assembly"]);
+    this.setNextStatement(true);
+    this.setTooltip('Combine shapes, remove a shape from another shape or keep the overlapping volume.');
+  }
+};
+
+
+
 Blockly.JavaScript.shape_sphere = function() {
  var value_radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   // todo: assemble javaScript into code variable.
@@ -240,72 +309,6 @@ matchPhrases['cone [d1=12] [d2=5] [h=10]'] = function(args){
   createBlockAtCursor('<xml><block type="shape_cone"><title name="CENTEROBJECT">TRUE</title><value name="diameter1"><block type="math_number"><title name="NUM">'+d1+'</title></block></value><value name="diameter2"><block type="math_number"><title name="NUM">'+d2+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+h+'</title></block></value></block></xml>');
 };
 
-Blockly.JavaScript.assembly_part = function() {
-  var name = this.getTitleValue('PARTNAME');
-  var addShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESADD');
-  var removeShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESREMOVE');
-  var booleanType = this.getTitleValue('booleanType');
-  code = '//part block: '+name+'\n'+booleanType+'() {\n//Add\nunion(){\n'+addShapes+'\n}\n//Remove\n'+removeShapes+'\n}';
-  if(codeLanguage == 'vol0.1')
-    return ''; // put blend bools here
-  if(codeLanguage == 'coffeescad0.1') {
-    code = '';
-    var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    var coffeescadOperation = '';
-    switch(booleanType){
-      case 'union':
-        coffeescadOperation = 'union';break;
-      case 'difference':
-        coffeescadOperation = 'subtract';break;
-      case 'intersection':
-        coffeescadOperation = 'intersect';break;
-    }
-    addShapesList = addShapes.split(';');
-    var pre =''; var post='';
-    while(addShapesList.length > 2) {
-      var str = addShapesList.shift();
-      if(str.substring(0,4)=='var ')
-        continue; // skip variable assignments
-      pre += str.trim()+".union("; post += ")";
-    }
-    codeAdd = pre+addShapesList.shift().trim()+post;
-    removeShapesList = removeShapes.split(';');
-    pre =''; post='';
-    while(removeShapesList.length > 2) {
-      pre += removeShapesList.shift().trim()+".union("; post += ")";
-    }
-    codeRemove = pre+removeShapesList.shift().trim()+post;
-    // console.log({add: codeAdd, remove: codeRemove, length: removeShapesList.length});
-    if(codeRemove.trim() === '')
-      return codeAdd.trim()+selectedStr+';'; // if there's nothing to bool with, don't bool.
-    else
-      return codeAdd+"."+coffeescadOperation+"("+codeRemove+")"+selectedStr+";";
-  }
-  else return code; // scad
-};
-// Shape Boolean Operators
-Blockly.Language.assembly_part = {
-  category: ucfirst(getLang('shape')),
-  helpUrl: 'http://www.example.com/',
-  init: function() {
-    this.setColour(65);
-    this.appendDummyInput()
-        .appendTitle("Part").appendTitle(new Blockly.FieldTextInput('Part name 1'), 'PARTNAME');
-    this.appendStatementInput("SHAPESADD")
-        // .setCheck(["Shape", "Assembly"])
-        .appendTitle("Base part(s)");
-// this.appendStatementInput("boolType")
-    this.appendStatementInput("SHAPESREMOVE")
-        .appendTitle(new Blockly.FieldDropdown([["Subtract", "difference"], ["Combine", "union"], ["Overlapping", "intersection"]]), "booleanType")
-        // .setCheck(["Shape", "Assembly"])
-        .appendTitle("part(s)");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    // this.setPreviousStatement(true, ["Shape", "Assembly"]);
-    this.setNextStatement(true);
-    this.setTooltip('Combine shapes, remove a shape from another shape or keep the overlapping volume.');
-  }
-};
 
 
 
