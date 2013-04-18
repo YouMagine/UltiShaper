@@ -1,14 +1,14 @@
-function MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement) {
+function MySliderInput(sliderType,sliderLabel,val,minVal,maxVal,stepIncrement) {
     this.uuid = uuid();
     this.sliderType = sliderType;
-    this.sliderName = sliderName;
+    this.sliderLabel = sliderLabel;
     this.val = val;
     this.minVal = minVal;
     this.maxVal = maxVal;
     this.stepIncrement = stepIncrement;
     this.update = function (options) {
         // this.sliderType = options.sliderType;
-        this.sliderName = options.sliderName;
+        this.sliderLabel = options.sliderLabel;
         // this.val = options.val || 0;
         this.minVal = options.minVal;
         this.maxVal = options.maxVal;
@@ -24,7 +24,7 @@ function MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement) {
         this.uuid = val;
     };
     this.toString = function () {
-        return 'Slider with name '+this.sliderName+' and value '+this.val;
+        return 'Slider with name '+this.sliderLabel+' and value '+this.val;
     };
 }
 
@@ -62,7 +62,7 @@ var inputManager = new InputManager();
 Blockly.JavaScript.input_field_slider = function() {
     var uuid = this.getTitleValue('uuid');
     var sliderType = this.getTitleValue('sliderType') || "Unspecified";
-    var sliderName = this.getTitleValue('sliderName') || "Value:";
+    var sliderLabel = this.getTitleValue('sliderLabel') || "Value:";
     var minVal = this.getTitleValue('minVal') || -42;
     var maxVal = this.getTitleValue('maxVal') || 42;
     var stepIncrement = this.getTitleValue('stepIncrement') || 1;
@@ -71,7 +71,7 @@ Blockly.JavaScript.input_field_slider = function() {
     setTimeout(function(){$('#inputPane').show();},200);
 
     // create a new slider:
-    var slider = new MySliderInput(sliderType,sliderName,val,minVal,maxVal,stepIncrement);
+    var slider = new MySliderInput(sliderType,sliderLabel,val,minVal,maxVal,stepIncrement);
     slider.setUUID(uuid);
     if(inputManager.getInputByUUID(uuid) === null) {
         // console.log('uuid not found... adding the slider to inputs.');
@@ -79,7 +79,7 @@ Blockly.JavaScript.input_field_slider = function() {
     } else {
         // uuid was found. Slider was created before. Use that one.
         slider = inputManager.getInputByUUID(uuid);
-        slider.update({sliderType:sliderType,sliderName:sliderName,minVal:minVal,maxVal:maxVal,stepIncrement:stepIncrement});
+        slider.update({sliderType:sliderType,sliderLabel:sliderLabel,minVal:minVal,maxVal:maxVal,stepIncrement:stepIncrement});
     }
     val = slider.val;
 
@@ -128,7 +128,7 @@ Blockly.Language.input_field_slider = {
         .appendTitle(new Blockly.FieldDropdown([["Horizontal slider", "horSlider"], ["Vertical slider", "vertSlider"], ["Depth slider", "depthSlider"], ["Hidden slider", "hiddenSlider"]]), "sliderType");
     this.appendDummyInput()
         .appendTitle("label")
-        .appendTitle(new Blockly.FieldTextInput("Input"+inputSequencenr+":"), "sliderName");
+        .appendTitle(new Blockly.FieldTextInput("Input"+inputSequencenr+":"), "sliderLabel");
     this.appendDummyInput()
         .appendTitle("min")
         .appendTitle(new Blockly.FieldTextInput("0"), "minVal");
