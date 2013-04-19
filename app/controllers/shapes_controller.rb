@@ -46,13 +46,25 @@ class ShapesController < ApplicationController
   # POST /shapes
   # POST /shapes.json
   def create
-    logger.info "create is ===================="
-    @existingShape = Shape.where(:name => params[:shape][:name])
+    logger.info "==== creating ======"
+    unless params[:shape].nil?
+      logger.info "shape is nil."
+      logger.info params[:shape][:name] unless params[:shape][:name].nil?
+      @existingShape = Shape.where(:name => params[:shape][:name]) unless params[:shape][:name].nil?
+      logger.info "found a shape"
+    end
     unless @existingShape.empty?
-      if @existingShape.update_attributes(params[:shape])
-        format.json { render :inline => 'Shape was succesfully updated.' }
+      logger.info "found a shape to update...!"
+      if @existingShape.first.update_attributes(params[:shape])
+        respond_to do |format|
+          render :inline => 'Shape was succesfully updated.'
+          return
+        end
       else
-        format.json { render :inline => 'Shape was not updated.' }
+        respond_to do |format|
+          format.json { render :inline => 'Shape was not updated.' }
+          return
+        end
       end
     end
 
@@ -60,8 +72,12 @@ class ShapesController < ApplicationController
 
     respond_to do |format|
       if @shape.save
-        format.html { redirect_to @shape, :notice => 'Shape was successfully created.' }
-        format.json { render :inline => 'Shape was succesfully created.' }
+        format.html do
+          redirect_to @shape, :notice => 'Shape was successfully created.'
+        end
+        format.json do
+          render :inline => 'Shape was succesfully created.'
+        end
         # format.json { render json: 'Shape was succesfully created.', status: :created, location: @shape }
       else
         format.html { render :action => "new" }

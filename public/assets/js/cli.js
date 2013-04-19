@@ -20,6 +20,7 @@ matchPhrases['define [name=myblockname]'] = function(args){
   setTimeout(function(){loadMatches('shapes');},1000); // reload modules. Wait a second to make sure its propagated on the server
 };
 
+  xml = getXML();
 
 matchPhrases.clear = function() { if(confirm('Are you sure you want to clear the canvas?')) clearWorkspace(); };
 matchPhrases.save = function() { saveCode(); };

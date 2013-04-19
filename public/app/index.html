@@ -66,7 +66,7 @@ if(typeof urlLang !='string' || urlLang == '')
 
 // var codeLanguage = 'scad';
 var codeLanguage = 'vol0.1';
-var storageApiEndpoint = '/shapes/';
+var storageApiEndpoint = '/shapes.json';
 var autoSave = false;
 var autoSaveInitial = true;
 var autoSaveInterval = 2000;
@@ -121,6 +121,9 @@ function init() {
     createBlockAtCursor('<xml><block type="shape_sphere" inline="true" x="2" y="-4"><value name="radius"><block type="input_field_slider"><title name="uuid">947be554-7cb9-9736-b2b3-e14c9c4000a2</title><title name="sliderType">horSlider</title><title name="sliderLabel">Sphere size:</title><title name="minVal">30</title><title name="maxVal">150</title><title name="stepIncrement">15</title></block></value></block><block type="cursor_rotate" inline="true" x="1" y="77"><title name="NAME">rotateBy</title><value name="rZ"><block type="input_field_slider"><title name="uuid">2666d1a4-9540-671c-c566-2b056a085ae4</title><title name="sliderType">horSlider</title><title name="sliderLabel">Angle:</title><title name="minVal">0</title><title name="maxVal">360</title><title name="stepIncrement">45</title></block></value><next><block type="shape_cube" inline="true"><title name="CENTEROBJECT">TRUE</title><value name="width"><block type="math_number"><title name="NUM">100</title></block></value><next><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">50</title></block></value><next><block type="shape_cylinder" inline="true"></block></next></block></next></block></next></block></xml>');
 */
 $('#inputPane').hide();
+    createBlockAtCursor('<xml><block type="assembly_part" x="-23" y="-7"><title name="PARTNAME">Ring</title><title name="booleanType">difference</title><statement name="SHAPESADD"><block type="shape_cylinder" inline="true"><value name="diameter1"><block type="math_arithmetic" inline="true"><title name="OP">ADD</title><value name="A"><block type="math_arithmetic" inline="true"><title name="OP">MULTIPLY</title><value name="A"><block type="input_field_slider"><title name="uuid">ad6afb2d-058f-8d51-ae1c-d542da1d5550</title><title name="sliderType">horSlider</title><title name="sliderLabel">Thickness:</title><title name="minVal">1</title><title name="maxVal">6</title><title name="stepIncrement">0.1</title></block></value><value name="B"><block type="math_number"><title name="NUM">2</title></block></value></block></value><value name="B"><block type="input_field_slider"><title name="uuid">be235213-c475-1688-d7b4-1130ce2350c4</title><title name="sliderType">horSlider</title><title name="sliderLabel">Input 1:</title><title name="minVal">0</title><title name="maxVal">20</title><title name="stepIncrement">1</title></block></value></block></value><value name="height"><block type="input_field_slider"><title name="uuid">fdf1de71-6255-447b-030d-ffe3adf49882</title><title name="sliderType">horSlider</title><title name="sliderLabel">Height:</title><title name="minVal">1</title><title name="maxVal">10</title><title name="stepIncrement">0.5</title></block></value></block></statement><statement name="SHAPESREMOVE"><block type="shape_cylinder" inline="true"><value name="diameter1"><block type="input_field_slider"><title name="uuid">be235213-c475-1688-d7b4-1130ce2350c4</title><title name="sliderType">horSlider</title><title name="sliderLabel">Size (mm):</title><title name="minVal">10</title><title name="maxVal">30</title><title name="stepIncrement">1</title></block></value><value name="height"><block type="math_number"><title name="NUM">10</title></block></value></block></statement></block></xml>');
+
+
     myUpdateFunction();
     $('div.ui-dialog a.ui-dialog-titlebar-close').click();// close all other windows.
   }, 1500);
@@ -260,7 +263,7 @@ function saveCode(name,saveType) {
     saveType = 'workspace'; // otherwise, it could be a definition (e.g. define cube)
   console.log("saveCode(name=",name,"saveType=",saveType,")");
   var code = getXML();//Blockly.Generator.workspaceToCode('JavaScript');
-  jQuery.post(storageApiEndpoint, { storeData: code, name: name, type: saveType })
+  jQuery.post(storageApiEndpoint, { shape: {name: name, xmldata: code} })
 .done(function(data) {
   alert("" + data);
 });
