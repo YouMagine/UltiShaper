@@ -55,6 +55,7 @@ if(args.length > 1)
 // block navigation
 
 matchPhrases.nextBlock = function () {
+  console.log("nextBlock");
   var sel = Blockly.selected;
   if(sel === null) {
     //gettopbl and select that
@@ -62,13 +63,16 @@ matchPhrases.nextBlock = function () {
     if(topBlocks.length === 0) return;
     sel = topBlocks[0];
     sel.select();
+    return;
   }
   sel.unselect();
   if(sel.nextConnection !== null && sel.nextConnection.targetConnection !== null) {
     sel.nextConnection.targetConnection.sourceBlock_.select();
   }
-}
+};
+
 matchPhrases.previousBlock = function () {
+  console.log("prevBlock");
   var sel = Blockly.selected;
   if(sel === null) {
     var topBlocks = Blockly.mainWorkspace.getTopBlocks();
@@ -80,7 +84,7 @@ matchPhrases.previousBlock = function () {
   if(sel.previousConnection !== null && sel.previousConnection.targetConnection !== null) {
     sel.previousConnection.targetConnection.sourceBlock_.select();
   }
-}
+};
 
 
 
@@ -104,6 +108,7 @@ function myKeyEvent(e){
   var keyCode = e.keyCode;
   // var prevKey;
   keyLog.push(e);
+  var focus = $('#quickSearchDiv input').is(":focus");
   if(!e.keyCode) keyCode = e.which;
   charNum = $('#quickSearchDiv input').val().length;
   argumentIndex = ($('#quickSearchDiv input').val().match(/ +/g)||[]).length;
@@ -131,14 +136,12 @@ function myKeyEvent(e){
     break;
     case 40://arrow down
       if(e.shiftKey) {return matchingPhrases['nextBlock'].call(null,null);}
-      focus = $('#quickSearchDiv input').is(":focus");
       if(!focus) return;
       selectedIndex++;
       return updateQuickSearchHtml();
     case 38://arrow up
-      focus = $('#quickSearchDiv input').is(":focus");
-      if(!focus) return;
       if(e.shiftKey) {return matchingPhrases['previousBlock'].call(null,null);}
+      if(!focus) return;
       selectedIndex--;
       return updateQuickSearchHtml();
     case 32:// spacebar
