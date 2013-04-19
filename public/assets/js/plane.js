@@ -53,7 +53,7 @@ function initSlider(sliderNr,uuid,sliderLabel) {
   var sliderObjGone = false;
   if(!document.getElementById('input'+uuid)) {
     //                    (x, y, width, svgParent, opt_changeFunc,uuid)
-    sliderObj = new Slider(90, h, 425, SVG, sliderChange,uuid); 
+    sliderObj = new Slider(90, h, 225, SVG, sliderChange,uuid); 
     sliderObj.setValue(1.0);
     sliderObj.setLabel(sliderLabel,h+2);
   }

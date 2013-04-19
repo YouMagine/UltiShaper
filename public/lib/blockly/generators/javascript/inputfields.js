@@ -68,7 +68,6 @@ Blockly.JavaScript.input_field_slider = function() {
     var stepIncrement = this.getTitleValue('stepIncrement') || 1;
     var code = '';
     var val = 20;//
-    setTimeout(function(){$('#inputPane').show();},200);
 
     // create a new slider:
     var slider = new MySliderInput(sliderType,sliderLabel,val,minVal,maxVal,stepIncrement);
@@ -82,7 +81,6 @@ Blockly.JavaScript.input_field_slider = function() {
         slider.update({sliderType:sliderType,sliderLabel:sliderLabel,minVal:minVal,maxVal:maxVal,stepIncrement:stepIncrement});
     }
     val = slider.val;
-
     // Determine row number for this field
     allFields = inputManager.list();
     console.log("Going to create the sliders...",'allFields',allFields,'uuid',uuid);
@@ -94,13 +92,16 @@ Blockly.JavaScript.input_field_slider = function() {
           break;
         }
     }
-    var sliderObj = planeSvg.initSlider(fieldNr,uuid,sliderLabel);
-    if(sliderObj) {
-        slider.sliderObj = sliderObj;
-        console.log('initSlider returned ',sliderObj);
+    if(planeSvg === null) console.log('Problem creating the slider... Is the SVG loaded?');
+    else {
+        var sliderObj = planeSvg.initSlider(fieldNr,uuid,sliderLabel);
+        if(sliderObj) {
+            slider.sliderObj = sliderObj;
+            console.log('initSlider returned ',sliderObj);
+        }
+        slider.sliderObj.setLabel(sliderLabel);
+        slider.sliderObj.setValueText(val);
     }
-    slider.sliderObj.setLabel(sliderLabel);
-    slider.sliderObj.setValueText(val);
 
     code = ""+val;
     return [code, Blockly.JavaScript.ORDER_NONE];
@@ -179,7 +180,7 @@ Blockly.Language.input_field_text = {
   }
 };
 
-/// REQUIRED????
+/// THE FOLLOWING IS REQUIRED FOR THE SLIDERS
 Blockly.JavaScript = Blockly.Generator.get('JavaScript');
 
 /**
