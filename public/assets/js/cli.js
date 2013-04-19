@@ -71,14 +71,73 @@ matchPhrases.nextBlock = function () {
   }
 };
 
+var parentSel = null;
+var selectedChildIndex = 0;
+
+
+matchPhrases.rightBlock = function () {
+  console.log("rightBlock");
+  var sel;
+  if(parentSel === null)
+    sel = Blockly.selected;
+  else sel = parentSel;
+  if(sel === null) {
+    //gettopbl and select that
+    var topBlocks = Blockly.mainWorkspace.getTopBlocks();
+    if(topBlocks.length === 0) return;
+    sel = topBlocks[0];
+    sel.select();
+    return;
+  }
+  sel.unselect();
+  if(sel.outputConnection === null) // has no outputs, probably is not an input.
+    parentSel = sel;
+  console.log("selected child",selectedChildIndex);
+  selectedChildIndex++;
+  try {
+    // Blockly.selected.unselect();
+  if(typeof sel.inputList[selectedChildIndex] === "object") {
+    console.log('selected:',sel.inputList[selectedChildIndex-1]);
+
+    if(sel.inputList[selectedChildIndex].connection !== null && sel.inputList[selectedChildIndex-1].connection.targetConnection !== null) {
+      if(sel.inputList[selectedChildIndex-1])
+      sel.inputList[selectedChildIndex-1].connection.targetConnection.sourceBlock_.unselect();
+      sel.inputList[selectedChildIndex].connection.targetConnection.sourceBlock_.select();
+    }
+  } else { selectedChildIndex = 0;
+  }
+  } catch (e) {
+
+  }
+  // if(sel.nextConnection !== null && sel.nextConnection.targetConnection !== null) {
+    // sel.nextConnection.targetConnection.sourceBlock_.select();
+  // }
+};
+matchPhrases.leftBlock = function () {
+  console.log("leftBlock");
+  selectedChildIndex = 0;
+};
+
 matchPhrases.previousBlock = function () {
   console.log("prevBlock");
   var sel = Blockly.selected;
   if(sel === null) {
     var topBlocks = Blockly.mainWorkspace.getTopBlocks();
     if(topBlocks.length === 0) return;
-    sel = topBlocks[topBlocks.length-1];
-    sel.select();
+    var nextBlock = topBlocks[topBlocks.length-1];
+    var tmpNextBlock;
+    while(typeof nextBlock === "object") {
+        try {
+          tmpNextBlock = nextBlock.nextConnection.targetConnection.sourceBlock_;
+        }catch (e) {
+           // statements to handle any exceptions
+           console.log(e); // pass exception object to error handler
+           break;
+        }
+        nextBlock = tmpNextBlock;
+    }
+    nextBlock.select();
+    return;
   }
   sel.unselect();
   if(sel.previousConnection !== null && sel.previousConnection.targetConnection !== null) {
@@ -144,6 +203,12 @@ function myKeyEvent(e){
       if(!focus) return;
       selectedIndex--;
       return updateQuickSearchHtml();
+    case 37://arrow left
+      if(e.shiftKey) {return matchingPhrases['leftBlock'].call(null,null);}
+      break;
+    case 39://arrow right
+      if(e.shiftKey) {return matchingPhrases['rightBlock'].call(null,null);}
+      break;
     case 32:// spacebar
       return updateQuickSearchHtml();
     case 8: // backspace
