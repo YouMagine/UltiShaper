@@ -8,6 +8,7 @@ var prevKey;
 var selectedIndex = 0;
 var charNum = 0;
 var argumentIndex = 0; // 0 is cmd, 1 is first argument.
+var reverseSearch = false;
 
 matchPhrases['define [name=myblockname]'] = function(args){
   var name = 'myblockname';
@@ -20,11 +21,30 @@ matchPhrases['define [name=myblockname]'] = function(args){
   setTimeout(function(){loadMatches('shapes');},1000); // reload modules. Wait a second to make sure its propagated on the server
 };
 
+matchPhrases['save [name=mydesign]'] = function(args){
+  var name = 'mydesign';
+  console.log(args);
+  if(args && args.length>1) {
+    name = args[1];
+  }
   xml = getXML();
+  saveCode(name,'save');
+  setTimeout(function(){loadMatches('shapes');},1000); // reload modules. Wait a second to make sure its propagated on the server
+};
 
-matchPhrases.clear = function() { if(confirm('Are you sure you want to clear the canvas?')) clearWorkspace(); };
+
+matchPhrases.clear = function(args){
+  console.log(args);
+  if((args.length >= 1) && args[1] == 'y') { clearWorkspace(); return; }
+  if(confirm('Are you sure you want to clear the canvas?')) {
+    clearWorkspace();
+  }
+};
+
 matchPhrases.save = function() { saveCode(); };
 matchPhrases.load = function() { loadCode(); };
+
+matchPhrases.duplicate = function () { Blockly.mainWorkspace.paste(Blockly.Xml.blockToDom_(Blockly.selected)); }
 matchPhrases['number [10]'] = function(args) {
 var num = 10;
 if(args.length > 1)
@@ -32,6 +52,37 @@ if(args.length > 1)
 
   createBlockAtCursor('<xml><block type="math_number"><title name="NUM">'+num+'</title></block></value>');
 };
+// block navigation
+
+matchPhrases.nextBlock = function () {
+  var sel = Blockly.selected;
+  if(sel === null) {
+    //gettopbl and select that
+    var topBlocks = Blockly.mainWorkspace.getTopBlocks();
+    if(topBlocks.length === 0) return;
+    sel = topBlocks[0];
+    sel.select();
+  }
+  sel.unselect();
+  if(sel.nextConnection !== null && sel.nextConnection.targetConnection !== null) {
+    sel.nextConnection.targetConnection.sourceBlock_.select();
+  }
+}
+matchPhrases.previousBlock = function () {
+  var sel = Blockly.selected;
+  if(sel === null) {
+    var topBlocks = Blockly.mainWorkspace.getTopBlocks();
+    if(topBlocks.length === 0) return;
+    sel = topBlocks[topBlocks.length-1];
+    sel.select();
+  }
+  sel.unselect();
+  if(sel.previousConnection !== null && sel.previousConnection.targetConnection !== null) {
+    sel.previousConnection.targetConnection.sourceBlock_.select();
+  }
+}
+
+
 
 function resetMatches() {
   for (var i in matchPhrases) { // copy match phrases
@@ -79,9 +130,15 @@ function myKeyEvent(e){
       $('#qsResults').hide();
     break;
     case 40://arrow down
+      if(e.shiftKey) {return matchingPhrases['nextBlock'].call(null,null);}
+      focus = $('#quickSearchDiv input').is(":focus");
+      if(!focus) return;
       selectedIndex++;
       return updateQuickSearchHtml();
-    case 38://arrow down
+    case 38://arrow up
+      focus = $('#quickSearchDiv input').is(":focus");
+      if(!focus) return;
+      if(e.shiftKey) {return matchingPhrases['previousBlock'].call(null,null);}
       selectedIndex--;
       return updateQuickSearchHtml();
     case 32:// spacebar
@@ -102,6 +159,10 @@ function myKeyEvent(e){
       }
     break;
     case 191:
+    if(e.shiftKey)
+        reverseSearch = true;
+    else 
+      reverseSearch = false;
     $('#quickSearchDiv input').focus();
     break;
     case 9: // tab
@@ -129,7 +190,10 @@ function myKeyEvent(e){
   }
   focus = $('#quickSearchDiv input').is(":focus");
   if(!focus) {
-    // console.log("arg"+ argumentIndex+': abort. No focus.');
+    console.log("arg"+ argumentIndex+': abort. No focus. Turning off reverse search.');
+
+    reverseSearch = false;
+
     return;
 
   }
@@ -137,6 +201,8 @@ function myKeyEvent(e){
 
   switch(keyCode) {
     case 191: // slash forward (/)
+      if(e.shiftKey)
+        reverseSearch = true;
       resetMatches();
       $('#quickSearchDiv input').focus();
       setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
