@@ -104,5 +104,6 @@ matchPhrases['move [x=10] [y=0] [z=0]'] = function(args){
   if(args && args.length>1) {
     x = args[1];
   }
+  insertBlockBefore = true;
   createBlockAtCursor('<xml><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };

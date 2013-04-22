@@ -176,7 +176,7 @@ console.log('createBlockAtCursor('+xmlStr+')');
     // xmlStr = '<xml><block type="shape_sphere" inline="true" x="21" y="-15"><value name="radius"><block type="math_number"><title name="NUM">10</title></block></value><next><block type="shape_sphere" inline="true"><value name="radius"><block type="math_number"><title name="NUM">20</title></block></value></block></next></block></xml>';
     // xmlStr = '<xml><block type="shape_sphere" inline="true" x="0" y="0"></block></xml>';
     var topBlocks = Blockly.mainWorkspace.getTopBlocks();
-    if(reverseSearch == false) {
+    if(insertBlockBefore == false) {
       if(topBlocks.length > 1) {
         var lastBlockAdded = topBlocks[topBlocks.length-1];
         if(selectedBlock.nextConnection.targetConnection === null) {
@@ -192,7 +192,7 @@ console.log('createBlockAtCursor('+xmlStr+')');
         }
       }
     } else {
-      console.log('reverseSearch',reverseSearch);
+      console.log('insertBlockBefore',insertBlockBefore);
       if(topBlocks.length > 1) {
         var lastBlockAdded = topBlocks[topBlocks.length-1];
         if(selectedBlock.previousConnection.targetConnection === null) {

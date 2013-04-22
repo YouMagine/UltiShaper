@@ -8,7 +8,7 @@ var prevKey;
 var selectedIndex = 0;
 var charNum = 0;
 var argumentIndex = 0; // 0 is cmd, 1 is first argument.
-var reverseSearch = false;
+var insertBlockBefore = false;
 
 matchPhrases['define [name=myblockname]'] = function(args){
   var name = 'myblockname';
@@ -228,9 +228,9 @@ function myKeyEvent(e){
     break;
     case 191:
     if(e.shiftKey)
-        reverseSearch = true;
+        insertBlockBefore = true;
     else 
-      reverseSearch = false;
+      insertBlockBefore = false;
     $('#quickSearchDiv input').focus();
     break;
     case 9: // tab
@@ -260,7 +260,7 @@ function myKeyEvent(e){
   if(!focus) {
     console.log("arg"+ argumentIndex+': abort. No focus. Turning off reverse search.');
 
-    reverseSearch = false;
+    insertBlockBefore = false;
 
     return;
 
@@ -270,7 +270,7 @@ function myKeyEvent(e){
   switch(keyCode) {
     case 191: // slash forward (/)
       if(e.shiftKey)
-        reverseSearch = true;
+        insertBlockBefore = true;
       resetMatches();
       $('#quickSearchDiv input').focus();
       setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
@@ -335,7 +335,7 @@ function runCmd(enterEvent){
       if(i==selectedIndex)
       {
         if(enterEvent)
-        args = ($('#quickSearchDiv input').attr('value') + '').split(' ');
+        args = ($('#quickSearchDiv input').attr('value') + '').trim().split(' ');
         console.log('performing match # '+selectedIndex + ': '+phrase,'args:',args);
         if(typeof matchingPhrases[phrase] == 'function')
           matchingPhrases[phrase].call(null,args);
