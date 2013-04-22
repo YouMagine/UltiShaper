@@ -97,13 +97,66 @@ Blockly.Language.cursor_move = {
   }
 };
 matchPhrases['move [x=10] [y=0] [z=0]'] = function(args){
-  var x = 10, y = 0, z = 0;
-  if(args && args.length>3) {var i = 1;
+  var x = 10, y = 0, z = 0, i;
+  if(args && args.length>3) { i = 1;
     x = args[i++]; y = args[i++]; z = args[i++];
+  }
+  if(args && args.length>2) { i = 1;
+    x = args[i++]; y = args[i++];
   }
   if(args && args.length>1) {
     x = args[1];
   }
   insertBlockBefore = true;
   createBlockAtCursor('<xml><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
+};
+
+
+
+Blockly.JavaScript.cursor_scale = function() {
+  var name = this.getTitleValue('NAME');
+  var X = var_to_number(Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_ATOMIC)) || 1;
+  var Y = var_to_number(Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_ATOMIC)) || 1;
+  var Z = var_to_number(Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_ATOMIC)) || 1;
+  // todo: assemble javaScript into code variable.
+  cursor_scale = [X,Y,Z];
+  if(codeLanguage == 'coffeescad0.1') {
+    return '';//rot=['+rX+','+rY+','+rZ+'];';
+  }
+  if(codeLanguage == 'vol0.1')
+    return '';
+  else return code; // scad
+};
+Blockly.Language.cursor_scale = {
+  category: ucfirst(getLang('cursor')),
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(65);
+    this.appendDummyInput()
+        .appendTitle(getLang("Scale"));
+    this.appendValueInput("X")
+        .appendTitle("X");
+    this.appendValueInput("Y")
+        .appendTitle("Y");
+    this.appendValueInput("Z")
+        .appendTitle("Z");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+  }
+};
+matchPhrases['scale [x=1] [y=1] [z=1]'] = function(args){
+  var x = 1, y = 1, z = 1, i;
+  if(args && args.length>3) { i = 1;
+    x = args[i++]; y = args[i++]; z = args[i++];
+  }
+  if(args && args.length>2) { i = 1;
+    x = args[i++]; y = args[i++];
+  }
+  if(args && args.length>1) {
+    x = args[1];
+  }
+  insertBlockBefore = true;
+  createBlockAtCursor('<xml><block type="cursor_scale" inline="true"><value name="X"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="Y"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="Z"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };

@@ -35,6 +35,7 @@ Blockly.JavaScript.assembly_part = function() {
   var addShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESADD');
   var removeShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESREMOVE');
   var booleanType = this.getTitleValue('booleanType');
+  var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   code = '//part block: '+name+'\n'+booleanType+'() {\n//Add\nunion(){\n'+addShapes+'\n}\n//Remove\n'+removeShapes+'\n}';
   if(codeLanguage == 'vol0.1')
     return ''; // put blend bools here
@@ -67,9 +68,9 @@ Blockly.JavaScript.assembly_part = function() {
     codeRemove = pre+removeShapesList.shift().trim()+post;
     // console.log({add: codeAdd, remove: codeRemove, length: removeShapesList.length});
     if(codeRemove.trim() === '')
-      return codeAdd.trim()+selectedStr+';'; // if there's nothing to bool with, don't bool.
+      return codeAdd.trim()+scaleStr+selectedStr+';'; // if there's nothing to bool with, don't bool.
     else
-      return codeAdd+"."+coffeescadOperation+"("+codeRemove+")"+selectedStr+";";
+      return codeAdd+"."+coffeescadOperation+"("+codeRemove+")"+scaleStr+selectedStr+";";
   }
   else return code; // scad
 };
@@ -100,7 +101,8 @@ Blockly.Language.assembly_part = {
 
 
 Blockly.JavaScript.shape_sphere = function() {
- var value_radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
+  var value_radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
+  var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   // todo: assemble javaScript into code variable.
   // var code = 'alert(\'sphere r = '+value_radius+')';
   // todo: change order_none to the correct strength.
@@ -111,7 +113,7 @@ Blockly.JavaScript.shape_sphere = function() {
     return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX="'+value_radius+'" radiusY="'+value_radius+'" radiusZ="'+value_radius+'"></uformia.base.Sphere.20110605>';
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    return 'new Sphere({d:'+value_radius+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';\n';
+    return 'new Sphere({d:'+value_radius+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+scaleStr+';\n';
   }
   else
     return 'sphere(r='+value_radius+');\n';
@@ -139,6 +141,7 @@ Blockly.JavaScript.shape_cube = function() {
   var value_depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var value_height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var center_object = this.getTitleValue('CENTEROBJECT') == 'TRUE';
+  var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   var centerStr = '';
   if(center_object) centerStr = ',center=true';
   // todo: assemble javascript into code variable.
@@ -150,7 +153,7 @@ Blockly.JavaScript.shape_cube = function() {
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     if(center_object) centerStr=',center:[0,0,0]';
-    return 'new Cube({size:['+value_width+','+value_depth+','+value_height+']'+centerStr+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';\n';
+    return 'new Cube({size:['+value_width+','+value_depth+','+value_height+']'+centerStr+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+scaleStr+selectedStr+';\n';
   }
   else
   return code; //[code, Blockly.JavaScript.ORDER_NONE];
@@ -192,13 +195,14 @@ matchPhrases['cube w=[10],d=[10],h=[10]'] = function(args){
   if(args && args.length>3) { i = 1;
     x = args[i++]; y = args[i++]; z = args[i++];
   }
-  createBlockAtCursor('<xml><block type="shape_cube"><title name="CENTEROBJECT">TRUE</title><value name="width"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="depth"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+z+'</title></block></value>');
+  createBlockAtCursor('<xml><block type="shape_cube"><title name="CENTEROBJECT">TRUE</title><value name="width"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="depth"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="height"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };
 
 Blockly.JavaScript.shape_cylinder = function() {
   var value_diameter1 = Blockly.JavaScript.valueToCode(this, 'diameter1', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var value_height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   // var center_object = this.getTitleValue('CENTEROBJECT') == 'TRUE';
+  var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   var centerStr = '';
   // if(center_object) centerStr = ',center=true';
   // todo: assemble javaScript into code variable.
@@ -209,7 +213,7 @@ Blockly.JavaScript.shape_cylinder = function() {
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     // if(center_object) centerStr=',center:[0,0,0]';
-    return 'new Cylinder({d:'+value_diameter1+',h:'+value_height+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+';';
+    return 'new Cylinder({d:'+value_diameter1+',h:'+value_height+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+scaleStr+selectedStr+';';
   } else return code;  // scad
 };
 Blockly.Language.shape_cylinder = {
@@ -224,6 +228,7 @@ Blockly.Language.shape_cylinder = {
         .setCheck(Number)
         .appendTitle(LANG.diameter);
     this.appendValueInput("height")
+        .appendTitle("height")
         .setCheck(Number)
         .appendTitle(LANG.hoogte);
     // this.appendDummyInput()
@@ -252,6 +257,7 @@ Blockly.JavaScript.shape_cone = function() {
   var value_diameter2 = Blockly.JavaScript.valueToCode(this, 'diameter2', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var value_height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var center_object = this.getTitleValue('CENTEROBJECT') == 'TRUE';
+  var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   var centerStr = '';
   if(center_object) centerStr = ',center=true';
   // todo: assemble javaScript into code variable.
@@ -260,7 +266,7 @@ Blockly.JavaScript.shape_cone = function() {
   if(codeLanguage == 'coffeescad0.1') {
     if(center_object) centerStr=',center:[0,0,0]';
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    return 'new Cylinder({d2:'+value_diameter1+',d1:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+selectedStr+';';
+    return 'new Cylinder({d2:'+value_diameter1+',d1:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+scaleStr+selectedStr+';';
   }
   if(codeLanguage == 'vol0.1')
     return '';
