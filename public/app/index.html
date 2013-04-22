@@ -135,15 +135,6 @@ $('#inputPane').hide();
 
 } // end of function init
 
-function createBlockAtCursorOld(xmlStr){
-  try {
-    var xml = Blockly.Xml.textToDom(xmlStr);      
-    console.log(Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml));
-  } catch(err){
-
-  }
-}
-
 function createBlockAtCursor(xmlStr){
 // create block after selection and select that block
 // when empty, just paste block:
