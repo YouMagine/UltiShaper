@@ -621,6 +621,9 @@ $(window).resize(function() {
 .flag.flag-nl {background-position: -16px -22px}
 .flag.flag-no {background-position: -32px -22px}
 .flag.flag-pt {background-position: -48px -22px}
+#jqDialog { 
+  display:none;
+}
   </style>
 </head>
 <body onload="init()">
@@ -679,6 +682,8 @@ $(window).resize(function() {
   </table>
   <embed id="inputPane" src="assets/plane.svg" height=140 width=380 type="image/svg+xml"/>
 </div>
-
+<div id="jqDialog" title="Dialog Title">
+  <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Your canvas will be cleared. Are you sure?</p>
+</div>
 </body>
 </html>

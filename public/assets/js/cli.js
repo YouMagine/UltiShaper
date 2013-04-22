@@ -35,10 +35,28 @@ matchPhrases['save [name=mydesign]'] = function(args){
 
 matchPhrases.clear = function(args){
   console.log(args);
-  if((args.length >= 1) && args[1] == 'y') { clearWorkspace(); return; }
-  if(confirm('Are you sure you want to clear the canvas?')) {
-    clearWorkspace();
-  }
+  if(typeof args !== 'undefined' && (args.length >= 1) && args[1] == 'y') { clearWorkspace(); return; }
+  $('#jqDialog').attr('title','Are you sure?');
+
+  console.log($('#jqDialog').dialog({
+    modal: true,
+    resizable: false,
+    autoOpen:false,
+    buttons: {
+        "Clear canvas": function() {
+          $( this ).dialog( "close" );
+          clearWorkspace();
+        },
+        // TODO: add save button.
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+  }));
+  setTimeout(function(){$('#jqDialog').dialog('open');$($('#jqDialog').offsetParent()).css('z-index','3000');},150);
+  // if(confirm('Are you sure you want to clear the canvas?')) {
+    // clearWorkspace();
+  // }
 };
 
 matchPhrases.save = function() { saveCode(); };
