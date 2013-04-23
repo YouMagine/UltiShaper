@@ -50,6 +50,8 @@ matchPhrases['rotate [x=0] [y=0] [z=45]'] = function(args){
   if(args && args.length>1) {var i = 1;
     x = args[i++];
   }
+  insertBlockBefore = true;
+  removePreviousCursorCmdBlockIf('cursor_rotate');
   createBlockAtCursor('<xml><block type="cursor_rotate"><title name="NAME">rotateBy</title><value name="rX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="rY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="rZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };
 
@@ -108,6 +110,7 @@ matchPhrases['move [x=10] [y=0] [z=0]'] = function(args){
     x = args[1];
   }
   insertBlockBefore = true;
+  removePreviousCursorCmdBlockIf('cursor_move');
   createBlockAtCursor('<xml><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };
 
@@ -158,5 +161,24 @@ matchPhrases['scale [x=1] [y=1] [z=1]'] = function(args){
     x = args[1];
   }
   insertBlockBefore = true;
+  removePreviousCursorCmdBlockIf('cursor_scale');
   createBlockAtCursor('<xml><block type="cursor_scale" inline="true"><value name="X"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="Y"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="Z"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
 };
+
+function removePreviousCursorCmdBlockIf(blockType) {
+  if(typeof Blockly.selected === "object" && Blockly.selected !== null)
+  if (Blockly.selected.category.toLowerCase() === getLang('cursor').toLowerCase() && Blockly.selected.type === blockType) {
+    console.log("replace the cursor cmd of ",Blockly.selected);
+    // figure out the next connected block
+    var nextBlock = null;
+    if(Blockly.selected.nextConnection && Blockly.selected.nextConnection.targetConnection && Blockly.selected.nextConnection.targetConnection.sourceBlock_) {
+      nextBlock = Blockly.selected.nextConnection.targetConnection.sourceBlock_;
+    }
+    // disconnect and remove the current cursor command
+      Blockly.selected.dispose(true, false);
+    // select the next connected block
+    if(nextBlock) {
+      nextBlock.select();
+    }
+  }
+}
