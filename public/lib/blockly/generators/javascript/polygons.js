@@ -16,6 +16,8 @@ Blockly.JavaScript.polygons_sketch = function() {
   return code; //[code, Blockly.JavaScript.ORDER_NONE];
 };
 
+
+
 Blockly.Language.polygons_sketch = {
   category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
@@ -181,9 +183,9 @@ matchPhrases['triangle [10]'] = function(args){
 
 Blockly.JavaScript.polygons_extrude = function() {
   var polyline = Blockly.JavaScript.statementToCode(this, 'shapeToExtrude');
-  var extrudeX = var_to_number(Blockly.JavaScript.valueToCode(this, 'extrudeX', Blockly.JavaScript.ORDER_NONE)) || 0;
-  var extrudeY = var_to_number(Blockly.JavaScript.valueToCode(this, 'extrudeY', Blockly.JavaScript.ORDER_NONE)) || 0;
-  var extrudeZ = var_to_number(Blockly.JavaScript.valueToCode(this, 'extrudeZ', Blockly.JavaScript.ORDER_NONE)) || 10;
+  var extrudeX = Blockly.JavaScript.valueToCode(this, 'extrudeX', Blockly.JavaScript.ORDER_ATOMIC) || 0;
+  var extrudeY = Blockly.JavaScript.valueToCode(this, 'extrudeY', Blockly.JavaScript.ORDER_ATOMIC) || 0;
+  var extrudeZ = Blockly.JavaScript.valueToCode(this, 'extrudeZ', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var code = '';
   var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
   code = polyline+'.extrude({offset:['+extrudeX+','+extrudeY+','+extrudeZ+']})'+selectedStr+';';
@@ -219,12 +221,20 @@ Blockly.Language.polygons_extrude = {
     this.setTooltip('Make a 3D shape from a 2D shape by giving it thickness.');
   }
 };
+matchPhrases['extrude [thickness=10]'] = function(args){
+  var arg1 = 10;
+  if(args && args.length>1) {var i = 1;
+    arg1 = args[i++];
+  }
+  createBlockAtCursor('<block type="polygons_extrude"><value name="extrudeZ"><block type="math_number"><title name="NUM">'+arg1+'</title></block></value></block>');
+};
+
 matchPhrases['prism'] = function(args){
   var arg1 = 10;
   if(args && args.length>1) {var i = 1;
     arg1 = args[i++];
   }
-  createBlockAtCursor('<xml><block type="polygons_extrude" inline="true" x="-10" y="16"><value name="extrudeZ"><block type="math_number"><title name="NUM">20</title></block></value><statement name="shapeToExtrude"><block type="polygons_polygon"><title name="polyName">polyline</title><statement name="pointList"><block type="polygons_point" inline="true"><next><block type="polygons_point" inline="true"><value name="tX"><block type="math_number"><title name="NUM">'+arg1+'</title></block></value><next><block type="polygons_point" inline="true"><value name="tY"><block type="math_number"><title name="NUM">'+arg1+'</title></block></value></block></next></block></next></block></statement></block></statement></block></xml>');
+  createBlockAtCursor('<block type="polygons_extrude"><value name="extrudeZ"><block type="math_number"><title name="NUM">20</title></block></value><statement name="shapeToExtrude"><block type="polygons_polygon"><title name="polyName">polyline</title><statement name="pointList"><block type="polygons_point" inline="true"><next><block type="polygons_point" inline="true"><value name="tX"><block type="math_number"><title name="NUM">'+arg1+'</title></block></value><next><block type="polygons_point" inline="true"><value name="tY"><block type="math_number"><title name="NUM">'+arg1+'</title></block></value></block></next></block></next></block></statement></block></statement></block>');
 };
 
 
