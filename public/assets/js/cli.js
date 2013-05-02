@@ -278,7 +278,77 @@ function myKeyEvent(e){
   }
   focus = $('#quickSearchDiv input').is(":focus");
   if(!focus) {
-    console.log("arg"+ argumentIndex+': abort. No focus. Turning off reverse search.');
+    // console.log("arg"+ argumentIndex+': abort.');
+    // TODO add minus sign
+    if(keyCode === 189) {
+      try { 
+        if(typeof Blockly.FieldTextInput.htmlInput_ === "undefined")
+          Blockly.selected.inputList[0].titleRow[0].showEditor_();
+        else if(Blockly.FieldTextInput.htmlInput_ === null)
+          Blockly.selected.inputList[0].titleRow[0].showEditor_();
+      }
+      catch (e) {
+      }
+    }
+    // FIXME: This is realy messy code. Clean it up. The goal of this code is to fix a Blockly bug without changing blockly
+    // This turns out to be harder than I though. I should fix it in blockly or report the bug.
+    if(keyCode > 47 && keyCode <= 57 && Blockly.selected && !e.shiftKey) {
+      if(Blockly.selected.type == 'math_number') {
+        var textFieldSelected = true;
+        if(typeof Blockly.FieldTextInput.htmlInput_ === "undefined")
+          textFieldSelected = false;
+        if(Blockly.FieldTextInput.htmlInput_ === null) 
+          textFieldSelected = false;
+        console.log('textFieldSelected',textFieldSelected);
+        if(textFieldSelected) {
+        }
+        if(true) {// if(textFieldSelected == true) {
+          console.log(Blockly.selected,keyCode-48);// 0=48, 9=57
+          if(typeof Blockly.FieldTextInput.htmlInput_ === 'object' && Blockly.FieldTextInput.htmlInput_ !== null) {
+            console.log('FTI obj...',Blockly.FieldTextInput.htmlInput_);
+            // $(Blockly.FieldTextInput.htmlInput_).focus();
+            // Blockly.FieldTextInput.htmlInput_.focus();
+            // Blockly.FieldTextInput.htmlInput_.blur();
+
+            // return;
+          }
+          try {
+
+            console.log('typeof htmlInput_: ',typeof Blockly.FieldTextInput.htmlInput_);
+            console.log('selblock text_: ',Blockly.selected.inputList[0].titleRow[0].text_);
+            // Blockly.selected.inputList[0].titleRow[0].setText(keyCode -48 + "");
+            // TODO: if it's NOT the same textfield object, blur first
+            // 
+            // Blockly.selected.inputList[0].titleRow[0].validate_();
+            // console.log("htmlInput_",Blockly.selected.inputList[0].titleRow[0].htmlInput_);
+            if(typeof Blockly.FieldTextInput.htmlInput_ === "undefined") {
+              // Blockly.selected.inputList[0].titleRow[0].showEditor_();
+            }
+            else if(Blockly.FieldTextInput.htmlInput_ === null) {
+              // Blockly.FieldTextInput.htmlInput_.blur();
+              // setTimeout(function(){
+                // if(Blockly.FieldTextInput.htmlInput_)
+                  // $(Blockly.FieldTextInput.htmlInput_).blur();
+                Blockly.selected.inputList[0].titleRow[0].showEditor_();
+
+// 
+              // },1000);
+              
+            }
+            // htmlInput_
+            // Blockly.bindEvent_(htmlInput, 'blur', this, this.onHtmlInputBlur_);
+
+
+          } catch (e) {
+          }
+
+        }
+
+        } 
+
+
+
+    }
 
     insertBlockBefore = false;
 
