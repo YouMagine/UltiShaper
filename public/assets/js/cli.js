@@ -64,11 +64,13 @@ matchPhrases.load = function() { loadCode(); };
 
 matchPhrases.duplicate = function () { Blockly.mainWorkspace.paste(Blockly.Xml.blockToDom_(Blockly.selected)); }
 matchPhrases['number [10]'] = function(args) {
-var num = 10;
-if(args.length > 1)
-  num = args[1];
-
-  createBlockAtCursor('<block type="math_number"><title name="NUM">'+num+'</title></block>');
+  var num = 10;
+  console.log(args);
+  args.shift(); // remove first el.
+  for(var i in args) {
+    if(!isNaN(args[i]))
+      createBlockAtCursor('<block type="math_number"><title name="NUM">'+Number(args[i])+'</title></block>');
+  }
 };
 // block navigation
 

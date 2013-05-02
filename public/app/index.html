@@ -175,6 +175,11 @@ console.log('createBlockAtCursor('+xmlStr+')');
     if(insertBlockBefore == false) {
       if(topBlocks.length > 1) {
         var lastBlockAdded = topBlocks[topBlocks.length-1];
+        if(lastBlockAdded.outputConnection !== null) {
+          console.log("Just leaving this block unconnected, since it's an output.",lastBlockAdded);
+          return;
+        }
+        if(selectedBlock.nextConnection === null) return;
         if(selectedBlock.nextConnection.targetConnection === null) {
           selectedBlock.nextConnection.connect(lastBlockAdded.previousConnection);
         } else {
@@ -191,6 +196,11 @@ console.log('createBlockAtCursor('+xmlStr+')');
       console.log('insertBlockBefore',insertBlockBefore);
       if(topBlocks.length > 1) {
         var lastBlockAdded = topBlocks[topBlocks.length-1];
+        if(lastBlockAdded.outputConnection !== null) {
+          console.log("Just leaving this block unconnected, since it's an output.",lastBlockAdded);
+          return;
+        }
+        if(selectedBlock.previousConnection === null) return;
         if(selectedBlock.previousConnection.targetConnection === null) {
           selectedBlock.previousConnection.connect(lastBlockAdded.nextConnection);
         } else {
