@@ -160,8 +160,8 @@ matchPhrases['scale [x=1] [y=1] [z=1]'] = function(args){
   if(args && args.length>2) { i = 1;
     x = args[1]; y = args[2];
   }
-  if(args && args.length>1) {
-    x = args[1];
+  if(args && args.length == 2) {
+    x = args[1]; y = args[1]; z = args[1];
   }
   insertBlockBefore = true;
   removePreviousCursorCmdBlockIf('cursor_scale');
