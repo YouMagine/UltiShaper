@@ -242,7 +242,7 @@ function myKeyEvent(e){
       if(e.shiftKey) {
         var num = prompt("Enter a number to create a block?");
         console.log(num,Number(num));
-        createBlockAtCursor('<block type="math_number"><title name="NUM">'+Number(num)+'</title></block></value>');
+        createBlockAtCursor('<block type="math_number"><title name="NUM">'+Number(num)+'</title></block>');
         return;
       }
     break;
