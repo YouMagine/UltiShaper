@@ -68,7 +68,7 @@ var num = 10;
 if(args.length > 1)
   num = args[1];
 
-  createBlockAtCursor('<xml><block type="math_number"><title name="NUM">'+num+'</title></block></value>');
+  createBlockAtCursor('<block type="math_number"><title name="NUM">'+num+'</title></block>');
 };
 // block navigation
 
@@ -240,7 +240,7 @@ function myKeyEvent(e){
       if(e.shiftKey) {
         var num = prompt("Enter a number to create a block?");
         console.log(num,Number(num));
-        createBlockAtCursor('<xml><block type="math_number"><title name="NUM">'+Number(num)+'</title></block></value>');
+        createBlockAtCursor('<block type="math_number"><title name="NUM">'+Number(num)+'</title></block></value>');
         return;
       }
     break;

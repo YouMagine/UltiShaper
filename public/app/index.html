@@ -138,6 +138,10 @@ $('#inputPane').hide();
 function createBlockAtCursor(xmlStr){
 // create block after selection and select that block
 // when empty, just paste block:
+  if(xmlStr.substring(0,5) !== '<xml>') {
+    xmlStr = '<xml>'+xmlStr+'</xml>';
+  }
+
   if(Blockly.mainWorkspace.getTopBlocks().length == 0)
   {
     try {

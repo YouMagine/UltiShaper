@@ -44,15 +44,18 @@ Blockly.Language.cursor_rotate = {
 };
 matchPhrases['rotate [x=0] [y=0] [z=45]'] = function(args){
   var x = 0, y = 0, z = 45;
-  if(args && args.length>3) {var i = 1;
-    x = args[i++]; y = args[i++]; z = args[i++];
+  if(args && args.length>3) {
+    x = args[1]; y = args[2]; z = args[3];
   }
-  if(args && args.length>1) {var i = 1;
-    x = args[i++];
+  if(args && args.length==3) {
+    x = args[1]; y = args[2]; z = 0;
+  }
+  if(args && args.length==2) {
+    x = args[1]; y = 0; z = 0;
   }
   insertBlockBefore = true;
   removePreviousCursorCmdBlockIf('cursor_rotate');
-  createBlockAtCursor('<xml><block type="cursor_rotate"><title name="NAME">rotateBy</title><value name="rX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="rY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="rZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
+  createBlockAtCursor('<block type="cursor_rotate"><title name="NAME">rotateBy</title><value name="rX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="rY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="rZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block>');
 };
 
 
@@ -99,19 +102,19 @@ Blockly.Language.cursor_move = {
   }
 };
 matchPhrases['move [x=10] [y=0] [z=0]'] = function(args){
-  var x = 10, y = 0, z = 0, i;
-  if(args && args.length>3) { i = 1;
-    x = args[i++]; y = args[i++]; z = args[i++];
+  var x = 10, y = 0, z = 0;
+  if(args && args.length>3) {
+    x = args[1]; y = args[2]; z = args[3];
   }
   if(args && args.length>2) { i = 1;
-    x = args[i++]; y = args[i++];
+    x = args[1]; y = args[2];
   }
   if(args && args.length>1) {
     x = args[1];
   }
   insertBlockBefore = true;
   removePreviousCursorCmdBlockIf('cursor_move');
-  createBlockAtCursor('<xml><block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
+  createBlockAtCursor('<block type="cursor_move" inline="true"><title name="NAME">moveBy</title><value name="tX"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="tY"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="tZ"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block>');
 };
 
 
@@ -150,19 +153,19 @@ Blockly.Language.cursor_scale = {
   }
 };
 matchPhrases['scale [x=1] [y=1] [z=1]'] = function(args){
-  var x = 1, y = 1, z = 1, i;
-  if(args && args.length>3) { i = 1;
-    x = args[i++]; y = args[i++]; z = args[i++];
+  var x = 1, y = 1, z = 1;
+  if(args && args.length>3) {
+    x = args[1]; y = args[2]; z = args[3];
   }
   if(args && args.length>2) { i = 1;
-    x = args[i++]; y = args[i++];
+    x = args[1]; y = args[2];
   }
   if(args && args.length>1) {
     x = args[1];
   }
   insertBlockBefore = true;
   removePreviousCursorCmdBlockIf('cursor_scale');
-  createBlockAtCursor('<xml><block type="cursor_scale" inline="true"><value name="X"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="Y"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="Z"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block></xml>');
+  createBlockAtCursor('<block type="cursor_scale" inline="true"><value name="X"><block type="math_number"><title name="NUM">'+x+'</title></block></value><value name="Y"><block type="math_number"><title name="NUM">'+y+'</title></block></value><value name="Z"><block type="math_number"><title name="NUM">'+z+'</title></block></value></block>');
 };
 
 function removePreviousCursorCmdBlockIf(blockType) {
