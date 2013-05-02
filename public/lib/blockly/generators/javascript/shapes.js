@@ -101,22 +101,22 @@ Blockly.Language.assembly_part = {
 
 
 Blockly.JavaScript.shape_sphere = function() {
-  var value_radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
+  var value_diameter = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   // todo: assemble javaScript into code variable.
-  // var code = 'alert(\'sphere r = '+value_radius+')';
+  // var code = 'alert(\'sphere r = '+value_diameter+')';
   // todo: change order_none to the correct strength.
   // return [code, Blockly.JavaScript.ORDER_NONE];
   
   // console.log({isSelected: blockIsSelected(this,'bubbletoshape')});
   if(codeLanguage == 'vol0.1')
-    return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX="'+value_radius+'" radiusY="'+value_radius+'" radiusZ="'+value_radius+'"></uformia.base.Sphere.20110605>';
+    return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX="'+value_diameter+'" radiusY="'+value_diameter+'" radiusZ="'+value_diameter+'"></uformia.base.Sphere.20110605>';
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    return 'new Sphere({d:'+value_radius+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+scaleStr+';\n';
+    return 'new Sphere({d:'+value_diameter+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+scaleStr+';\n';
   }
   else
-    return 'sphere(r='+value_radius+');\n';
+    return 'sphere(r='+value_diameter+');\n';
 };
 Blockly.Language.shape_sphere = {
   category: ucfirst(getLang('shape')),
@@ -126,14 +126,22 @@ Blockly.Language.shape_sphere = {
     this.appendDummyInput()
         .appendTitle(new Blockly.FieldImage("assets/img/shape_sphere.png", 25, 25))
         .appendTitle(ucfirst(LANG.sphere));
-    this.appendValueInput("radius")
+    this.appendValueInput("diameter")
         .setCheck(Number)
-        .appendTitle(LANG.radius);
+        .appendTitle(LANG.diameter);
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Creates a sphere');
   }
+};
+matchPhrases['sphere [d=10]'] = function(args){
+  var d = 10;
+  if(args && args.length>1) {
+    d = args[1];
+  }
+  if(!isNaN(d))
+    createBlockAtCursor('<block type="shape_sphere"><value name="diameter"><block type="math_number"><title name="NUM">'+Number(d)+'</title></block></value></block>');
 };
 
 Blockly.JavaScript.shape_cube = function() {
