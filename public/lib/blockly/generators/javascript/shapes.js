@@ -81,6 +81,7 @@ Blockly.Language.assembly_part = {
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/assembly.png", 27, 24))
         .appendTitle("Part").appendTitle(new Blockly.FieldTextInput('Part name 1'), 'PARTNAME');
     this.appendStatementInput("SHAPESADD")
         // .setCheck(["Shape", "Assembly"])

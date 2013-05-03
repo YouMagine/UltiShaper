@@ -33,6 +33,7 @@ Blockly.Language.polygons_sketch = {
   init: function() {
     this.setColour(230);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/2dsketch.png", 25, 24))
         .appendTitle("Sketch");
     this.appendDummyInput()
         .appendTitle("coordinate code")
@@ -212,6 +213,7 @@ Blockly.Language.polygons_extrude = {
   init: function() {
     this.setColour(230);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/extrude2.png", 25, 24))
         .appendTitle("Extrude shape");
     this.appendValueInput("extrudeX")
         .setCheck(Number)

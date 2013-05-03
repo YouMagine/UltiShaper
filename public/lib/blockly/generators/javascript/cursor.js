@@ -25,6 +25,7 @@ Blockly.Language.cursor_rotate = {
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/rotate.png", 32, 24))
         // .appendTitle(new Blockly.FieldImage("../webgl/shape_cube.png", 25, 25))
         .appendTitle(new Blockly.FieldDropdown([[ucfirst(getLang('rotateBy')), "rotateBy"], [ucfirst(getLang('rotateTo')), "rotateTo"]]), "NAME");
     this.appendValueInput("rX")
@@ -88,6 +89,7 @@ Blockly.Language.cursor_move = {
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/move.png", 29, 24))
         .appendTitle(new Blockly.FieldDropdown([[ucfirst(getLang('moveBy')), "moveBy"], [ucfirst(getLang('moveTo')), "moveTo"]]), "NAME");
     this.appendValueInput("tX")
         .appendTitle("X");
@@ -139,6 +141,7 @@ Blockly.Language.cursor_scale = {
   init: function() {
     this.setColour(65);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/scale.png", 27, 24))
         .appendTitle(getLang("Scale"));
     this.appendValueInput("X")
         .appendTitle("X");
