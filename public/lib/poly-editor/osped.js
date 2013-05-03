@@ -363,6 +363,10 @@ function updateExport()
 	}
 	$("#exportArea").val(str);
 	local.oldExportStr = str;
+	// FIXME: do something like this to preserve more state:
+	// window.localStorage.setItem("2dcanvas.paths",JSON.stringify(local.paths));
+	window.localStorage.setItem("2dcanvas.polyString",str);
+
 }
 
 $(document).mousedown(function(e) {

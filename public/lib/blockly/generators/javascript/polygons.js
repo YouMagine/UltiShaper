@@ -1,12 +1,21 @@
 
 Blockly.JavaScript.polygons_sketch = function() {
   var code = this.getTitleValue('code') || '[0,0],[10,0],[0,10]';
+  if(typeof canvas2d === 'object') {
+    // FIXME: This is just a proof of concept way of allowing the inter-browser communications.
+    if(canvas2d.isMonitoring() == false) {
+      canvas2d.startMonitoring(500);
+      $(document).bind('SKETCH_CHANGED', myUpdateFunction);
+    }
+    code = canvas2d.getPolyLineStr();
+  }
+
   code = code.replace(/\/\*[^\*]*\*\//g,"");
   code = code.replace(/polygon\(\[/g,""); // remove polygon([ from string
   code = code.replace(/\]\);?/g,""); // remove ]); from string
-
   code = 'fromPoints(['+code+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
 
+  console.log("sketch code = ",code);
   if(codeLanguage == 'vol0.1')
     return '';
   if(codeLanguage == 'coffeescad0.1') {
