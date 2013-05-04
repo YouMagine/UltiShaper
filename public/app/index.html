@@ -133,6 +133,7 @@ $('#inputPane').hide();
   window.setInterval(doAutoSave,autoSaveInterval);
   loadMatches('shapes'); // load defines, etc.
 
+
 } // end of function init
 
 function createBlockAtCursor(xmlStr){
@@ -644,6 +645,11 @@ $(window).resize(function() {
 #jqDialog { 
   display:none;
 }
+.unselectable, .blocklyToolboxDiv { -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
   </style>
 </head>
 <body onload="init()">
