@@ -230,7 +230,7 @@ Blockly.Language.polygons_extrude = {
         .setCheck(Number)
         .appendTitle("Z (thickness)");
     this.appendStatementInput("shapeToExtrude")
-        .appendTitle("Polyline to expand");
+        .appendTitle("Polyline to extrude");
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
