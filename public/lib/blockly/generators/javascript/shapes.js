@@ -102,7 +102,7 @@ Blockly.Language.assembly_part = {
 
 
 Blockly.JavaScript.shape_sphere = function() {
-  var value_diameter = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_ATOMIC) || 10;
+  var value_diameter = Blockly.JavaScript.valueToCode(this, 'diameter', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
   // todo: assemble javaScript into code variable.
   // var code = 'alert(\'sphere r = '+value_diameter+')';
