@@ -58,7 +58,8 @@ Canvas2d.prototype.openWindow = function() {
 
 };
 Canvas2d.prototype.getPolyLineStr = function() {
-    return this.polyLineStr.trim();
+	if(this.polyLineStr != null)
+    	return this.polyLineStr.trim();
 };
 Canvas2d.prototype.isMonitoring = function() {
     return (this.monitorPid !== null);
