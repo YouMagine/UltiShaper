@@ -10,7 +10,9 @@ function Canvas2d () {
     this.isWindowOpen = false;
     this.dialog = null;
     this.updateState = function() {
-		canvas2d.setPolyLineStr(window.localStorage.getItem("2dcanvas.polyString"));
+    	var str = '';
+    	str = window.localStorage.getItem("2dcanvas.polyString") || '';
+		canvas2d.setPolyLineStr(str);
     	if(canvas2d.getPolyLineStr() != canvas2d.lastPolyStr) {
     		console.log("updated",canvas2d.polyLineStr);
     		$(document).trigger('SKETCH_CHANGED');
