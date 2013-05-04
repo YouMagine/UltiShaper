@@ -2,18 +2,47 @@
 <head>
   <meta charset="utf-8">
   <title>UltiCreator Blocks</title>
-  <!--
-  <script type="text/javascript" src="assets/js/localization.js"></script>
-  <script type="text/javascript" src="/translations.js"></script>-->
   
+  <script type="text/javascript" src="assets/js/localization.js"></script>
+
+    <script type="text/javascript">
+// default lang:
+LANG = LANG_EN_EN;
+
+var codeLanguage = "coffeescad0.1"
+var cursor_rot=[0,0,0];
+var cursor_trans=[0,0,0];
+var cursor_scale=[1,1,1];
+var colors = {selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255]};
+
+re = /l=([^&]*)/g;
+var urlLang = '';
+try
+{
+  if(location.search)
+    urlLang = re.exec(location.search.slice(1))[1];
+  else urlLang = 'EN_EN';
+  if(urlLang=='NL_NL'){ LANG = LANG_NL_NL;}
+  if(urlLang=='EN_EN'){ LANG = LANG_EN_EN;}
+  if(urlLang=='DE_DE'){ LANG = LANG_DE_DE;}
+} catch (err) {
+  console.log('Error trying to detect best language. Defaulting to English.',err);
+}
+if(typeof urlLang !='string' || urlLang == '') 
+  urlLang = 'EN_EN';
+
+</script>
+    <script type="text/javascript" src="/translations.js"></script>
   <!--
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>-->
   <!-- blockly -->
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="assets/js/utils.js"></script><!-- Various utilities -->
-  <script type="text/javascript" src="assets/js/history.js"></script><!-- Undo/Redo -->
-  <script type="text/javascript" src="assets/js/2dcanvas.js"></script><!-- 2D canvas tool -->
+  
+  <!-- <script type="text/javascript" src="assets/js/history.js"></script>Undo/Redo -->
+  <!-- <script type="text/javascript" src="assets/js/2dcanvas.js"></script>2D canvas tool -->
+  
   <script type="text/javascript" src="assets/js/cli.js"></script><!-- Command line interface -->
   <script type="text/javascript" src="lib/blockly/language/en/_messages.js"></script>
   <script type="text/javascript" src="lib/blockly/language/common/math.js"></script>
@@ -51,6 +80,10 @@
       width: 95%;
       border: 1px solid #ccc;
     }
+    .blocklySvg {
+        height: 100%;
+        width: 100%;
+      }
 </style>
 
 </head>

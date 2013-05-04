@@ -4,7 +4,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var $, BlocklyEditorView, appVent, jquery_layout, jquery_ui, marionette, template, _;
+  var $, BlocklyEditorView, appVent, jquery_layout, jquery_ui, marionette, template, utils, _;
 
   $ = require('jquery');
   _ = require('underscore');
@@ -14,6 +14,7 @@ define(function(require) {
   jquery_ui = require('jquery_ui');
   appVent = require('core/messaging/appVent');
   template = require("text!./blocklyEditorView.tmpl");
+  utils = require('./utils');
   BlocklyEditorView = (function(_super) {
     var _blockIsShape;
 
@@ -39,6 +40,7 @@ define(function(require) {
       this.onResizeStart = __bind(this.onResizeStart, this);
       this.onDomRefresh = __bind(this.onDomRefresh, this);
       this.clearWorkspace = __bind(this.clearWorkspace, this);
+      this.codeUpdateFunction = __bind(this.codeUpdateFunction, this);
       this._tearDownEventHandlers = __bind(this._tearDownEventHandlers, this);
       this._setupEventHandlers = __bind(this._setupEventHandlers, this);
       var keepers, newLanguage, x, _i, _ref;
@@ -46,6 +48,7 @@ define(function(require) {
       BlocklyEditorView.__super__.constructor.call(this, options);
       this.settings = options.settings;
       this._setupEventHandlers();
+      this.project = this.model;
       this.cursor_rot = [0, 0, 0];
       this.cursor_trans = [0, 0, 0];
       this.cursor_scale = [1, 1, 1];
@@ -67,8 +70,8 @@ define(function(require) {
 
     BlocklyEditorView.prototype._tearDownEventHandlers = function() {};
 
-    BlocklyEditorView.prototype.myUpdateFunction = function() {
-      var allFields, code, codeLanguage, cursor_move, cursor_rot, cursor_scale, i, inputs, joinShapesList, langDropbox, myVars, post, pre, str, variables, xml;
+    BlocklyEditorView.prototype.codeUpdateFunction = function() {
+      var allFields, code, codeLanguage, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainFile, str, variables, xml;
 
       this.skipMyUpdate = false;
       this.numUpdates = 0;
@@ -76,7 +79,7 @@ define(function(require) {
         console.log("Skipping my update...", skipMyUpdate);
         return;
       }
-      xml = getXML();
+      xml = utils.getXML();
       if (typeof inputManager === "object") {
         inputs = inputManager.list();
         i = 0;
@@ -102,9 +105,6 @@ define(function(require) {
         hist.addEntry(xml);
       }
       langDropbox = document.getElementById("lang");
-      cursor_rot = [0, 0, 0];
-      cursor_move = [0, 0, 0];
-      cursor_scale = [1, 1, 1];
       myVars = void 0;
       codeLanguage = $("#langDropbox").val();
       if (typeof codeLanguage !== "string") {
@@ -126,7 +126,7 @@ define(function(require) {
           post += ")";
         }
         code = pre + joinShapesList.shift().trim() + post;
-        code = "# coffeescad0.1\n\nrot=[0,0,0];tr=[0,0,0];\nreturn " + code;
+        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\nassembly.add(" + code + ")";
       }
       if (codeLanguage === "vol0.1") {
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">";
@@ -137,9 +137,10 @@ define(function(require) {
         code = Blockly.Generator.workspaceToCode("JavaScript");
         code = "$fs=0.4;\n$fa=5;\n" + code;
       }
-      document.getElementById("codearea").value = code;
-      if (app2 && app2.loadCode) {
-        return app2.loadCode(code);
+      projectMainFile = this.project.rootFolder.get("" + this.project.name + ".coffee");
+      projectMainFile.content = code;
+      if (this.app2 && this.app2.loadCode) {
+        return this.app2.loadCode(code);
       }
     };
 
@@ -284,18 +285,35 @@ define(function(require) {
         console.log("couldn't load CLI.");
       }
       toolbox = this.ui.toolbox[0];
-      toolbox = document.getElementById('blocklyToolbox');
-      console.log("toolbox", toolbox);
       Blockly.inject(document.getElementById('svgDiv'), {
         path: 'lib/blockly/',
         toolbox: toolbox
       });
-      return Blockly.addChangeListener(this.myUpdateFunction);
+      Blockly.addChangeListener(this.codeUpdateFunction);
+      window.blockIsSelected = this._blockIsSelected;
+      window.blockIsShape = this._blockIsShape;
+      window.createBlockAtCursor = this._createBlockAtCursor;
+      window.cursor_rot = this.cursor_rot;
+      window.cursor_move = this.cursor_trans;
+      return window.cursor_scale = this.cursor_scale;
     };
 
     BlocklyEditorView.prototype.onResizeStart = function() {};
 
-    BlocklyEditorView.prototype.onResizeStop = function() {};
+    BlocklyEditorView.prototype.onResizeStop = function() {
+      console.log("blockly view resize stop");
+      return $('#blockly').css('width', $(window).width() - 20);
+      /* 
+      $('#blockly').css('top',$(window).height()-115)
+      $('#blockly').css('height',360)
+      $('#blockly').css('right',$(window).width())
+      $('#blockly').css('width',$(window).width()-20)
+      $('#qsResults').css('left',$('#quickSearchDiv').position().left)
+      if (navigator.userAgent.indexOf("Firefox")!=-1) 
+        $('#blockly').css('top',$(document).height()-$('#blockly').height()/2+60)
+      */
+
+    };
 
     BlocklyEditorView.prototype.onClose = function() {
       this._tearDownEventHandlers();

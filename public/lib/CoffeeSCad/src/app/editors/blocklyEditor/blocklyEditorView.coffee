@@ -9,6 +9,7 @@ define (require)->
   appVent = require 'core/messaging/appVent'
   
   template =  require "text!./blocklyEditorView.tmpl"
+  utils = require './utils'
 
 
   class BlocklyEditorView extends Backbone.Marionette.ItemView
@@ -26,6 +27,8 @@ define (require)->
       super options
       @settings = options.settings
       @_setupEventHandlers()
+      
+      @project = @model
       
       @cursor_rot=[0,0,0]
       @cursor_trans=[0,0,0]
@@ -47,15 +50,15 @@ define (require)->
     _tearDownEventHandlers:=>
       #appVent.off("project:compiled",@onProjectCompiled)
     
-    myUpdateFunction:->
+    codeUpdateFunction:=>
       @skipMyUpdate = false
       @numUpdates = 0
       
       if @skipMyUpdate
         console.log "Skipping my update...", skipMyUpdate
         return
-      # console.log('myUpdateFunction() ran '+(numUpdates++)+' times');
-      xml = getXML()
+      # console.log('codeUpdateFunction() ran '+(numUpdates++)+' times');
+      xml = utils.getXML()
       if typeof inputManager is "object"
         inputs = inputManager.list()
         i = 0
@@ -75,13 +78,12 @@ define (require)->
         $("#inputModal").hide()
       hist.addEntry xml  unless typeof hist is "undefined"
       langDropbox = document.getElementById("lang")
-      cursor_rot = [0, 0, 0]
-      cursor_move = [0, 0, 0]
-      cursor_scale = [1, 1, 1]
+      
       myVars = undefined
       codeLanguage = $("#langDropbox").val()
       codeLanguage = "coffeescad0.1"  unless typeof codeLanguage is "string"
       code = undefined
+      
       if codeLanguage is "coffeescad0.1"
         variables = Blockly.Variables.allVariables()
         code = Blockly.Generator.workspaceToCode("JavaScript")
@@ -91,13 +93,12 @@ define (require)->
         while joinShapesList.length > 2
           str = joinShapesList.shift()
           continue  if str.substring(0, 4) is "var " # skip variable assignments
-          # colors.selected 
-          
           # if(joinShapesList.current()=='')
           pre += str.trim() + ".union("
           post += ")"
         code = pre + joinShapesList.shift().trim() + post
-        code = "# coffeescad0.1\n\nrot=[0,0,0];tr=[0,0,0];\nreturn " + code
+        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\nassembly.add(#{code})" 
+        
       if codeLanguage is "vol0.1"
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">"
         code += Blockly.Generator.workspaceToCode("JavaScript")
@@ -105,8 +106,13 @@ define (require)->
       if codeLanguage is "scad"
         code = Blockly.Generator.workspaceToCode("JavaScript")
         code = "$fs=0.4;\n$fa=5;\n" + code
-      document.getElementById("codearea").value = code
-      app2.loadCode code  if app2 and app2.loadCode 
+        
+      #get the project's main file
+      projectMainFile = @project.rootFolder.get("#{@project.name}.coffee")
+      #set the code : all view will get the propagated content automagically
+      projectMainFile.content = code
+      #document.getElementById("codearea").value = code
+      @app2.loadCode code  if @app2 and @app2.loadCode 
     
     clearWorkspace: =>
       # Blockly.mainWorkspace.getTopBlocks(false)[0].dispose();
@@ -222,14 +228,33 @@ define (require)->
         console.log("couldn't load CLI.")
       
       toolbox = @ui.toolbox[0]
-      toolbox = document.getElementById('blocklyToolbox')
-      console.log "toolbox",toolbox
-      #Blockly.inject(document.getElementById('svgDiv'),{ path: '../../',toolbox: toolbox })
+      #toolbox = document.getElementById('blocklyToolbox')
       Blockly.inject(document.getElementById('svgDiv'),{ path: 'lib/blockly/',toolbox: toolbox })
-      Blockly.addChangeListener(@myUpdateFunction)
+      Blockly.addChangeListener(@codeUpdateFunction)
+      
+      #big bad hack:#TODO: clean this up
+      window.blockIsSelected = @_blockIsSelected
+      window.blockIsShape= @_blockIsShape
+      window.createBlockAtCursor = @_createBlockAtCursor
+      
+      window.cursor_rot=@cursor_rot
+      window.cursor_move=@cursor_trans
+      window.cursor_scale=@cursor_scale
 
     onResizeStart:=>
+      
     onResizeStop:=>
+      console.log "blockly view resize stop"
+      $('#blockly').css('width',$(window).width()-20)
+      ### 
+      $('#blockly').css('top',$(window).height()-115)
+      $('#blockly').css('height',360)
+      $('#blockly').css('right',$(window).width())
+      $('#blockly').css('width',$(window).width()-20)
+      $('#qsResults').css('left',$('#quickSearchDiv').position().left)
+      if (navigator.userAgent.indexOf("Firefox")!=-1) 
+        $('#blockly').css('top',$(document).height()-$('#blockly').height()/2+60)
+      ###
       
     onClose:=>
       @_tearDownEventHandlers()
