@@ -111,8 +111,8 @@ function init() {
   Blockly.inject(document.getElementById('svgDiv'),{ path: '../../',toolbox: toolbox });
 
   Blockly.addChangeListener(myUpdateFunction);
-  Blockly.bindEvent_(Blockly.mainWorkspace.getCanvas(),
-        'blocklySelectChange', null, function() {setTimeout(myUpdateFunction,1)});
+  // Blockly.bindEvent_(Blockly.mainWorkspace.getCanvas(),
+        // 'blocklySelectChange', null, function() {setTimeout(myUpdateFunction,1)});
   // window.onbeforeunload = function() {
    // return 'Leaving this page will result in the loss of your work.';
   // };
@@ -280,7 +280,13 @@ console.log('createBlockAtCursor('+xmlStr+')');
 }
 
 var numUpdates = 0;
+
+var skipMyUpdate = false;
 function myUpdateFunction() {
+  if(skipMyUpdate) {
+    console.log("Skipping my update...",skipMyUpdate);
+    return;
+  }
   // console.log('myUpdateFunction() ran '+(numUpdates++)+' times');
   var xml = getXML();
   if(typeof inputManager === 'object') {
