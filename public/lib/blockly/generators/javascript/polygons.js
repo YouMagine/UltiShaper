@@ -9,6 +9,11 @@ Blockly.JavaScript.polygons_sketch = function() {
     }
     code = canvas2d.getPolyLineStr();
   }
+  if(Blockly.selected == this)
+    canvas2d.addBlock(this);
+  skipMyUpdate = 'sketch';
+  this.setTitleValue(code,'code');
+  setTimeout(function(){skipMyUpdate = false;},200);
 
   code = code.replace(/\/\*[^\*]*\*\//g,"");
   code = code.replace(/polygon\(\[/g,""); // remove polygon([ from string
