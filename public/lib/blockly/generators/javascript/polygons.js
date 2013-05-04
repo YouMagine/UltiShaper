@@ -276,6 +276,7 @@ Blockly.Language.polygons_expand = {
   init: function() {
     this.setColour(230);
     this.appendDummyInput()
+        .appendTitle(new Blockly.FieldImage("assets/img/expand.png", 25, 24))
         .appendTitle("Expand shape");
     this.appendValueInput("expandX")
         .setCheck(Number)
