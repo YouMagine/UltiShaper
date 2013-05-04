@@ -1,0 +1,65 @@
+    body {
+      background-color: white;
+      font-family: sans-serif;
+    }
+    #blockly {top:750px;width: 500px;height:300px;
+      left: 287px;
+
+      position: absolute;}
+
+    #inputModal {top:350px;width: 380px;height: 180px;
+      left: 287px;
+      position: absolute;}
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+    #svgDiv {
+      height: 280px;
+      width: 95%;
+      border: 1px solid #ccc;
+    }
+    .hide {
+      display:none;
+    }
+    #qsResults {
+      z-index: 99;
+      top: 27px;
+      left:180px;
+      position: absolute;
+      background-color: #fff;
+      border: 1px #aaa solid;
+      border-radius: 4px;
+      padding: 4px;
+    }
+    .qsItem {
+      background-color: white;
+      width: 100%;
+      cursor: hand;
+      min-width: 240px;
+    }
+    .qsSelected {
+      color: white;
+      background-color: blue;
+    }
+    #langDropdown {width: 100px; position: fixed; top:30px;right:200px}
+/* flags from http://flag-sprites.com/ */
+.flag {width: 16px; height: 11px;background:url(flags.png) no-repeat}
+.flag.flag-ch {background-position: -16px 0}
+.flag.flag-de {background-position: -32px 0}
+.flag.flag-dk {background-position: -48px 0}
+.flag.flag-es {background-position: 0 -11px}
+.flag.flag-fi {background-position: -16px -11px}
+.flag.flag-fr {background-position: -32px -11px}
+.flag.flag-gb {background-position: -48px -11px}
+.flag.flag-it {background-position: 0 -22px}
+.flag.flag-nl {background-position: -16px -22px}
+.flag.flag-no {background-position: -32px -22px}
+.flag.flag-pt {background-position: -48px -22px}
+#jqDialog { 
+  display:none;
+}
+.unselectable, .blocklyToolboxDiv { -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}

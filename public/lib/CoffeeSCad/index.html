@@ -1,32 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="description" content="CoffeeSCad web based parametric CAD tool">
+	<meta name="keywords" content="CAD,Webgl,CoffeeSCad">
+	<meta name="author" content="Mark Moissette">
+	
+	<script src="app/disable_require.js"></script>
 	<script data-main="app/config" src="assets/js/libs/require.min.js"></script>
-	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	<!--<script data-main="build/main.min.js" src="assets/js/libs/require.min.js"></script>-->
+	<!--<script src="build/main.min.js"></script>-->
+	<!--<link id="mainTheme" rel="stylesheet" href="assets/css/themes/default/bootstrap.css">-->
 	<link rel="stylesheet" href="assets/css/font-awesome.css">
 	<link rel="stylesheet" href="assets/css/codemirror.css">
+	<link rel="stylesheet" href="assets/css/slider.css">
 	<link rel="stylesheet" href="assets/css/backbone.forms.default.css">
 	<link rel="stylesheet" href="assets/css/backbone.forms.bootstrap.css">
-	<link rel="stylesheet" href="assets/css/custom-theme/jquery-ui-1.9.0.custom.css">
-	<link rel="stylesheet" href="assets/css/editor.css">
+	<link rel="stylesheet" href="assets/css/ui-lightness/jquery-ui-1.10.1.custom.min.css">
+	<link rel="stylesheet" href="assets/js/libs/codeMirror/theme/lesser-dark.css"/>
+	<link id="mainTheme" rel="stylesheet" href="assets/css/style/coffeescad/bootstrap.css">
+	
 
 <title>CoffeeScad</title> 
 <link rel="shortcut icon" href="favicon.ico" />
 </head>
 
-<body >
-	<div class="container-fluid ui-layout-center">
-		<div class="row-fluid">
-			<div class="span12">
-				<div id="navigation">
-				</div>
-				<div id="mainContent" class="row-fluid " >
-				</div>	
-			</div>
+<body>
+	<div id="header" class="unselectable"> </div>
+	<div class="container-fluid fullHeight box-wrap-inner" id="mainContent">
+		<div id="_dockZoneWest" class="dockZone dockZoneWest"></div>
+		<div id="visual" class="unselectable"></div>
+		<div id="_dockZoneEast" class="dockZone dockZoneEast"></div>
+		<!--
+		<div id="_dockZoneNorth" class="dockZone dockZoneNorth"></div>
+		<div id="_dockZoneSouth" class="dockZone dockZoneSouth"></div>-->
+		<div id="initialLoader" class="initalLoaderOverlay">
+			<h3>Loading CoffeeSCad, please wait...</h3> <img src="assets/img/logo.png"/>
 		</div>
 	</div>
-	<div id="modal" class="modal hide fade">	</div>
-	<div id="alertmodal" class="modal hide fade">	</div>
-	<div id="dialogRegion"> </div>
+	<!--experimental, only used in node-webkit (desktop app) variant-->
+	<script>
+	  var http = nodeRequire('http');
+	
+	  http.createServer(function (req, res) {
+	    res.writeHead(200, {'Content-Type': 'text/plain'});
+	    res.end('hello');
+	  }).listen(10086);
+	  
+	  var io = require('socket.io').listen(80);
+
+		io.sockets.on('connection', function (socket) {
+		  socket.emit('news', { hello: 'world' });
+		  socket.on('my other event', function (data) {
+		    console.log(data);
+		  });
+		});
+	  
+	</script>
+	
 </body>
 </html>
