@@ -31,11 +31,12 @@ define(function(require) {
 
     function CoffeeScadApp(options) {
       this.onInitializeAfter = __bind(this.onInitializeAfter, this);
+      this.onInitializeBefore = __bind(this.onInitializeBefore, this);
       this.onProjectLoaded = __bind(this.onProjectLoaded, this);
-      this.onSettingsChanged = __bind(this.onSettingsChanged, this);
       this.onSettingsShow = __bind(this.onSettingsShow, this);
       this.onAppClosing = __bind(this.onAppClosing, this);
       this.onStart = __bind(this.onStart, this);
+      this._setupLanguage = __bind(this._setupLanguage, this);
       this._setupKeyboardBindings = __bind(this._setupKeyboardBindings, this);
       this.initLayout = __bind(this.initLayout, this);
       var BomExporter, BrowserStore, DropBoxStore, StlExporter, exporter, name, _ref,
@@ -48,6 +49,7 @@ define(function(require) {
       this.projectManager = new ProjectManager({
         appSettings: this.settings
       });
+      this.editorsList = ["code", "hierarchy", "blockly"];
       this.editors = {};
       this.exporters = {};
       this.stores = {};
@@ -104,8 +106,7 @@ define(function(require) {
     };
 
     CoffeeScadApp.prototype.initPreVisuals = function() {
-      "Initialize correct theme css";      this.theme = this.settings.get("General").get("theme");
-      return $("#mainTheme").attr("href", "assets/css/style/coffeescad/bootstrap.css");
+      "Initialize correct theme css";      return this.theme = this.settings.get("General").get("theme");
     };
 
     CoffeeScadApp.prototype.initData = function() {
@@ -127,37 +128,53 @@ define(function(require) {
       @$el.bind 'keydown', 'ctrl+s', ->
         console.log "i want to save a FILE"
         return false
+      
+      $(document).bind "keydown", "alt+n", =>
+        @vent.trigger("project:new")
+        return false
+        
+      $(document).bind "keydown", "ctrl+s", =>
+        @vent.trigger("project:save")
+        return false
+        
+      $(document).bind "keydown", "ctrl+l", =>
+        @vent.trigger("project:load")
+        return false
+      
+      $(document).bind "keydown", "alt+c", =>
+        @vent.trigger("project:compile")
+        return false
+      
+      $(document).bind "keydown", "f4", =>
+        @vent.trigger("project:compile")
+        return false
       */
 
-      var _this = this;
+    };
 
-      $(document).bind("keydown", "alt+n", function() {
-        _this.vent.trigger("project:new");
-        return false;
-      });
-      $(document).bind("keydown", "ctrl+s", function() {
-        _this.vent.trigger("project:save");
-        return false;
-      });
-      $(document).bind("keydown", "ctrl+l", function() {
-        _this.vent.trigger("project:load");
-        return false;
-      });
-      $(document).bind("keydown", "alt+c", function() {
-        _this.vent.trigger("project:compile");
-        return false;
-      });
-      return $(document).bind("keydown", "f4", function() {
-        _this.vent.trigger("project:compile");
-        return false;
-      });
+    CoffeeScadApp.prototype._setupLanguage = function() {
+      var langCodeMap, re, urlLang;
+
+      langCodeMap = {
+        english: 'EN_EN',
+        dutch: 'NL_NL',
+        german: 'DE_DE'
+      };
+      re = /l=([^&]*)/g;
+      return urlLang = "";
     };
 
     CoffeeScadApp.prototype.onStart = function() {
+      var editorInst, editorName, _ref;
+
       console.log("app started");
       this.visualEditor.start();
-      this.codeEditor.start();
-      this.hierarchyEditor.start();
+      _ref = this.editors;
+      for (editorName in _ref) {
+        editorInst = _ref[editorName];
+        console.log("starting " + editorName + "Editor");
+        editorInst.start();
+      }
       return this.projectManager.start();
     };
 
@@ -187,24 +204,15 @@ define(function(require) {
       return modReg.show(settingsView);
     };
 
-    CoffeeScadApp.prototype.onSettingsChanged = function(settings, value) {
-      var key, val, _ref, _results;
+    /* 
+    onSettingsChanged:(settings, value)=> 
+      for key, val of @settings.get("General").changedAttributes()
+        switch key
+          when "theme"
+            @theme = val
+            $("#mainTheme").attr("href","assets/css/themes/#{@theme}/bootstrap.css")
+    */
 
-      _ref = this.settings.get("General").changedAttributes();
-      _results = [];
-      for (key in _ref) {
-        val = _ref[key];
-        switch (key) {
-          case "theme":
-            this.theme = val;
-            _results.push($("#mainTheme").attr("href", "assets/css/themes/" + this.theme + "/bootstrap.css"));
-            break;
-          default:
-            _results.push(void 0);
-        }
-      }
-      return _results;
-    };
 
     CoffeeScadApp.prototype.onProjectLoaded = function(newProject) {
       console.log("project loaded");
@@ -212,7 +220,7 @@ define(function(require) {
     };
 
     CoffeeScadApp.prototype.onInitializeBefore = function() {
-      var CodeEditor, HierarchyEditor, VisualEditor;
+      var BlocklyEditor, CodeEditor, HierarchyEditor, VisualEditor;
 
       console.log("before init");
       VisualEditor = require('./editors/visualEditor/visualEditor');
@@ -223,16 +231,32 @@ define(function(require) {
         project: this.project,
         appSettings: this.settings
       });
+      /* 
+      deferredList = []
+      #dynamic load, problematic
+      for editorName in @editorsList
+        do(editorName)=>
+          console.log "editorName",editorName
+          editorPath = "./editors/#{editorName}Editor/#{editorName}Editor"
+          console.log "editorPath: #{editorPath}"
+          require [editorPath], (editorClass)=>
+            @editors[editorName] = new editorClass
+              project: @project
+              appSettings: @settings
+      */
+
       CodeEditor = require('./editors/codeEditor/codeEditor');
-      this.codeEditor = new CodeEditor({
-        regions: {
-          mainRegion: "#code"
-        },
+      this.editors['code'] = new CodeEditor({
         project: this.project,
         appSettings: this.settings
       });
       HierarchyEditor = require('./editors/hierarchyEditor/hierarchyEditor');
-      this.hierarchyEditor = new HierarchyEditor({
+      this.editors['hierarchy'] = new HierarchyEditor({
+        project: this.project,
+        appSettings: this.settings
+      });
+      BlocklyEditor = require('./editors/blocklyEditor/blocklyEditor');
+      this.editors['blockly'] = new BlocklyEditor({
         project: this.project,
         appSettings: this.settings
       });

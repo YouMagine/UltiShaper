@@ -2,15 +2,14 @@
 <head>
   <meta charset="utf-8">
   <title>UltiCreator Blocks</title>
+  <!--
   <script type="text/javascript" src="assets/js/localization.js"></script>
-  <script type="text/javascript" src="/translations.js"></script>
+  <script type="text/javascript" src="/translations.js"></script>-->
   
+  <!--
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-  
-  <script src="app/js/init.js"></script>
-  
-<!-- blockly -->
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>-->
+  <!-- blockly -->
   <script type="text/javascript" src="lib/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="assets/js/utils.js"></script><!-- Various utilities -->
   <script type="text/javascript" src="assets/js/history.js"></script><!-- Undo/Redo -->
@@ -18,10 +17,10 @@
   <script type="text/javascript" src="assets/js/cli.js"></script><!-- Command line interface -->
   <script type="text/javascript" src="lib/blockly/language/en/_messages.js"></script>
   <script type="text/javascript" src="lib/blockly/language/common/math.js"></script>
-<!--  <script type="text/javascript" src="lib/blockly/language/common/logic.js"></script>-->
-<!--  <script type="text/javascript" src="lib/blockly/language/common/control.js"></script>-->
-<!--  <script type="text/javascript" src="lib/blockly/language/common/lists.js"></script>-->
-<!--  <script type="text/javascript" src="lib/blockly/language/common/procedures.js"></script>-->
+  <!--  <script type="text/javascript" src="lib/blockly/language/common/logic.js"></script>-->
+  <!--  <script type="text/javascript" src="lib/blockly/language/common/control.js"></script>-->
+  <!--  <script type="text/javascript" src="lib/blockly/language/common/lists.js"></script>-->
+  <!--  <script type="text/javascript" src="lib/blockly/language/common/procedures.js"></script>-->
   <script type="text/javascript" src="lib/blockly/language/common/text.js"></script>
   <script type="text/javascript" src="lib/blockly/language/common/variables.js"></script>
   <script type="text/javascript" src="lib/blockly/generators/javascript.js"></script>
@@ -31,23 +30,42 @@
   <script type="text/javascript" src="lib/blockly/generators/javascript/polygons.js"></script>
   <script type="text/javascript" src="lib/blockly/generators/javascript/inputfields.js"></script>
   <script type="text/javascript" src="lib/blockly/generators/javascript/vars.js"></script>
-<!-- /blockly -->  
+<!-- /blockly --> 
+
   
 <!-- CoffeeSCAD -->
   <script data-main="lib/CoffeeSCad/app/config" src="lib/CoffeeSCad/assets/js/libs/require.min.js"></script>
-  <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/bootstrap.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/font-awesome.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/codemirror.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/backbone.forms.default.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/backbone.forms.bootstrap.css">
-  <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/custom-theme/jquery-ui-1.9.0.custom.css">
-  <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/editor.css">
+  <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/ui-lightness/jquery-ui-1.10.1.custom.min.css">
+  <link rel="stylesheet" href="lib/CoffeeSCad/assets/js/libs/codeMirror/theme/lesser-dark.css"/>
+  <link id="mainTheme" rel="stylesheet" href="lib/CoffeeSCad/assets/css/style/coffeescad/bootstrap.css">
+	
+  
 <!-- /CoffeeSCAD -->
+<style>
+#svgDiv {
+      height: 280px;
+      width: 95%;
+      border: 1px solid #ccc;
+    }
+</style>
 
 </head>
-<body onload="init()">
-
-              
-
-</body>
+	<body>
+		<div id="header" class="unselectable"> </div>
+		<div class="container-fluid fullHeight box-wrap-inner" id="mainContent">
+			<div id="_dockZoneWest" class="dockZone dockZoneWest"></div>
+			<div id="visual" class="unselectable"></div>
+			<div id="_dockZoneEast" class="dockZone dockZoneEast"></div>
+			<!--
+			<div id="_dockZoneNorth" class="dockZone dockZoneNorth"></div>
+			<div id="_dockZoneSouth" class="dockZone dockZoneSouth"></div>-->
+			<div id="initialLoader" class="initalLoaderOverlay">
+				<h3>Loading UltiShaper, please wait...</h3>
+			</div>
+		</div>
+	</body>
 </html>

@@ -23,10 +23,6 @@ define(function(require) {
 
     CodeEditor.prototype.title = "CodeEditor";
 
-    CodeEditor.prototype.regions = {
-      mainRegion: "#code"
-    };
-
     function CodeEditor(options) {
       this.resetEditor = __bind(this.resetEditor, this);
       this.showView = __bind(this.showView, this);
@@ -94,14 +90,26 @@ define(function(require) {
 
     CodeEditor.prototype.resetEditor = function(newProject) {
       console.log("resetting code editor");
-      this.dia.hide();
-      this.codeEditorView.close();
       this.project = newProject;
-      this.codeEditorView = new CodeEditorView({
-        model: this.project,
-        settings: this.settings
-      });
-      return this.dia.show(this.codeEditorView);
+      if (this.dia) {
+        this.dia.hide();
+        return this.codeEditorView.close();
+      } else {
+        this.dia = new DialogView({
+          elName: "codeEdit",
+          title: "CodeEditor",
+          width: 450,
+          height: 250,
+          position: [25, 125],
+          dockable: true
+        });
+        this.dia.render();
+        this.codeEditorView = new CodeEditorView({
+          model: this.project,
+          settings: this.settings
+        });
+        return this.dia.show(this.codeEditorView);
+      }
     };
 
     return CodeEditor;

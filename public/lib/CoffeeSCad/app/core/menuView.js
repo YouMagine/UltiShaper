@@ -420,7 +420,6 @@ define(function(require) {
       this.$el.parent().append("<a tabindex=\"-1\" href=\"#\"><i class=\"icon-list-ul\"></i>Examples</a>");
       insertRoot = this.$el;
       $(rootEl).children("li").each(function(i) {
-        console.log($(this));
         return insertRoot.append($(this));
       });
       this.bindUIElements();

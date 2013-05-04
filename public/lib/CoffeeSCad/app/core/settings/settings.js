@@ -113,6 +113,7 @@ define(function(require) {
       autoReloadLastProject: false,
       autoSave: false,
       autoSaveFrequency: 30,
+      language: "english",
       theme: "default"
     };
 

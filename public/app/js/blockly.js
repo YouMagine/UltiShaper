@@ -113,10 +113,10 @@ function myUpdateFunction() {
       code = "# coffeescad0.1\n\nrot=[0,0,0];tr=[0,0,0];\nreturn "+code;
     }
     if (codeLanguage == 'vol0.1') {
-      code = '<'+'?xml version="1.0" ?'+'>\n <VOL VersionMajor="1" VersionMinor="2">\n     <Parameters />\n     <uformia.base.Model.20110605 Name="43">';
+      code = '<'+'?xml version="1.0" ?'+'>\n <VOL VersionMajor="1" VersionMinor="2">\n     <Parameters />\n     <uformia.base.Model.20110605 Name="43">';
       code += Blockly.Generator.workspaceToCode('JavaScript');
       
-       code += '\n     </uformia.base.Model.20110605>\n </VOL>';
+       code += '\n     </uformia.base.Model.20110605>\n </VOL>';
     }
     if(codeLanguage == 'scad') {
       code = Blockly.Generator.workspaceToCode('JavaScript');
@@ -250,4 +250,3 @@ function createBlockAtCursor(xmlStr){
 function var_to_number(varStr){
  return (1*varStr.substring(1,varStr.length-1));
 }
-
