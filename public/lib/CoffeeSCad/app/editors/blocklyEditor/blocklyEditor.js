@@ -23,6 +23,7 @@ define(function(require) {
 
     function BlocklyEditor(options) {
       this.resetEditor = __bind(this.resetEditor, this);
+      this.hideView = __bind(this.hideView, this);
       this.showView = __bind(this.showView, this);
       this.onStart = __bind(this.onStart, this);
       this.init = __bind(this.init, this);
@@ -58,25 +59,32 @@ define(function(require) {
     };
 
     BlocklyEditor.prototype.showView = function() {
-      if (this.dia != null) {
-        this.dia.close();
+      if (this.dia == null) {
+        this.dia = new DialogView({
+          elName: "blocklyEdit",
+          title: "Blockly",
+          width: 500,
+          height: 200,
+          position: [325, 25],
+          dockable: true
+        });
+        this.dia.render();
       }
-      this.dia = new DialogView({
-        elName: "blocklyEdit",
-        title: "Blockly",
-        width: 500,
-        height: 200,
-        position: [325, 25],
-        dockable: true
-      });
-      this.dia.render();
       if (this.blocklyEditorView == null) {
         this.blocklyEditorView = new BlocklyEditorView({
           model: this.project,
           settings: this.settings
         });
       }
-      return this.dia.show(this.blocklyEditorView);
+      if (this.dia.currentView == null) {
+        return this.dia.show(this.blocklyEditorView);
+      } else {
+        return this.dia.showDialog();
+      }
+    };
+
+    BlocklyEditor.prototype.hideView = function() {
+      return this.dia.hideDialog();
     };
 
     BlocklyEditor.prototype.resetEditor = function(newProject) {
@@ -85,7 +93,6 @@ define(function(require) {
       if (this.dia != null) {
         console.log("closing current Blockly editor");
         this.dia.close();
-        this.blocklyEditorView.close();
         this.blocklyEditorView = null;
       }
       return this.showView();

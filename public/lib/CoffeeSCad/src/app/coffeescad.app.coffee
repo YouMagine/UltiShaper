@@ -52,10 +52,8 @@ define (require)->
       
       #stores 
       DropBoxStore = require './stores/dropbox/dropBoxStore'
-      #GithubStore = require './stores/github/gitHubStore'
       BrowserStore = require './stores/browser/browserStore'
       @stores["Dropbox"] = new DropBoxStore()
-      #@stores["gitHub"] = new GithubStore()
       @stores["browser"] = new BrowserStore()
       
       #events
@@ -180,6 +178,7 @@ define (require)->
       
     onInitializeBefore:()=>
       console.log "before init"
+      #always present
       VisualEditor = require './editors/visualEditor/visualEditor'
       @visualEditor = new VisualEditor
         regions: 

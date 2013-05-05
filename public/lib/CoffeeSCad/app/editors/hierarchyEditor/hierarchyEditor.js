@@ -23,6 +23,7 @@ define(function(require) {
 
     function HierarchyEditor(options) {
       this.resetEditor = __bind(this.resetEditor, this);
+      this.hideView = __bind(this.hideView, this);
       this.showView = __bind(this.showView, this);
       this.onStart = __bind(this.onStart, this);
       this.init = __bind(this.init, this);
@@ -58,24 +59,31 @@ define(function(require) {
     };
 
     HierarchyEditor.prototype.showView = function() {
-      if (this.dia != null) {
-        this.dia.close();
+      if (this.dia == null) {
+        this.dia = new DialogView({
+          elName: "hiearchyEdit",
+          title: "Assembly",
+          width: 200,
+          height: 150,
+          position: [25, 25]
+        });
+        this.dia.render();
       }
-      this.dia = new DialogView({
-        elName: "hiearchyEdit",
-        title: "Assembly",
-        width: 200,
-        height: 150,
-        position: [25, 25]
-      });
-      this.dia.render();
       if (this.hierarchyEditorView == null) {
         this.hierarchyEditorView = new HierarchyEditorView({
           model: this.project,
           settings: this.settings
         });
       }
-      return this.dia.show(this.hierarchyEditorView);
+      if (this.dia.currentView == null) {
+        return this.dia.show(this.hierarchyEditorView);
+      } else {
+        return this.dia.showDialog();
+      }
+    };
+
+    HierarchyEditor.prototype.hideView = function() {
+      return this.dia.hideDialog();
     };
 
     HierarchyEditor.prototype.resetEditor = function(newProject) {
@@ -84,7 +92,6 @@ define(function(require) {
       if (this.dia != null) {
         console.log("closing current hiearchy editor");
         this.dia.close();
-        this.hierarchyEditorView.close();
         this.hierarchyEditorView = null;
       }
       return this.showView();

@@ -25,6 +25,7 @@ define(function(require) {
 
     function CodeEditor(options) {
       this.resetEditor = __bind(this.resetEditor, this);
+      this.hideView = __bind(this.hideView, this);
       this.showView = __bind(this.showView, this);
       this.onStart = __bind(this.onStart, this);
       this.init = __bind(this.init, this);
@@ -63,38 +64,7 @@ define(function(require) {
     };
 
     CodeEditor.prototype.showView = function() {
-      if (this.dia != null) {
-        this.dia.close();
-      }
-      this.dia = new DialogView({
-        elName: "codeEdit",
-        title: "CodeEditor",
-        width: 450,
-        height: 250,
-        position: [25, 125],
-        dockable: true
-      });
-      this.dia.render();
-      this.codeEditorView = new CodeEditorView({
-        model: this.project,
-        settings: this.settings
-      });
-      return this.dia.show(this.codeEditorView);
-      /* 
-      $(document).bind('keydown', 'ctrl+a', (event)->
-        console.log "I WANT TO SAVE"
-        )
-      */
-
-    };
-
-    CodeEditor.prototype.resetEditor = function(newProject) {
-      console.log("resetting code editor");
-      this.project = newProject;
-      if (this.dia) {
-        this.dia.hide();
-        return this.codeEditorView.close();
-      } else {
+      if (this.dia == null) {
         this.dia = new DialogView({
           elName: "codeEdit",
           title: "CodeEditor",
@@ -104,12 +74,49 @@ define(function(require) {
           dockable: true
         });
         this.dia.render();
+      }
+      if (this.codeEditorView == null) {
         this.codeEditorView = new CodeEditorView({
           model: this.project,
           settings: this.settings
         });
-        return this.dia.show(this.codeEditorView);
       }
+      if (this.dia.currentView == null) {
+        return this.dia.show(this.codeEditorView);
+      } else {
+        return this.dia.showDialog();
+      }
+      /* 
+      $(document).bind('keydown', 'ctrl+a', (event)->
+        console.log "I WANT TO SAVE"
+        )
+      */
+
+    };
+
+    CodeEditor.prototype.hideView = function() {
+      return this.dia.hideDialog();
+    };
+
+    CodeEditor.prototype.resetEditor = function(newProject) {
+      console.log("resetting code editor");
+      this.project = newProject;
+      if (this.dia != null) {
+        this.dia.close();
+        this.codeEditorView = null;
+      }
+      return this.showView();
+      /*else
+        
+        @dia = new DialogView({elName:"codeEdit", title: "CodeEditor", width:450, height:250,position:[25,125],dockable:true})
+        @dia.render()
+        @codeEditorView = new CodeEditorView 
+          model:    @project
+          settings: @settings
+        
+        @dia.show(@codeEditorView)
+      */
+
     };
 
     return CodeEditor;

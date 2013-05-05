@@ -97,49 +97,6 @@ define(function(require) {
 
     DialogView.prototype._setTransparency = function() {
       return $(".dialog").css("opacity", 0.9);
-      /*
-      elements = [".dialog",".dialog-body", "#tabContent","#filesList",".CodeMirror cm-s-lesser-dark CodeMirror-focused",".cm-s-lesser-dark.CodeMirror"]
-      for elem in elements
-        rawBgRgba = $(elem).css("background-color")
-        if not rawBgRgba?
-          rawBgRgba = $(elem).css("background")
-          
-        rgbvals = /rgb\((.+),(.+),(.+)\)/i.exec(rawBgRgba)
-        a = 0.5
-        if rgbvals?
-          r = parseInt(rgbvals[1])
-          g = parseInt(rgbvals[2])
-          b = parseInt(rgbvals[3])
-          newColor = "rgba(#{r},#{g},#{b},#{a})"
-          $(elem).css("background-color",newColor)
-          $(elem).css("background",newColor)
-      */
-
-      /*
-      rawBgRgba = $(".dialog").css("background-color")
-      rgbvals = /rgb\((.+),(.+),(.+)\)/i.exec(rawBgRgba)
-      if rgbvals?
-        r = parseInt(rgbvals[1])
-        g = parseInt(rgbvals[2])
-        b = parseInt(rgbvals[3])
-      else
-        r = 255
-        g = 255
-        b = 255
-      a = 0.2
-      newColor = "rgba(#{r},#{g},#{b},#{a})"
-      console.log "new bg color",newColor 
-      
-      $(".dialog").css("background-color",newColor)
-      #$(".dialog-body").css("background-color",newColor)
-      
-      $("#tabContent").css("background-color",newColor)
-      $(".filesListContainer").css("background-color",newColor)
-      
-      $(".cm-s-lesser-dark.CodeMirror").css("background-color",newColor)
-      #$(".CodeMirror cm-s-lesser-dark CodeMirror-focused").css("background-color",newColor)
-      */
-
     };
 
     DialogView.prototype.onOpacityChanged = function(e) {
@@ -247,10 +204,8 @@ define(function(require) {
 
         that = _this;
         $target = $(_this).parent().parent().parent();
-        console.log("hiding bla");
         $target.addClass("hide");
-        _this.close();
-        return _this.$el.remove();
+        return _this.hideDialog();
       });
       if (this.dockable) {
         this.$el.bind("dragstart", function(e, ui) {
@@ -438,7 +393,7 @@ define(function(require) {
     };
 
     DialogView.prototype._undoc = function() {
-      var triggerResize,
+      var error, triggerResize,
         _this = this;
 
       console.log("undocking");
@@ -455,7 +410,11 @@ define(function(require) {
       }
       this.$el.removeClass('docked dockNorth dockEast dockWest dockSouth');
       this.$el.addClass('floatpanel draggingpanel');
-      this.$el.resizable('destroy');
+      try {
+        this.$el.resizable('destroy');
+      } catch (_error) {
+        error = _error;
+      }
       this._setResizeable();
       this._setDragable();
       triggerResize = function() {
@@ -514,23 +473,36 @@ define(function(require) {
       Marionette.triggerMethod.call(view, "show");
       Marionette.triggerMethod.call(this, "show", view);
       this.currentView = view;
-      return this._setTransparency();
+      this._setTransparency();
+      return this.showDialog();
     };
 
     DialogView.prototype.hide = function(view) {
       var injectTarget;
 
-      this.currentView.close();
+      if (this.currentView) {
+        this.currentView.close();
+        this.currentView = null;
+      }
       injectTarget = this.$el.find("#contentContainer");
-      injectTarget.html("");
-      return this.currentView = null;
+      return injectTarget.html("");
     };
 
     DialogView.prototype.close = function() {
       this._isShown = false;
       this.isClosed = true;
-      console.log("fdgd");
-      return this._undoc();
+      this._undoc();
+      if (this.currentView != null) {
+        return this.hide(this.currentView);
+      }
+    };
+
+    DialogView.prototype.hideDialog = function() {
+      return this.$el.addClass('hide');
+    };
+
+    DialogView.prototype.showDialog = function() {
+      return this.$el.removeClass('hide');
     };
 
     return DialogView;

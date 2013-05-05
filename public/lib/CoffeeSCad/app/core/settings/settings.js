@@ -110,6 +110,7 @@ define(function(require) {
       csgCompileMode: "onCodeChange",
       csgCompileDelay: 1.0,
       csgBackgroundProcessing: false,
+      displayEventNotifications: true,
       autoReloadLastProject: false,
       autoSave: false,
       autoSaveFrequency: 30,

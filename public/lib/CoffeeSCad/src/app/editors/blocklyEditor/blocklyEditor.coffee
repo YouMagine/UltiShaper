@@ -51,17 +51,22 @@ define (require)->
       @showView()
       
     showView:=>
-      if @dia?
-        @dia.close()
-      @dia = new DialogView({elName:"blocklyEdit", title: "Blockly", width:500, height:200,position:[325,25], dockable:true})
-      @dia.render()
+      if not @dia?
+        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly", width:500, height:200,position:[325,25], dockable:true})
+        @dia.render()
       
       if not @blocklyEditorView?
         @blocklyEditorView = new BlocklyEditorView 
           model:    @project
           settings: @settings
       
-      @dia.show(@blocklyEditorView)
+      if not @dia.currentView?    
+        @dia.show(@blocklyEditorView)
+      else
+        @dia.showDialog()
+      
+    hideView:=>
+      @dia.hideDialog()
       
     resetEditor:(newProject)=>
       console.log "resetting Blockly editor"
@@ -69,7 +74,6 @@ define (require)->
       if @dia?
         console.log "closing current Blockly editor"
         @dia.close()
-        @blocklyEditorView.close()
         @blocklyEditorView = null
         
       @showView()
