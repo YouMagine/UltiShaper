@@ -189,8 +189,17 @@ function myKeyEvent(e){
   keyLog.push(e);
   var focus = $('#quickSearchDiv input').is(":focus");
   if(!e.keyCode) keyCode = e.which;
-  charNum = $('#quickSearchDiv input').val().length;
-  argumentIndex = ($('#quickSearchDiv input').val().match(/ +/g)||[]).length;
+  
+  quickSearchVal = $('#quickSearchDiv input').val();
+  var charNum = -1;
+  
+  if (quickSearchVal!==null)
+  {
+      charNum = quickSearchVal.length;
+      argumentIndex = (quickSearchVal.match(/ +/g)||[]).length;
+  }
+  
+  
   switch(keyCode) {
     case 90:// Ctrl-Z / cmd-Z
       if(e.metaKey || e.ctrlKey) {
