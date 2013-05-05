@@ -123,7 +123,7 @@ define (require)->
         break  if n > 10
         Blockly.mainWorkspace.getTopBlocks(false)[0].dispose()  unless typeof Blockly.mainWorkspace.getTopBlocks(false)[0] is "undefined"
     
-    _blockIsSelected : (block, typeOfCheck) ->
+    _blockIsSelected : (block, typeOfCheck) =>
       isSelected = false
       
       # if(block.id && Blockly.selected) console.log("checking if block (id="+block.id+",type="+block.type+') is selected (id='+Blockly.selected.id+',type='+Blockly.selected.type+').');
@@ -135,7 +135,7 @@ define (require)->
       # this is not the shape we're looking for...
       
       # console.log("isShape? "+blockIsShape(block)+" -- not bubbling up, this isn.t the shape we're looking for.");
-      return false  if blockIsShape(Blockly.selected) and (block.id isnt Blockly.selected.id) # don't bubble up if we have a different shape selected
+      return false  if @_blockIsShape(Blockly.selected) and (block.id isnt Blockly.selected.id) # don't bubble up if we have a different shape selected
       if typeOfCheck is "bubbletoshape"
         
         # console.log({a:"checking if it's a shape, otherwise go to parent.",sel:Blockly.selected});
@@ -143,16 +143,16 @@ define (require)->
         while o.parentBlock_ # as long as it has a parent...
           # check if it's a shape.
           # console.log('block id '+o.id,' in category',o.parentBlock_.category,o.category == ucfirst(LANG.shape));
-          return true  if block.id is o.parentBlock_.id  if blockIsShape(o.parentBlock_)
+          return true  if block.id is o.parentBlock_.id  if @_blockIsShape(o.parentBlock_)
           # it's an unselected shape. Stop looking.
-          return false  if blockIsShape(o.parentBlock_)
+          return false  if @_blockIsShape(o.parentBlock_)
           
           # it's not the chosen one, bubble up one level:
           # console.log('bubbling up a level (not a selected shape)');
           o = o.parentBlock_
       isSelected
     
-    _blockIsShape = (o) ->
+    _blockIsShape : (o) =>
       return false  unless o
       return true  if o.category and (o.category is ucfirst(LANG.shape))
       return true  if o.type and (o.type is "polygons_extrude")

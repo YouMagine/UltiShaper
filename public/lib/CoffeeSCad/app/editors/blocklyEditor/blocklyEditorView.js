@@ -16,8 +16,6 @@ define(function(require) {
   template = require("text!./blocklyEditorView.tmpl");
   utils = require('./utils');
   BlocklyEditorView = (function(_super) {
-    var _blockIsShape;
-
     __extends(BlocklyEditorView, _super);
 
     BlocklyEditorView.prototype.template = template;
@@ -39,6 +37,8 @@ define(function(require) {
       this.onResizeStop = __bind(this.onResizeStop, this);
       this.onResizeStart = __bind(this.onResizeStart, this);
       this.onDomRefresh = __bind(this.onDomRefresh, this);
+      this._blockIsShape = __bind(this._blockIsShape, this);
+      this._blockIsSelected = __bind(this._blockIsSelected, this);
       this.clearWorkspace = __bind(this.clearWorkspace, this);
       this.codeUpdateFunction = __bind(this.codeUpdateFunction, this);
       this._tearDownEventHandlers = __bind(this._tearDownEventHandlers, this);
@@ -173,16 +173,16 @@ define(function(require) {
       if (Blockly.selected.id === block.id) {
         return true;
       }
-      if (blockIsShape(Blockly.selected) && (block.id !== Blockly.selected.id)) {
+      if (this._blockIsShape(Blockly.selected) && (block.id !== Blockly.selected.id)) {
         return false;
       }
       if (typeOfCheck === "bubbletoshape") {
         o = Blockly.selected;
         while (o.parentBlock_) {
-          if (blockIsShape(o.parentBlock_) ? block.id === o.parentBlock_.id : void 0) {
+          if (this._blockIsShape(o.parentBlock_) ? block.id === o.parentBlock_.id : void 0) {
             return true;
           }
-          if (blockIsShape(o.parentBlock_)) {
+          if (this._blockIsShape(o.parentBlock_)) {
             return false;
           }
           o = o.parentBlock_;
@@ -191,7 +191,7 @@ define(function(require) {
       return isSelected;
     };
 
-    _blockIsShape = function(o) {
+    BlocklyEditorView.prototype._blockIsShape = function(o) {
       if (!o) {
         return false;
       }
