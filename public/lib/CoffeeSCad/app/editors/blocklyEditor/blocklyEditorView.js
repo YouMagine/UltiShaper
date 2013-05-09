@@ -302,17 +302,9 @@ define(function(require) {
 
     BlocklyEditorView.prototype.onResizeStop = function() {
       console.log("blockly view resize stop");
-      return $('#blockly').css('width', $(window).width() - 20);
-      /* 
-      $('#blockly').css('top',$(window).height()-115)
-      $('#blockly').css('height',360)
-      $('#blockly').css('right',$(window).width())
-      $('#blockly').css('width',$(window).width()-20)
-      $('#qsResults').css('left',$('#quickSearchDiv').position().left)
-      if (navigator.userAgent.indexOf("Firefox")!=-1) 
-        $('#blockly').css('top',$(document).height()-$('#blockly').height()/2+60)
-      */
-
+      $('#svgDiv').height($(document).height()-670);
+      Blockly.fireUiEvent(window, 'resize');
+      console.log(this);
     };
 
     BlocklyEditorView.prototype.onClose = function() {
