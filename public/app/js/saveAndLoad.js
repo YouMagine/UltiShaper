@@ -7,10 +7,10 @@ var prevXML = '';
 
 function doAutoSave() {
   var xml = getXML();
-  if(xml == prevXML) 
+  if(xml == prevXML)
     return; // no change, no save.
   prevXML = xml;
-  if(prevXML == '') 
+  if(prevXML == '')
     return; // empty, no save.
   if(autoSave == true) {
     console.log('autosaving... (a change was made)');
@@ -36,7 +36,7 @@ function changeAutoSave(changeTo) {
 function saveCode(name,saveType) {
   if(!name)
     name = 'autosave';
-  if(!saveType) 
+  if(!saveType)
     saveType = 'workspace'; // otherwise, it could be a definition (e.g. define cube)
   console.log("saveCode(name=",name,"saveType=",saveType,")");
   var code = getXML();//Blockly.Generator.workspaceToCode('JavaScript');
