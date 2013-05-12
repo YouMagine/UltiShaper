@@ -388,6 +388,7 @@ define(function(require) {
     };
 
     StoreView.prototype.onRender = function() {
+      console.log("getting projects from " + this.model.name);
       this.model.getProjectsName(this.onProjectsFetched);
       return this.modelBinder.bind(this.model, this.el, this.bindings);
     };
@@ -400,13 +401,10 @@ define(function(require) {
         this.ui.projects.append("<li><a id='" + this.model.name + name + "' class='projectSelector' href='#' data-toggle='context' data-target='#" + this.model.name + "ProjectContextMenu'>" + name + "</a></li>");
       }
       this.delegateEvents();
-      this.ui.projects.slimScroll({
+      return this.ui.projects.slimScroll({
         size: "10px",
         height: "100px",
         alwaysVisible: true
-      });
-      return this.$el.find('[rel=tooltip]').tooltip({
-        'placement': 'right'
       });
     };
 

@@ -302,9 +302,10 @@ define(function(require) {
 
     BlocklyEditorView.prototype.onResizeStop = function() {
       console.log("blockly view resize stop");
-      $('#svgDiv').height($(document).height()-670);
+      $('#blockly').css('width', $(window).width() - 20);
+      $('#svgDiv').height($(document).height() - 670);
       Blockly.fireUiEvent(window, 'resize');
-      console.log(this);
+      return console.log(this);
     };
 
     BlocklyEditorView.prototype.onClose = function() {

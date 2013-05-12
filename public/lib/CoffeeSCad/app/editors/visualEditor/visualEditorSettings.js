@@ -10,7 +10,7 @@ define(function(require) {
   VisualEditorSettings = (function(_super) {
     __extends(VisualEditorSettings, _super);
 
-    VisualEditorSettings.prototype.attributeNames = ['name', 'renderer', 'antialiasing', 'shadows', 'selfShadows', 'showAxes', 'showConnectors', 'showGrid', 'gridSize', 'gridStep', 'gridColor', 'gridOpacity', 'gridText', 'showStats', 'position', 'projection', 'objectViewMode', 'helpersColor', 'textColor', 'bgColor', 'bgColor2', 'axesSize'];
+    VisualEditorSettings.prototype.attributeNames = ['name', 'renderer', 'antialiasing', 'shadows', 'shadowResolution', 'selfShadows', 'showAxes', 'showConnectors', 'showGrid', 'gridSize', 'gridStep', 'gridColor', 'gridOpacity', 'gridText', 'showStats', 'position', 'projection', 'objectViewMode', 'helpersColor', 'textColor', 'bgColor', 'bgColor2', 'axesSize'];
 
     buildProperties(VisualEditorSettings);
 
@@ -22,13 +22,14 @@ define(function(require) {
       renderer: 'webgl',
       antialiasing: true,
       shadows: true,
+      shadowResolution: "256x256",
       selfShadows: false,
       showAxes: true,
       showConnectors: false,
       showGrid: true,
       gridSize: 200,
       gridStep: 10,
-      gridColor: "0xFFFFFF",
+      gridColor: "0x00baff",
       gridOpacity: 0.1,
       gridText: true,
       gridNumberingPosition: 'center',
@@ -36,11 +37,11 @@ define(function(require) {
       position: "diagonal",
       projection: "perspective",
       objectViewMode: 'shaded',
-      helpersColor: "0xFFFFFF",
-      textColor: "#FFFFFF",
-      bgColor: "#363335",
-      bgColor2: "#363335",
-      axesSize: 80
+      helpersColor: "0x00baff",
+      textColor: "#000000",
+      bgColor: "#FFFFFF",
+      bgColor2: "#FFFFFF",
+      axesSize: 100
     };
 
     function VisualEditorSettings(options) {

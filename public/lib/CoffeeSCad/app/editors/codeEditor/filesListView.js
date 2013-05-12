@@ -17,7 +17,7 @@ define(function(require) {
   fileTabTemplate = require("text!./fileTab.tmpl");
   filesTabTemplate = require("text!./filesTab.tmpl");
   filesListTemplate = require("text!./filesList.tmpl");
-  FileCodeView = require("./fileCodeView");
+  FileCodeView = require("./fileCodeViewAce");
   ConsoleView = require("./consoleView");
   DummyView = require('core/utils/dummyView');
   FileTabView = (function(_super) {
@@ -281,18 +281,6 @@ define(function(require) {
         model: this.model
       });
       return this.console.show(consoleView);
-      /* 
-      #activate first tab      
-      #firstFile = @tabHeaders.$el.find('a:first')
-      try
-        @tabHeaders.$el.find('a:first').tab('show')
-        defaultItem = @tabContent.$el.find('div .tab-pane:first')
-        defaultItem.addClass('active')
-        defaultItem.removeClass('fade')
-        #vent.trigger("file:selected", @activeFile)
-      catch error
-      */
-
     };
 
     FilesListView.prototype.showFile = function(file) {

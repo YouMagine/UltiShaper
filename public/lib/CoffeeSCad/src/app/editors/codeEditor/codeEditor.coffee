@@ -26,7 +26,11 @@ define (require)->
       @router = new CodeEditorRouter
         controller: @
       
-      @icon = "icon-text-width" #TODO: should this be here? in the settings?
+      #TODO: should this be here? in the settings?
+      @startWithParent = true
+      @showOnAppStart = false
+      @addMainMenuIcon = false
+      @icon = "icon-text-width" 
         
       @vent.on("project:loaded",@resetEditor)
       @vent.on("project:created",@resetEditor)
@@ -46,7 +50,8 @@ define (require)->
         
     onStart:()=>
       @settings = @appSettings.get("CodeEditor")
-      @showView()
+      if @showOnAppStart
+        @showView()
       
     showView:=>
       if not @dia?
@@ -78,16 +83,7 @@ define (require)->
       if @dia?
         @dia.close()
         @codeEditorView = null
-      @showView()
-      ###else
-        
-        @dia = new DialogView({elName:"codeEdit", title: "CodeEditor", width:450, height:250,position:[25,125],dockable:true})
-        @dia.render()
-        @codeEditorView = new CodeEditorView 
-          model:    @project
-          settings: @settings
-        
-        @dia.show(@codeEditorView)
-        ###
+      if @showOnAppStart
+        @showView()
   
   return CodeEditor

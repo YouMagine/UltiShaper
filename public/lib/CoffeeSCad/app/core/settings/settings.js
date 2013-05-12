@@ -98,7 +98,7 @@ define(function(require) {
   GeneralSettings = (function(_super) {
     __extends(GeneralSettings, _super);
 
-    GeneralSettings.prototype.attributeNames = ['name', 'csgCompileMode', 'csgCompileDelay', 'csgBackgroundProcessing', 'autoReloadLastProject', 'autoSave', 'autoSaveFrequency'];
+    GeneralSettings.prototype.attributeNames = ['name', 'csgCompileMode', 'csgCompileDelay', 'csgBackgroundProcessing', 'displayEventNotifications', 'autoReloadLastProject', 'autoSave', 'autoSaveFrequency'];
 
     buildProperties(GeneralSettings);
 
@@ -110,12 +110,12 @@ define(function(require) {
       csgCompileMode: "onCodeChange",
       csgCompileDelay: 1.0,
       csgBackgroundProcessing: false,
-      displayEventNotifications: true,
       autoReloadLastProject: false,
       autoSave: false,
       autoSaveFrequency: 30,
       language: "english",
-      theme: "default"
+      theme: "default",
+      displayEventNotifications: true
     };
 
     function GeneralSettings(options) {

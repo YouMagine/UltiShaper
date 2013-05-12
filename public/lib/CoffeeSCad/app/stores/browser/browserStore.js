@@ -112,12 +112,14 @@ define(function(require) {
 
       try {
         projectsList = localStorage.getItem("" + this.storeURI);
+        console.log("browser store projects", projectsList, "storeURI", "" + this.storeURI);
         if (projectsList) {
           projectsList = projectsList.split(',');
         } else {
           projectsList = [];
         }
         this.projectsList = projectsList;
+        this._getAllProjectsHelper();
         /* 
         projectNames = []
         for model in @lib.models
@@ -218,7 +220,7 @@ define(function(require) {
       }
       strinfigiedProject = JSON.stringify(attributes);
       localStorage.setItem(projectURI, strinfigiedProject);
-      this.vent.trigger("project:saved");
+      this.vent.trigger("project:saved", project);
       if (firstSave) {
         project._clearFlags();
       }
@@ -373,20 +375,22 @@ define(function(require) {
       if (projects != null) {
         projects = projects.split(',');
         index = projects.indexOf(projectName);
-        projects.splice(index, 1);
-        if (projects.length > 0) {
-          projects = projects.join(',');
-        } else {
-          projects = "";
+        if (index !== -1) {
+          projects.splice(index, 1);
+          if (projects.length > 0) {
+            projects = projects.join(',');
+          } else {
+            projects = "";
+          }
+          localStorage.setItem(this.storeURI, projects);
+          index = this.projectsList.indexOf(projectName);
+          this.projectsList.splice(index, 1);
+          console.log("projectName");
+          projectURI = "" + this.storeURI + "-" + projectName;
+          rootStoreURI = "" + projectURI + "-files";
+          localStorage.removeItem(rootStoreURI);
+          return localStorage.removeItem(projectURI);
         }
-        localStorage.setItem(this.storeURI, projects);
-        index = this.projectsList.indexOf(projectName);
-        this.projectsList.splice(index, 1);
-        console.log("projectName");
-        projectURI = "" + this.storeURI + "-" + projectName;
-        rootStoreURI = "" + projectURI + "-files";
-        localStorage.removeItem(rootStoreURI);
-        return localStorage.removeItem(projectURI);
       }
     };
 
@@ -503,6 +507,27 @@ define(function(require) {
         };
         return this.loadProject(projectName, true).done(getContent);
       }
+    };
+
+    BrowserStore.prototype._getAllProjectsHelper = function() {
+      var item, key, projData, projectName, projects;
+
+      projects = [];
+      console.log("localStorage", localStorage);
+      for (item in localStorage) {
+        key = localStorage[item];
+        projData = item.split("-");
+        if (projData[0] === "projects") {
+          console.log("item", item);
+          projectName = projData[1];
+          if (projectName != null) {
+            if (__indexOf.call(projects, projectName) < 0) {
+              projects.push(projectName);
+            }
+          }
+        }
+      }
+      return console.log("projects", projects.join(","));
     };
 
     return BrowserStore;

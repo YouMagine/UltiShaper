@@ -212,6 +212,10 @@ define(function(require) {
           csgBackgroundProcessing: {
             type: 'Checkbox'
           },
+          displayEventNotifications: {
+            type: 'Checkbox',
+            title: 'Display event notifications'
+          },
           autoReloadLastProject: {
             type: 'Checkbox',
             title: 'Reload last project on application start'
@@ -242,7 +246,7 @@ define(function(require) {
             "fields": ["autoReloadLastProject", "autoSave", "autoSaveFrequency"]
           }, {
             "legend": "Other settings",
-            "fields": ["theme"]
+            "fields": ["theme", "displayEventNotifications"]
           }
         ];
       }

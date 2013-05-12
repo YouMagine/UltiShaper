@@ -39,6 +39,9 @@ define(function(require) {
       this.router = new CodeEditorRouter({
         controller: this
       });
+      this.startWithParent = true;
+      this.showOnAppStart = false;
+      this.addMainMenuIcon = false;
       this.icon = "icon-text-width";
       this.vent.on("project:loaded", this.resetEditor);
       this.vent.on("project:created", this.resetEditor);
@@ -60,7 +63,9 @@ define(function(require) {
 
     CodeEditor.prototype.onStart = function() {
       this.settings = this.appSettings.get("CodeEditor");
-      return this.showView();
+      if (this.showOnAppStart) {
+        return this.showView();
+      }
     };
 
     CodeEditor.prototype.showView = function() {
@@ -105,18 +110,9 @@ define(function(require) {
         this.dia.close();
         this.codeEditorView = null;
       }
-      return this.showView();
-      /*else
-        
-        @dia = new DialogView({elName:"codeEdit", title: "CodeEditor", width:450, height:250,position:[25,125],dockable:true})
-        @dia.render()
-        @codeEditorView = new CodeEditorView 
-          model:    @project
-          settings: @settings
-        
-        @dia.show(@codeEditorView)
-      */
-
+      if (this.showOnAppStart) {
+        return this.showView();
+      }
     };
 
     return CodeEditor;

@@ -4,7 +4,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var $, CustomOrbitControls, OrbitControls, THREE, TrackballControls, VisualEditorView, combo_cam, contextMenuTemplate, detector, dndMixin, helpers, includeMixin, marionette, reqRes, requestAnimationFrame, stats, threedView_template, utils, vent;
+  var $, CustomOrbitControls, ObjectExport, ObjectParser, OrbitControls, Shaders, THREE, VisualEditorView, combo_cam, detector, dndMixin, helpers, includeMixin, marionette, reqRes, requestAnimationFrame, stats, threedView_template, transformControls, utils, vent;
 
   $ = require('jquery');
   marionette = require('marionette');
@@ -16,14 +16,16 @@ define(function(require) {
   utils = require('utils');
   OrbitControls = require('./orbitControls');
   CustomOrbitControls = require('./customOrbitControls');
-  TrackballControls = require('./trackballControls');
+  transformControls = require('transformControls');
+  ObjectExport = require('ObjectExport');
+  ObjectParser = require('ObjectParser');
+  Shaders = require('./shaders');
   reqRes = require('core/messaging/appReqRes');
   vent = require('core/messaging/appVent');
   threedView_template = require("text!./visualEditorView.tmpl");
   requestAnimationFrame = require('core/utils/anim');
   THREE.CSG = require('core/projects/csg/csg.Three');
   helpers = require('./helpers');
-  contextMenuTemplate = require("text!./contextMenu.tmpl");
   includeMixin = require('core/utils/mixins/mixins');
   dndMixin = require('core/utils/mixins/dragAndDropRecieverMixin');
   VisualEditorView = (function(_super) {
@@ -38,81 +40,18 @@ define(function(require) {
     VisualEditorView.prototype.ui = {
       renderBlock: "#glArea",
       glOverlayBlock: "#glOverlay",
-      overlayDiv: "#overlay",
-      dropOverlay: "#dropOverlay"
+      overlayDiv: "#overlay"
     };
 
     VisualEditorView.prototype.events = {
-      'contextmenu': 'rightclick',
-      'dragover': 'onDragOver',
-      'dragenter': 'onDragEnter',
-      'dragexit': 'onDragExit',
-      'drop': 'onDrop',
+      "mousedown": "_onSelectAttempt",
+      "contextmenu": "_onRightclick",
+      "mousemove": "_onMouseMove",
       "resize:stop": "onResizeStop",
-      "resize": "onResizeStop",
-      "dummy": "onDummy"
-    };
-
-    VisualEditorView.prototype.onDummy = function(e) {
-      return console.log("dummy event fired");
-    };
-
-    VisualEditorView.prototype.onDragOver = function(e) {
-      var dm;
-
-      e.preventDefault();
-      e.stopPropagation();
-      dm = this.ui.dropOverlay[0];
-      dm.style.left = (e.clientX + e.offsetX) + 'px';
-      dm.style.top = (e.clientY + e.offsetY) + 'px';
-      dm.style.left = e.originalEvent.clientX + 'px';
-      return dm.style.top = e.originalEvent.clientY + 'px';
-    };
-
-    VisualEditorView.prototype.onDragEnter = function(e) {
-      return this.ui.dropOverlay.removeClass("hide");
-    };
-
-    VisualEditorView.prototype.onDragExit = function(e) {
-      return this.ui.dropOverlay.addClass("hide");
-    };
-
-    VisualEditorView.prototype.onDrop = function(e) {
-      var file, files, _fn, _i, _len,
-        _this = this;
-
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      }
-      e.preventDefault();
-      this.ui.dropOverlay.addClass("hide");
-      files = e.originalEvent.dataTransfer.files;
-      _fn = function(file) {
-        var ext, name, reader;
-
-        name = file.name;
-        ext = name.split(".").pop();
-        if (ext === "coffee") {
-          reader = new FileReader();
-          reader.onload = function(e) {
-            var fileContent;
-
-            fileContent = e.target.result;
-            return console.log("fileContent", fileContent);
-          };
-          return reader.readAsText(file);
-        }
-      };
-      for (_i = 0, _len = files.length; _i < _len; _i++) {
-        file = files[_i];
-        console.log("dropped file", file);
-        _fn(file);
-      }
-      return false;
+      "resize": "onResizeStop"
     };
 
     function VisualEditorView(options, settings) {
-      this.informationOverlay = __bind(this.informationOverlay, this);
       this._updateAssemblyVisualAttrs = __bind(this._updateAssemblyVisualAttrs, this);
       this._importGeom = __bind(this._importGeom, this);
       this.fromCsg = __bind(this.fromCsg, this);
@@ -122,138 +61,637 @@ define(function(require) {
       this.onResizeStop = __bind(this.onResizeStop, this);
       this.onResize = __bind(this.onResize, this);
       this._computeViewSize = __bind(this._computeViewSize, this);
-      this.addCage = __bind(this.addCage, this);
       this.removeGrid = __bind(this.removeGrid, this);
       this.addGrid = __bind(this.addGrid, this);
       this.setBgColor = __bind(this.setBgColor, this);
+      this.settingsChanged = __bind(this.settingsChanged, this);
+      this._onProjectCompileFailed = __bind(this._onProjectCompileFailed, this);
+      this._onProjectCompiled = __bind(this._onProjectCompiled, this);
+      this._onRightclick = __bind(this._onRightclick, this);
+      this._onSelectAttempt = __bind(this._onSelectAttempt, this);
+      this.makeScreenshot = __bind(this.makeScreenshot, this);
+      this._setupEventBindings = __bind(this._setupEventBindings, this);
       this.setupView = __bind(this.setupView, this);
+      this.setupPostProcess = __bind(this.setupPostProcess, this);
       this.setupLights = __bind(this.setupLights, this);
-      this.configure = __bind(this.configure, this);
+      this.setupRenderers = __bind(this.setupRenderers, this);
+      this.reloadAssembly = __bind(this.reloadAssembly, this);
       this.init = __bind(this.init, this);
       this.settingsChanged = __bind(this.settingsChanged, this);
-      this.projectCompileFailed = __bind(this.projectCompileFailed, this);
-      this.projectCompiled = __bind(this.projectCompiled, this);
-      this.selectObj = __bind(this.selectObj, this);
-      this.rightclick = __bind(this.rightclick, this);
-      this.makeScreeshot = __bind(this.makeScreeshot, this);
-      this._setupEventBindings = __bind(this._setupEventBindings, this);
-      this.onDragExit = __bind(this.onDragExit, this);
-      this.onDragOver = __bind(this.onDragOver, this);
-      this.onDummy = __bind(this.onDummy, this);
+      this.init = __bind(this.init, this);
       var _this = this;
 
       VisualEditorView.__super__.constructor.call(this, options);
       this.vent = vent;
       this.settings = options.settings;
-      this.stats = new stats();
-      this.stats.domElement.style.position = 'absolute';
-      this.stats.domElement.style.top = '30px';
-      this.stats.domElement.style.zIndex = 100;
       this.settings.on("change", this.settingsChanged);
       this._setupEventBindings();
       reqRes.addHandler("project:getScreenshot", function() {
-        return _this.makeScreeshot();
+        return _this.makeScreenshot();
       });
+      this.stats = new stats();
+      this.renderer = null;
+      this.overlayRenderer = null;
       this.defaultCameraPosition = new THREE.Vector3(100, 100, 200);
       this.width = 100;
       this.height = 100;
+      this.dpr = 1;
       this.init();
+      this.selectionHelper = new helpers.SelectionHelper({
+        renderCallback: this._render,
+        camera: this.camera,
+        color: 0x000000,
+        textColor: this.settings.textColor
+      });
     }
 
-    VisualEditorView.prototype._setupEventBindings = function() {
-      this.model.on("compiled", this.projectCompiled);
-      return this.model.on("compile:error", this.projectCompileFailed);
+    VisualEditorView.prototype.init = function() {
+      var BlendShader, DotScreenPass, EdgeShader, EdgeShader2, EffectComposer, FXAAShader, VignetteShader;
+
+      EffectComposer = require('EffectComposer');
+      DotScreenPass = require('DotScreenPass');
+      FXAAShader = require('FXAAShader');
+      EdgeShader2 = require('EdgeShader2');
+      EdgeShader = require('EdgeShader');
+      VignetteShader = require('VignetteShader');
+      BlendShader = require('BlendShader');
+      this.stats.domElement.style.position = 'absolute';
+      this.stats.domElement.style.top = '30px';
+      return this.stats.domElement.style.zIndex = 100;
     };
 
-    VisualEditorView.prototype.makeScreeshot = function(width, height) {
-      var canvas, ctx, d, img, imgAsDataURL, srcImg,
+    VisualEditorView.prototype.settingsChanged = function(settings, value) {
+      var error, key, offset, shadowResolution, tgt, val, _ref;
+
+      _ref = this.settings.changedAttributes();
+      for (key in _ref) {
+        val = _ref[key];
+        switch (key) {
+          case "bgColor":
+            this.setBgColor();
+            break;
+          case "bgColor2":
+            this.setBgColor();
+            break;
+          case "renderer":
+            delete this.renderer;
+            this.init();
+            this.fromCsg(this.model);
+            this.render();
+            break;
+          case "showGrid":
+            if (val) {
+              this.addGrid();
+            } else {
+              this.removeGrid();
+            }
+            break;
+          case "gridSize":
+            if (this.grid != null) {
+              this.removeGrid();
+              this.addGrid();
+            }
+            break;
+          case "gridStep":
+            if (this.grid != null) {
+              this.removeGrid();
+              this.addGrid();
+            }
+            break;
+          case "gridColor":
+            if (this.grid != null) {
+              this.grid.setColor(val);
+            }
+            break;
+          case "gridOpacity":
+            if (this.grid != null) {
+              this.grid.setOpacity(val);
+            }
+            break;
+          case "gridText":
+            this.grid.toggleText(val);
+            break;
+          case "gridNumberingPosition":
+            this.grid.setTextLocation(val);
+            break;
+          case "showAxes":
+            if (val) {
+              this.addAxes();
+            } else {
+              this.removeAxes();
+            }
+            break;
+          case "axesSize":
+            this.removeAxes();
+            this.addAxes();
+            break;
+          case "shadows":
+            if (!val) {
+              this.renderer.clearTarget(this.light.shadowMap);
+              this._updateAssemblyVisualAttrs();
+              this._render();
+              this.renderer.shadowMapAutoUpdate = false;
+              if (this.settings.showGrid) {
+                this.removeGrid();
+                this.addGrid();
+              }
+            } else {
+              this.renderer.shadowMapAutoUpdate = true;
+              this._updateAssemblyVisualAttrs();
+              this._render();
+              if (this.settings.showGrid) {
+                this.removeGrid();
+                this.addGrid();
+              }
+            }
+            break;
+          case "shadowResolution":
+            shadowResolution = parseInt(val.split("x")[0]);
+            this.light.shadowMapWidth = shadowResolution;
+            this.light.shadowMapHeight = shadowResolution;
+            if (this.settings.shadows) {
+              this.renderer.shadowMapAutoUpdate = true;
+              this._updateAssemblyVisualAttrs();
+              this._render();
+              if (this.settings.showGrid) {
+                this.removeGrid();
+                this.addGrid();
+              }
+            }
+            break;
+          case "selfShadows":
+            this._updateAssemblyVisualAttrs();
+            this._render();
+            break;
+          case "showStats":
+            if (val) {
+              this.ui.overlayDiv.append(this.stats.domElement);
+            } else {
+              $(this.stats.domElement).remove();
+            }
+            break;
+          case "projection":
+            if (val === "orthographic") {
+              this.camera.toOrthographic();
+            } else {
+              this.camera.toPerspective();
+              this.camera.setZoom(1);
+            }
+            break;
+          case "position":
+            this.setupView(val);
+            break;
+          case "objectViewMode":
+            this._updateAssemblyVisualAttrs();
+            this._render();
+            break;
+          case 'center':
+            try {
+              tgt = this.controls.target;
+              offset = new THREE.Vector3().sub(this.controls.target.clone());
+              this.controls.target.addSelf(offset);
+              this.camera.position.addSelf(offset);
+            } catch (_error) {
+              error = _error;
+              console.log("error " + error + " in center");
+            }
+            this.camera.lookAt(this.scene.position);
+            break;
+          case 'helpersColor':
+            if (this.axes != null) {
+              this.removeAxes();
+              this.addAxes();
+            }
+            break;
+          case 'textColor':
+            if (this.axes != null) {
+              this.removeAxes();
+              this.addAxes();
+            }
+            break;
+          case 'showConnectors':
+            if (val) {
+              this.assembly.traverse(function(object) {
+                console.log("pouet");
+                console.log(object);
+                if (object.name === "connectors") {
+                  return object.visible = true;
+                }
+              });
+            } else {
+              this.assembly.traverse(function(object) {
+                console.log("pouet");
+                console.log(object);
+                if (object.name === "connectors") {
+                  return object.visible = false;
+                }
+              });
+            }
+        }
+      }
+      return this._render();
+    };
+
+    VisualEditorView.prototype.init = function() {
+      this.setupRenderers(this.settings);
+      this.setupScenes();
+      this.setupPostProcess();
+      if (this.settings.shadows) {
+        this.renderer.shadowMapAutoUpdate = this.settings.shadows;
+      }
+      if (this.settings.showGrid) {
+        this.addGrid();
+      }
+      if (this.settings.showAxes) {
+        this.addAxes();
+      }
+      this.setBgColor();
+      return this.setupView(this.settings.position);
+    };
+
+    VisualEditorView.prototype.reloadAssembly = function() {
+      var loader, reloadedAssembly;
+
+      reloadedAssembly = this.model.rootFolder.get(".assembly");
+      console.log("reloadedAssembly", reloadedAssembly);
+      if (reloadedAssembly != null) {
+        reloadedAssembly = JSON.parse(reloadedAssembly.content);
+        loader = new THREE.ObjectParser();
+        this.assembly = loader.parse(reloadedAssembly);
+        console.log("parse Result", this.assembly);
+        this.scene.add(this.assembly);
+        this._updateAssemblyVisualAttrs();
+        return this._render();
+      }
+    };
+
+    VisualEditorView.prototype.setupRenderers = function(settings) {
+      var getValidRenderer, renderer;
+
+      getValidRenderer = function(settings) {
+        var renderer;
+
+        renderer = settings.renderer;
+        if (!detector.webgl && !detector.canvas) {
+          throw new Error("No Webgl and no canvas (fallback) support, cannot render");
+        }
+        if (renderer === "webgl") {
+          if (detector.webgl) {
+            return renderer;
+          } else if (!detector.webgl && detector.canvas) {
+            return "canvas";
+          }
+        }
+        if (renderer === "canvas") {
+          if (detector.canvas) {
+            return renderer;
+          }
+        }
+      };
+      renderer = getValidRenderer(settings);
+      console.log("" + renderer + " renderer");
+      if (renderer === "webgl") {
+        this.renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          preserveDrawingBuffer: true
+        });
+        this.renderer.setSize(this.width, this.height);
+        this.renderer.clear();
+        this.renderer.setClearColor(0x00000000, 0);
+        this.renderer.shadowMapEnabled = true;
+        this.renderer.shadowMapAutoUpdate = true;
+        this.renderer.shadowMapSoft = true;
+        this.overlayRenderer = new THREE.WebGLRenderer({
+          antialias: true
+        });
+        this.overlayRenderer.setSize(350, 250);
+        return this.overlayRenderer.setClearColor(0x00000000, 0);
+      } else if (renderer === "canvas") {
+        this.renderer = new THREE.CanvasRenderer({
+          antialias: true
+        });
+        this.renderer.setSize(this.width, this.height);
+        this.renderer.clear();
+        this.overlayRenderer = new THREE.CanvasRenderer({
+          clearColor: 0x000000,
+          clearAlpha: 0,
+          antialias: true
+        });
+        this.overlayRenderer.setSize(350, 250);
+        return this.overlayRenderer.setClearColor(0x00000000, 0);
+      }
+    };
+
+    VisualEditorView.prototype.setupScenes = function() {
+      this.setupScene();
+      return this.setupOverlayScene();
+    };
+
+    VisualEditorView.prototype.setupScene = function() {
+      var ASPECT;
+
+      this.viewAngle = 45;
+      ASPECT = this.width / this.height;
+      this.NEAR = 1;
+      this.FAR = 1000;
+      this.camera = new THREE.CombinedCamera(this.width, this.height, this.viewAngle, this.NEAR, this.FAR, this.NEAR, this.FAR);
+      this.camera.up = new THREE.Vector3(0, 0, 1);
+      this.camera.position = this.defaultCameraPosition;
+      this.scene = new THREE.Scene();
+      this.scene.add(this.camera);
+      this.setupLights();
+      return this.cameraHelper = new THREE.CameraHelper(this.camera);
+    };
+
+    VisualEditorView.prototype.setupOverlayScene = function() {
+      var ASPECT, FAR, NEAR;
+
+      ASPECT = 350 / 250;
+      NEAR = 1;
+      FAR = 10000;
+      this.overlayCamera = new THREE.CombinedCamera(350, 250, this.viewAngle, NEAR, FAR, NEAR, FAR);
+      this.overlayCamera.up = new THREE.Vector3(0, 0, 1);
+      this.overlayScene = new THREE.Scene();
+      return this.overlayScene.add(this.overlayCamera);
+    };
+
+    VisualEditorView.prototype.setupLights = function() {
+      var ambientLight, pointLight, pointLight2, shadowResolution, spotLight;
+
+      pointLight = new THREE.PointLight(0x333333, 4);
+      pointLight.position.x = -2500;
+      pointLight.position.y = -2500;
+      pointLight.position.z = 2200;
+      pointLight2 = new THREE.PointLight(0x333333, 3);
+      pointLight2.position.x = 2500;
+      pointLight2.position.y = 2500;
+      pointLight2.position.z = -5200;
+      this.ambientColor = 0x253565;
+      this.ambientColor = 0x354575;
+      this.ambientColor = 0x455585;
+      this.ambientColor = 0x565595;
+      ambientLight = new THREE.AmbientLight(this.ambientColor);
+      spotLight = new THREE.SpotLight(0xbbbbbb, 1.5);
+      spotLight.position.x = 50;
+      spotLight.position.y = 50;
+      spotLight.position.z = 300;
+      spotLight.shadowCameraNear = 1;
+      spotLight.shadowCameraFar = 500;
+      spotLight.shadowCameraFov = 50;
+      spotLight.shadowMapBias = 0.000039;
+      spotLight.shadowMapDarkness = 0.5;
+      shadowResolution = parseInt(this.settings.shadowResolution.split("x")[0]);
+      spotLight.shadowMapWidth = shadowResolution;
+      spotLight.shadowMapHeight = shadowResolution;
+      spotLight.castShadow = true;
+      this.light = spotLight;
+      this.scene.add(ambientLight);
+      this.scene.add(pointLight);
+      this.scene.add(pointLight2);
+      this.scene.add(spotLight);
+      return this.camera.add(pointLight);
+    };
+
+    VisualEditorView.prototype.setupPostProcess = function() {
+      var copyPass, depthPass, depthShader, depthUniforms, dotScreenPass, edgeDetectPass, edgeDetectPass2, overlayRenderPass, renderPass, vignettePass;
+
+      if (window.devicePixelRatio === !void 0) {
+        this.dpr = window.devicePixelRatio;
+      }
+      depthShader = THREE.ShaderLib["depthRGBA"];
+      depthUniforms = THREE.UniformsUtils.clone(depthShader.uniforms);
+      this.depthMaterial = new THREE.ShaderMaterial({
+        fragmentShader: depthShader.fragmentShader,
+        vertexShader: depthShader.vertexShader,
+        uniforms: depthUniforms
+      });
+      this.depthMaterial.blending = THREE.NoBlending;
+      this.depthTarget = new THREE.WebGLRenderTarget(this.width, this.height, {
+        minFilter: THREE.NearestFilter,
+        magFilter: THREE.NearestFilter,
+        format: THREE.RGBAFormat
+      });
+      renderPass = new THREE.RenderPass(this.scene, this.camera);
+      overlayRenderPass = new THREE.RenderPass(this.overlayScene, this.overlayCamera);
+      this.depthTarget = new THREE.WebGLRenderTarget(this.width, this.height, {
+        minFilter: THREE.NearestFilter,
+        magFilter: THREE.NearestFilter,
+        format: THREE.RGBFormat
+      });
+      this.depthMaterial = new THREE.MeshDepthMaterial();
+      depthPass = new THREE.RenderPass(this.scene, this.camera, this.depthMaterial);
+      copyPass = new THREE.ShaderPass(THREE.CopyShader);
+      dotScreenPass = new THREE.ShaderPass(THREE.DotScreenShader);
+      this.fxAAPass = new THREE.ShaderPass(THREE.FXAAShader);
+      this.fxAAPass.uniforms['resolution'].value.set(1 / (this.width * this.dpr), 1 / (this.height * this.dpr));
+      edgeDetectPass = new THREE.ShaderPass(THREE.EdgeShader);
+      edgeDetectPass2 = new THREE.ShaderPass(THREE.EdgeShader2);
+      vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
+      this.depthExtractPass = new THREE.ShaderPass(Shaders.depthExtractShader);
+      this.composer = new THREE.EffectComposer(this.renderer);
+      this.composer.setSize(this.width * this.dpr, this.height * this.dpr);
+      this.composer.addPass(renderPass);
+      this.composer.addPass(this.fxAAPass);
+      return this.composer.passes[this.composer.passes.length - 1].renderToScreen = true;
+    };
+
+    VisualEditorView.prototype.setupView = function(val) {
+      var error, nPost, offset, resetCam,
         _this = this;
 
+      if (this.settings.projection === "orthographic") {
+        this.camera.toOrthographic();
+        this.camera.setZoom(6);
+      }
+      resetCam = function() {
+        _this.camera.position.z = 0;
+        _this.camera.position.y = 0;
+        return _this.camera.position.x = 0;
+      };
+      switch (val) {
+        case 'diagonal':
+          this.camera.position = this.defaultCameraPosition;
+          this.overlayCamera.position.x = 150;
+          this.overlayCamera.position.y = 150;
+          this.overlayCamera.position.z = 250;
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+          break;
+        case 'top':
+          this.camera.toTopView();
+          this.overlayCamera.toTopView();
+          console.log(this.camera);
+          /*
+          try
+            offset = @camera.position.clone().sub(@controls.target)
+            nPost = new THREE.Vector3()
+            nPost.z = offset.length()
+            @camera.position = nPost
+            
+          catch error
+            @camera.position = new THREE.Vector3(0,0,@defaultCameraPosition.z)
+            
+          @overlayCamera.position = new THREE.Vector3(0,0,250)
+          @camera.lookAt(@scene.position)
+          @overlayCamera.lookAt(@overlayScene.position)
+          */
+
+          break;
+        case 'bottom':
+          try {
+            offset = this.camera.position.clone().sub(this.controls.target);
+            nPost = new THREE.Vector3();
+            nPost.z = -offset.length();
+            this.camera.position = nPost;
+          } catch (_error) {
+            error = _error;
+            this.camera.position = new THREE.Vector3(0, 0, -this.defaultCameraPosition.z);
+          }
+          this.overlayCamera.position = new THREE.Vector3(0, 0, -250);
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+          break;
+        case 'front':
+          try {
+            offset = this.camera.position.clone().sub(this.controls.target);
+            nPost = new THREE.Vector3();
+            nPost.y = -offset.length();
+            this.camera.position = nPost;
+          } catch (_error) {
+            error = _error;
+            this.camera.position = new THREE.Vector3(0, -this.defaultCameraPosition.y, 0);
+          }
+          this.overlayCamera.position = new THREE.Vector3(0, -250, 0);
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+          break;
+        case 'back':
+          try {
+            offset = this.camera.position.clone().sub(this.controls.target);
+            nPost = new THREE.Vector3();
+            nPost.y = offset.length();
+            this.camera.position = nPost;
+          } catch (_error) {
+            error = _error;
+            this.camera.position = new THREE.Vector3(0, this.defaultCameraPosition.y, 0);
+          }
+          this.overlayCamera.position = new THREE.Vector3(0, 250, 0);
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+          break;
+        case 'left':
+          try {
+            offset = this.camera.position.clone().sub(this.controls.target);
+            nPost = new THREE.Vector3();
+            nPost.x = offset.length();
+            this.camera.position = nPost;
+          } catch (_error) {
+            error = _error;
+            this.camera.position = new THREE.Vector3(this.defaultCameraPosition.x, 0, 0);
+          }
+          this.overlayCamera.position = new THREE.Vector3(250, 0, 0);
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+          break;
+        case 'right':
+          try {
+            offset = this.camera.position.clone().sub(this.controls.target);
+            nPost = new THREE.Vector3();
+            nPost.x = -offset.length();
+            this.camera.position = nPost;
+          } catch (_error) {
+            error = _error;
+            this.camera.position = new THREE.Vector3(-this.defaultCameraPosition.x, 0, 0);
+          }
+          this.overlayCamera.position = new THREE.Vector3(-250, 0, 0);
+          this.camera.lookAt(this.scene.position);
+          this.overlayCamera.lookAt(this.overlayScene.position);
+      }
+      return this._render();
+    };
+
+    VisualEditorView.prototype._setupEventBindings = function() {
+      this.model.on("compiled", this._onProjectCompiled);
+      return this.model.on("compile:error", this._onProjectCompileFailed);
+    };
+
+    VisualEditorView.prototype.makeScreenshot = function(width, height) {
       if (width == null) {
         width = 300;
       }
       if (height == null) {
         height = 300;
       }
-      srcImg = this.renderer.domElement.toDataURL("image/png");
-      canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      ctx = canvas.getContext('2d');
-      d = $.Deferred();
-      imgAsDataURL = null;
-      img = new Image();
-      img.onload = function() {
-        ctx.drawImage(img, 0, 0, width, height);
-        imgAsDataURL = canvas.toDataURL("image/png");
-        return d.resolve(imgAsDataURL);
-      };
-      img.src = srcImg;
-      return d;
+      return helpers.captureScreen(this.renderer.domElement, width, height);
     };
 
-    VisualEditorView.prototype.rightclick = function(ev) {
+    VisualEditorView.prototype._onSelectAttempt = function(ev) {
       "used either for selection or context menu";
-      var x, y;
+      var hiearchyRoot, selected, x, y;
 
       normalizeEvent(ev);
       x = ev.offsetX;
       y = ev.offsetY;
-      this.selectObj(x, y);
+      hiearchyRoot = this.assembly != null ? this.assembly.children : this.scene.children;
+      this.selectionHelper.hiearchyRoot = hiearchyRoot;
+      this.selectionHelper.viewWidth = this.width;
+      this.selectionHelper.viewHeight = this.height;
+      selected = this.selectionHelper.selectObjectAt(x, y);
       /*
-      {ContextMenuRegion,ContextMenu} = require "views/contextMenuView"
-      @contextMenu = new ContextMenu()
-      @contextMenuRegion.show @contextMenu
+      selectionChange = false
+      if selected?
+        if @currentSelection?
+          if @currentSelection != selected
+            selectionChange = true
+        else 
+          selectionChange = true
+           
+      if selectionChange
+        if @currentSelection?
+          controls = @currentSelection.controls
+          if controls?
+            controls.detatch(@currentSelection)
+            controls.removeEventListener( 'change', @_render)
+            @scene.remove(controls.gizmo)
+            controls = null
+            @currentSelection = null
+        
+        @currentSelection = selected        
+        controls = new THREE.TransformControls(@camera, @renderer.domElement)
+        console.log controls
+        controls.addEventListener( 'change', @_render );
+        controls.attatch( selected );
+        controls.scale = 0.65;
+        @scene.add( controls.gizmo );
+        selected.controls = controls
+      
+      @_render()
       */
 
       ev.preventDefault();
       return false;
     };
 
-    VisualEditorView.prototype.selectObj = function(mouseX, mouseY) {
-      var intersects, newMat, raycaster, unselect, v,
-        _this = this;
+    VisualEditorView.prototype._onRightclick = function(ev) {
+      return this.selectionHelper._unSelect();
+    };
 
-      v = new THREE.Vector3((mouseX / this.width) * 2 - 1, -(mouseY / this.height) * 2 + 1, 0.5);
-      this.projector.unprojectVector(v, this.camera);
-      raycaster = new THREE.Raycaster(this.camera.position, v.sub(this.camera.position).normalize());
-      intersects = raycaster.intersectObjects(this.scene.children, true);
-      unselect = function() {
-        if (_this.current != null) {
-          _this.current.selected = false;
-          _this.current.material = _this.current.origMaterial;
-          if (_this.current.cage != null) {
-            _this.current.remove(_this.current.cage);
-            _this.current.cage = null;
-          }
-          return _this.current = null;
-        }
-      };
-      if (this.current != null) {
-        unselect();
-      }
-      if (intersects != null) {
-        if (intersects.length > 0) {
-          if (intersects[0].object.name !== "workplane") {
-            this.current = intersects[0].object;
-            newMat = new THREE.MeshLambertMaterial({
-              color: 0xCC0000
-            });
-            this.current.origMaterial = this.current.material;
-            this.current.material = newMat;
-            this.addCage(this.current);
-            this.camera.lookAt(this.current.position.clone());
-            this.controls.zoomInOn(this.current);
-            this._render();
-          }
-        }
-      }
-      return this._render();
+    VisualEditorView.prototype._onMouseMove = function(ev) {
+      var hiearchyRoot, x, y;
+
+      normalizeEvent(ev);
+      x = ev.offsetX;
+      y = ev.offsetY;
+      hiearchyRoot = this.assembly != null ? this.assembly.children : this.scene.children;
+      this.selectionHelper.hiearchyRoot = hiearchyRoot;
+      this.selectionHelper.viewWidth = this.width;
+      this.selectionHelper.viewHeight = this.height;
+      return this.selectionHelper.highlightObjectAt(x, y);
     };
 
     VisualEditorView.prototype.switchModel = function(newModel) {
-      this.model.off("compiled", this.projectCompiled);
-      this.model.off("compile:error", this.projectCompileFailed);
+      this.model.off("compiled", this._onProjectCompiled);
+      this.model.off("compile:error", this._onProjectCompileFailed);
       try {
         this.scene.remove(this.current.cageView);
       } catch (_error) {}
@@ -262,15 +700,18 @@ define(function(require) {
         this.current = null;
       }
       this.model = newModel;
+      this.selectionHelper._unSelect();
       this._setupEventBindings();
-      return this._render();
+      this._render();
+      return this.reloadAssembly();
     };
 
-    VisualEditorView.prototype.projectCompiled = function(res) {
+    VisualEditorView.prototype._onProjectCompiled = function(res) {
+      this.selectionHelper._unSelect();
       return this.fromCsg(res);
     };
 
-    VisualEditorView.prototype.projectCompileFailed = function() {
+    VisualEditorView.prototype._onProjectCompileFailed = function() {
       if (this.assembly != null) {
         this.scene.remove(this.assembly);
         this.assembly = null;
@@ -286,9 +727,6 @@ define(function(require) {
         val = _ref[key];
         switch (key) {
           case "bgColor":
-            this.setBgColor();
-            break;
-          case "bgColor2":
             this.setBgColor();
             break;
           case "renderer":
@@ -416,8 +854,6 @@ define(function(require) {
           case 'showConnectors':
             if (val) {
               this.assembly.traverse(function(object) {
-                console.log("pouet");
-                console.log(object);
                 if (object.name === "connectors") {
                   return object.visible = true;
                 }
@@ -436,291 +872,29 @@ define(function(require) {
       return this._render();
     };
 
-    VisualEditorView.prototype.init = function() {
-      var val;
-
-      this.renderer = null;
-      this.configure(this.settings);
-      this.renderer.shadowMapEnabled = true;
-      this.renderer.shadowMapAutoUpdate = true;
-      this.projector = new THREE.Projector();
-      this.setupScene();
-      this.setupOverlayScene();
-      this.setBgColor();
-      if (this.settings.shadows) {
-        this.renderer.shadowMapAutoUpdate = this.settings.shadows;
-      }
-      if (this.settings.showGrid) {
-        this.addGrid();
-      }
-      if (this.settings.showAxes) {
-        this.addAxes();
-      }
-      if (this.settings.projection === "orthographic") {
-        this.camera.toOrthographic();
-        this.camera.setZoom(6);
-      } else {
-
-      }
-      if (this.mesh != null) {
-        this.mesh.material.wireframe = this.settings.wireframe;
-      }
-      val = this.settings.position;
-      return this.setupView(val);
-    };
-
-    VisualEditorView.prototype.configure = function(settings) {
-      var renderer;
-
-      if (settings.renderer) {
-        renderer = settings.renderer;
-        if (renderer === "webgl") {
-          if (detector.webgl) {
-            console.log("Gl Renderer");
-            this.renderer = new THREE.WebGLRenderer({
-              clearColor: 0x00000000,
-              clearAlpha: 0,
-              antialias: true,
-              preserveDrawingBuffer: true
-            });
-            this.renderer.clear();
-            this.renderer.setSize(this.width, this.height);
-            this.overlayRenderer = new THREE.WebGLRenderer({
-              clearColor: 0x000000,
-              clearAlpha: 0,
-              antialias: true
-            });
-            return this.overlayRenderer.setSize(350, 250);
-          } else if (!detector.webgl && !detector.canvas) {
-            return console.log("No Webgl and no canvas (fallback) support, cannot render");
-          } else if (!detector.webgl && detector.canvas) {
-            this.renderer = new THREE.CanvasRenderer({
-              clearColor: 0x00000000,
-              clearAlpha: 0,
-              antialias: true
-            });
-            this.renderer.clear();
-            this.overlayRenderer = new THREE.CanvasRenderer({
-              clearColor: 0x000000,
-              clearAlpha: 0,
-              antialias: true
-            });
-            this.overlayRenderer.setSize(350, 250);
-            return this.renderer.setSize(this.width, this.height);
-          } else {
-            return console.log("No Webgl and no canvas (fallback) support, cannot render");
-          }
-        } else if (renderer === "canvas") {
-          if (detector.canvas) {
-            this.renderer = new THREE.CanvasRenderer({
-              clearColor: 0x00000000,
-              clearAlpha: 0,
-              antialias: true
-            });
-            this.renderer.clear();
-            this.overlayRenderer = new THREE.CanvasRenderer({
-              clearColor: 0x000000,
-              clearAlpha: 0,
-              antialias: true
-            });
-            this.overlayRenderer.setSize(350, 250);
-            return this.renderer.setSize(this.width, this.height);
-          } else if (!detector.canvas) {
-            return console.log("No canvas support, cannot render");
-          }
-        }
-      }
-    };
-
-    VisualEditorView.prototype.setupScene = function() {
-      var ASPECT, FAR, NEAR;
-
-      this.viewAngle = 45;
-      ASPECT = this.width / this.height;
-      NEAR = 1;
-      FAR = 10000;
-      this.camera = new THREE.CombinedCamera(this.width, this.height, this.viewAngle, NEAR, FAR, NEAR, FAR);
-      this.camera.up = new THREE.Vector3(0, 0, 1);
-      this.camera.position = this.defaultCameraPosition;
-      this.scene = new THREE.Scene();
-      this.scene.add(this.camera);
-      this.setupLights();
-      return this.cameraHelper = new THREE.CameraHelper(this.camera);
-    };
-
-    VisualEditorView.prototype.setupOverlayScene = function() {
-      var ASPECT, FAR, NEAR;
-
-      ASPECT = 350 / 250;
-      NEAR = 1;
-      FAR = 10000;
-      this.overlayCamera = new THREE.CombinedCamera(350, 250, this.viewAngle, NEAR, FAR, NEAR, FAR);
-      this.overlayCamera.up = new THREE.Vector3(0, 0, 1);
-      this.overlayScene = new THREE.Scene();
-      return this.overlayScene.add(this.overlayCamera);
-    };
-
-    VisualEditorView.prototype.setupLights = function() {
-      var ambientLight, pointLight, pointLight2, spotLight;
-
-      pointLight = new THREE.PointLight(0x333333, 4);
-      pointLight.position.x = -2500;
-      pointLight.position.y = -2500;
-      pointLight.position.z = 2200;
-      pointLight2 = new THREE.PointLight(0x333333, 3);
-      pointLight2.position.x = 2500;
-      pointLight2.position.y = 2500;
-      pointLight2.position.z = -5200;
-      this.ambientColor = 0x253565;
-      this.ambientColor = 0x354575;
-      this.ambientColor = 0x455585;
-      this.ambientColor = 0x565595;
-      ambientLight = new THREE.AmbientLight(this.ambientColor);
-      spotLight = new THREE.SpotLight(0xbbbbbb, 1.5);
-      spotLight.position.x = 0;
-      spotLight.position.y = 0;
-      spotLight.position.z = 300;
-      spotLight.castShadow = true;
-      this.light = spotLight;
-      this.scene.add(ambientLight);
-      this.scene.add(pointLight);
-      this.scene.add(pointLight2);
-      this.scene.add(spotLight);
-      return this.camera.add(pointLight);
-    };
-
-    VisualEditorView.prototype.setupView = function(val) {
-      var error, nPost, offset, resetCam,
-        _this = this;
-
-      resetCam = function() {
-        _this.camera.position.z = 0;
-        _this.camera.position.y = 0;
-        return _this.camera.position.x = 0;
-      };
-      switch (val) {
-        case 'diagonal':
-          this.camera.position = this.defaultCameraPosition;
-          this.overlayCamera.position.x = 150;
-          this.overlayCamera.position.y = 150;
-          this.overlayCamera.position.z = 250;
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-          break;
-        case 'top':
-          this.camera.toTopView();
-          this.overlayCamera.toTopView();
-          console.log(this.camera);
-          /*
-          try
-            offset = @camera.position.clone().sub(@controls.target)
-            nPost = new THREE.Vector3()
-            nPost.z = offset.length()
-            @camera.position = nPost
-            
-          catch error
-            @camera.position = new THREE.Vector3(0,0,@defaultCameraPosition.z)
-            
-          @overlayCamera.position = new THREE.Vector3(0,0,250)
-          @camera.lookAt(@scene.position)
-          @overlayCamera.lookAt(@overlayScene.position)
-          */
-
-          break;
-        case 'bottom':
-          try {
-            offset = this.camera.position.clone().sub(this.controls.target);
-            nPost = new THREE.Vector3();
-            nPost.z = -offset.length();
-            this.camera.position = nPost;
-          } catch (_error) {
-            error = _error;
-            this.camera.position = new THREE.Vector3(0, 0, -this.defaultCameraPosition.z);
-          }
-          this.overlayCamera.position = new THREE.Vector3(0, 0, -250);
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-          break;
-        case 'front':
-          try {
-            offset = this.camera.position.clone().sub(this.controls.target);
-            nPost = new THREE.Vector3();
-            nPost.y = -offset.length();
-            this.camera.position = nPost;
-          } catch (_error) {
-            error = _error;
-            this.camera.position = new THREE.Vector3(0, -this.defaultCameraPosition.y, 0);
-          }
-          this.overlayCamera.position = new THREE.Vector3(0, -250, 0);
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-          break;
-        case 'back':
-          try {
-            offset = this.camera.position.clone().sub(this.controls.target);
-            nPost = new THREE.Vector3();
-            nPost.y = offset.length();
-            this.camera.position = nPost;
-          } catch (_error) {
-            error = _error;
-            this.camera.position = new THREE.Vector3(0, this.defaultCameraPosition.y, 0);
-          }
-          this.overlayCamera.position = new THREE.Vector3(0, 250, 0);
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-          break;
-        case 'left':
-          try {
-            offset = this.camera.position.clone().sub(this.controls.target);
-            nPost = new THREE.Vector3();
-            nPost.x = offset.length();
-            this.camera.position = nPost;
-          } catch (_error) {
-            error = _error;
-            this.camera.position = new THREE.Vector3(this.defaultCameraPosition.x, 0, 0);
-          }
-          this.overlayCamera.position = new THREE.Vector3(250, 0, 0);
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-          break;
-        case 'right':
-          try {
-            offset = this.camera.position.clone().sub(this.controls.target);
-            nPost = new THREE.Vector3();
-            nPost.x = -offset.length();
-            this.camera.position = nPost;
-          } catch (_error) {
-            error = _error;
-            this.camera.position = new THREE.Vector3(-this.defaultCameraPosition.x, 0, 0);
-          }
-          this.overlayCamera.position = new THREE.Vector3(-250, 0, 0);
-          this.camera.lookAt(this.scene.position);
-          this.overlayCamera.lookAt(this.overlayScene.position);
-      }
-      return this._render();
-    };
-
     VisualEditorView.prototype.setBgColor = function() {
-      var bgColor1, bgColor2;
+      var bgColor, bgColor1, bgColor2;
 
-      console.log("setting bg color");
       bgColor1 = this.settings.bgColor;
       bgColor2 = this.settings.bgColor2;
       $("body").css("background-color", bgColor1);
-      if (bgColor1 !== bgColor2) {
-        $("body").css("background-image", "-moz-radial-gradient(center center, circle cover, " + bgColor1 + "," + bgColor2 + "  100%)");
-        $("body").css("background-image", "-webkit-radial-gradient(center center, circle cover, " + bgColor1 + "," + bgColor2 + "  100%)");
-        $("body").css("background-image", "-o-radial-gradient(center center, circle cover, " + bgColor1 + "," + bgColor2 + "  100%)");
-        $("body").css("background-image", "-ms-radial-gradient(center center, circle cover, " + bgColor1 + "," + bgColor2 + "  100%)");
-        $("body").css("background-image", "radial-gradient(center center, circle cover, " + bgColor1 + "," + bgColor2 + "  100%)");
-        $("body").css("background-repeat", "no-repeat");
-        return $("body").css("background-attachment", "fixed");
-      } else {
-        $("body").css("background-image", "");
-        $("body").css("background-image", "");
-        $("body").css("background-repeat", "");
-        return $("body").css("background-attachment", "");
-      }
+      console.log(this.settings.bgColor);
+      return bgColor = this.settings.bgColor.split('#').pop();
+      /*
+      bgColor = a.map((x) -> #For each array element
+        x = parseInt(x).toString(16) #Convert to a base16 string
+        (if (x.length is 1) then "0" + x else x) #Add zero if we get only one character
+      )     
+      
+      b = "0x"+b.join("");
+      */
+
+      /*      
+      @renderer.clearColor=0x363335
+      console.log @renderer
+      @renderer.setClearColorHex( 0xFFFFFF, @renderer.getClearAlpha() )
+      */
+
     };
 
     VisualEditorView.prototype.addGrid = function() {
@@ -782,38 +956,6 @@ define(function(require) {
       return delete this.overlayAxes;
     };
 
-    VisualEditorView.prototype.addCage = function(mesh) {
-      return new helpers.BoundingCage({
-        mesh: mesh,
-        color: this.settings.helpersColor,
-        textColor: this.settings.textColor
-      });
-    };
-
-    VisualEditorView.prototype.setupPickerHelper = function() {
-      var PI2, canvas, context, texture;
-
-      canvas = document.createElement('canvas');
-      canvas.width = 100;
-      canvas.height = 100;
-      context = canvas.getContext('2d');
-      PI2 = Math.PI * 2;
-      context.beginPath();
-      context.arc(0, 0, 1, 0, PI2, true);
-      context.closePath();
-      context.fill();
-      context.fillText("X", 40, 40);
-      texture = new THREE.Texture(canvas);
-      texture.needsUpdate = true;
-      this.particleTexture = new THREE.Texture(canvas);
-      this.particleTexture.needsUpdate = true;
-      return this.particleMaterial = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        color: 0x000000
-      });
-    };
-
     VisualEditorView.prototype._computeViewSize = function() {
       var eastWidth, westWidth;
 
@@ -821,7 +963,6 @@ define(function(require) {
       this.height = this.$el.height();
       if (this.initialized == null) {
         this.initialized = true;
-        console.log("initial view size setting");
         westWidth = $("#_dockZoneWest").width();
         eastWidth = $("#_dockZoneEast").width();
         this.width = window.innerWidth - (westWidth + eastWidth);
@@ -835,6 +976,14 @@ define(function(require) {
 
     VisualEditorView.prototype.onResize = function() {
       this._computeViewSize();
+      if (window.devicePixelRatio != null) {
+        this.dpr = window.devicePixelRatio;
+      }
+      this.fxAAPass.uniforms['resolution'].value.set(1 / (this.width * this.dpr), 1 / (this.height * this.dpr));
+      this.composer.setSize(this.width * this.dpr, this.height * this.dpr);
+      this.depthExtractPass.uniforms['size'].value.set(this.width, this.height);
+      this.depthExtractPass.uniforms['cameraNear'].value = 0.1;
+      this.depthExtractPass.uniforms['cameraFar'].value = 100;
       this.camera.aspect = this.width / this.height;
       this.camera.setSize(this.width, this.height);
       this.renderer.setSize(this.width, this.height);
@@ -875,6 +1024,7 @@ define(function(require) {
       container2.append(this.overlayRenderer.domElement);
       this.overlayControls = new CustomOrbitControls(this.overlayCamera, this.el);
       this.overlayControls.noPan = true;
+      this.overlayControls.noZoom = true;
       this.overlayControls.rotateSpeed = 1.8;
       this.overlayControls.zoomSpeed = 0;
       this.overlayControls.panSpeed = 0;
@@ -883,8 +1033,38 @@ define(function(require) {
     };
 
     VisualEditorView.prototype._render = function() {
+      var centerLeft, centerTop, height, infoText, length, width, _ref;
+
+      if (this.selectionHelper != null) {
+        if (this.selectionHelper.currentSelect != null) {
+          _ref = this.selectionHelper.get2DBB(this.selectionHelper.currentSelect, this.width, this.height), centerLeft = _ref[0], centerTop = _ref[1], length = _ref[2], width = _ref[3], height = _ref[4];
+          $("#testOverlay2").removeClass("hide");
+          $("#testOverlay2").css("left", centerLeft + this.$el.offset().left);
+          $("#testOverlay2").css('top', (centerTop - $("#testOverlay2").height() / 2) + 'px');
+          infoText = "" + this.selectionHelper.currentSelect.name;
+          $("#testOverlay2").text(infoText);
+        } else {
+          $("#testOverlay2").addClass("hide");
+        }
+      } else {
+        $("#testOverlay2").addClass("hide");
+      }
+      THREE.EffectComposer.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      THREE.EffectComposer.quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+      THREE.EffectComposer.scene = new THREE.Scene();
+      THREE.EffectComposer.scene.add(THREE.EffectComposer.quad);
+      /*
+      @scene.overrideMaterial = @depthMaterial
+      @renderer.render( @scene, @camera, @depthTarget )
+      */
+
+      /*
+      if @assembly?
+        for child in @assembly.children
+          child.material = @depthMaterial
+      */
+
       this.renderer.render(this.scene, this.camera);
-      this.overlayRenderer.render(this.overlayScene, this.overlayCamera);
       if (this.settings.showStats) {
         return this.stats.update();
       }
@@ -896,24 +1076,15 @@ define(function(require) {
       return requestAnimationFrame(this.animate);
     };
 
-    VisualEditorView.prototype.toCsgTest = function(mesh) {
-      var csgResult;
-
-      csgResult = THREE.CSG.toCSG(mesh);
-      if (csgResult != null) {
-        return console.log("CSG conversion result ok:");
-      }
-    };
-
     VisualEditorView.prototype.fromCsg = function() {
-      var end, index, part, start, _ref;
+      var end, exported, exporter, index, part, start, _ref;
 
       start = new Date().getTime();
       if (this.assembly != null) {
         this.scene.remove(this.assembly);
         this.current = null;
       }
-      this.assembly = new THREE.Mesh(new THREE.Geometry());
+      this.assembly = new THREE.Object3D();
       this.assembly.name = "assembly";
       if (this.model.rootAssembly.children != null) {
         _ref = this.model.rootAssembly.children;
@@ -926,6 +1097,17 @@ define(function(require) {
       end = new Date().getTime();
       console.log("Csg visualization time: " + (end - start));
       this._updateAssemblyVisualAttrs();
+      exporter = new THREE.ObjectExporter();
+      exported = exporter.parse(this.assembly);
+      exported = JSON.stringify(exported);
+      if (!this.model.rootFolder.get(".assembly")) {
+        this.model.addFile({
+          name: ".assembly",
+          content: exported
+        });
+      } else {
+        this.model.rootFolder.get(".assembly").content = exported;
+      }
       return this._render();
     };
 
@@ -1012,6 +1194,9 @@ define(function(require) {
 
         child.castShadow = _this.settings.shadows;
         child.receiveShadow = _this.settings.selfShadows && _this.settings.shadows;
+        if (child.material != null) {
+          child.material.vertexColors = THREE.VertexColors;
+        }
         switch (_this.settings.objectViewMode) {
           case "shaded":
             removeRenderHelpers(child);
@@ -1060,7 +1245,7 @@ define(function(require) {
               renderSubElementsHelper.name = "renderSubs";
               geom = child.geometry;
               obj2 = new THREE.Mesh(geom.clone(), basicMaterial1);
-              obj3 = new THREE.Line(_this.geo2line(geom.clone()), dashMaterial, THREE.LinePieces);
+              obj3 = new THREE.Line(helpers.geometryToline(geom.clone()), dashMaterial, THREE.LinePieces);
               obj4 = new THREE.Mesh(geom.clone(), wireFrameMaterial);
               renderSubElementsHelper.add(obj2);
               renderSubElementsHelper.add(obj3);
@@ -1090,139 +1275,6 @@ define(function(require) {
         }
         return _results;
       }
-    };
-
-    VisualEditorView.prototype.geo2line = function(geo) {
-      var a, b, c, d, face, geometry, i, vertices, _i, _ref;
-
-      geometry = new THREE.Geometry();
-      vertices = geometry.vertices;
-      for (i = _i = 0, _ref = geo.faces.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        face = geo.faces[i];
-        if (face instanceof THREE.Face3) {
-          a = geo.vertices[face.a].clone();
-          b = geo.vertices[face.b].clone();
-          c = geo.vertices[face.c].clone();
-          vertices.push(a, b, b, c, c, a);
-        } else if (face instanceof THREE.Face4) {
-          a = geo.vertices[face.a].clone();
-          b = geo.vertices[face.b].clone();
-          c = geo.vertices[face.c].clone();
-          d = geo.vertices[face.d].clone();
-          vertices.push(a, b, b, c, c, d, d, a);
-        }
-      }
-      geometry.computeLineDistances();
-      return geometry;
-    };
-
-    VisualEditorView.prototype._addIndicator = function(mesh) {
-      var geometry, line, material;
-
-      material = new THREE.LineDashedMaterial({
-        color: 0xffaa00,
-        dashSize: 3,
-        gapSize: 1,
-        linewidth: 2
-      });
-      geometry = new THREE.Geometry();
-      geometry.vertices.push(new THREE.Vector3(mesh.position.x, mesh.position.y, mesh.position.z));
-      geometry.vertices.push(new THREE.Vector3(150, 0, 150));
-      geometry.vertices.push(new THREE.Vector3(150, 0, 157));
-      geometry.vertices.push(new THREE.Vector3(150, 0, 160));
-      line = new THREE.Line(geometry, material, THREE.LineStrip);
-      return mesh.add(line);
-    };
-
-    VisualEditorView.prototype._addIndicator2 = function(mesh) {
-      var cube, geometryCube, geometrySpline, hilbert3D, i, index, material, points, position, recursion, spline, subdivisions, _i, _ref;
-
-      hilbert3D = function(center, side, iterations, v0, v1, v2, v3, v4, v5, v6, v7) {
-        var half, tmp, vec, vec_s;
-
-        half = side / 2;
-        vec_s = [new THREE.Vector3(center.x - half, center.y + half, center.z - half), new THREE.Vector3(center.x - half, center.y + half, center.z + half), new THREE.Vector3(center.x - half, center.y - half, center.z + half), new THREE.Vector3(center.x - half, center.y - half, center.z - half), new THREE.Vector3(center.x + half, center.y - half, center.z - half), new THREE.Vector3(center.x + half, center.y - half, center.z + half), new THREE.Vector3(center.x + half, center.y + half, center.z + half), new THREE.Vector3(center.x + half, center.y + half, center.z - half)];
-        vec = [vec_s[v0], vec_s[v1], vec_s[v2], vec_s[v3], vec_s[v4], vec_s[v5], vec_s[v6], vec_s[v7]];
-        if (--iterations >= 0) {
-          tmp = [];
-          Array.prototype.push.apply(tmp, hilbert3D(vec[0], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[1], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[2], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[3], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[4], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[5], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[6], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7));
-          Array.prototype.push.apply(tmp, hilbert3D(vec[7], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7));
-          return tmp;
-        }
-        return vec;
-      };
-      cube = function(size) {
-        var geometry, h;
-
-        h = size * 0.5;
-        geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(-h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, -h, h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, h));
-        geometry.vertices.push(new THREE.Vector3(h, h, h));
-        geometry.vertices.push(new THREE.Vector3(h, h, h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, h));
-        geometry.vertices.push(new THREE.Vector3(-h, -h, h));
-        geometry.vertices.push(new THREE.Vector3(-h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, -h, h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(-h, h, h));
-        geometry.vertices.push(new THREE.Vector3(h, h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, h, h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, -h));
-        geometry.vertices.push(new THREE.Vector3(h, -h, h));
-        return geometry;
-      };
-      subdivisions = 6;
-      recursion = 1;
-      points = hilbert3D(new THREE.Vector3(0, 0, 0), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7);
-      spline = new THREE.Spline(points);
-      geometrySpline = new THREE.Geometry();
-      for (i = _i = 0, _ref = points.length * subdivisions; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        index = i / (points.length * subdivisions);
-        position = spline.getPoint(index);
-        geometrySpline.vertices[i] = new THREE.Vector3(position.x, position.y, position.z);
-      }
-      geometryCube = cube(350);
-      geometryCube.computeLineDistances();
-      geometrySpline.computeLineDistances();
-      material = new THREE.LineDashedMaterial({
-        color: 0xffaa00,
-        dashSize: 3,
-        gapSize: 1,
-        linewidth: 2
-      });
-      cube = new THREE.Line(geometryCube, material, THREE.LinePieces);
-      spline = new THREE.Line(geometrySpline, material, THREE.LinePieces);
-      mesh.add(cube);
-      return mesh.add(spline);
-    };
-
-    VisualEditorView.prototype.informationOverlay = function(object3d) {
-      var left, p, percX, percY, top, v;
-
-      p = object3d.matrixWorld.getPosition().clone();
-      v = projector.projectVector(p, this.camera);
-      percX = (v.x + 1) / 2;
-      percY = (-v.y + 1) / 2;
-      left = percX * this.width;
-      top = percY * this.height;
-      return $trackingOverlay.css('left', (left - $trackingOverlay.width() / 2) + 'px').css('top', (top - $trackingOverlay.height() / 2) + 'px');
     };
 
     return VisualEditorView;

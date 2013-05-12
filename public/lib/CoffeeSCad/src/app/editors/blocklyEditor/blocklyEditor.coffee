@@ -26,6 +26,9 @@ define (require)->
       @vent = vent
       #@router = new blocklyEditorRouter
       #  controller: @
+      @startWithParent = true
+      @showOnAppStart = true
+      @addMainMenuIcon = true
       @icon = "icon-th-large"
       
       @vent.on("project:loaded",@resetEditor)

@@ -154,6 +154,7 @@ define(function(require) {
       three_geometry.computeBoundingBox();
       three_geometry.computeCentroids();
       three_geometry.computeFaceNormals();
+      three_geometry.computeBoundingSphere();
       connectors = [];
       searchForConnectors = function(obj) {
         var axisvector, connector, geometry, point, prop, _results;
@@ -192,7 +193,6 @@ define(function(require) {
         }
         return _results;
       };
-      searchForConnectors(properties);
       three_geometry.connectors = connectors;
       end = new Date().getTime();
       console.log("Conversion to three.geometry time: " + (end - start));

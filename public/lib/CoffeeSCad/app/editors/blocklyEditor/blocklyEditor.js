@@ -34,6 +34,9 @@ define(function(require) {
       this.settings = (_ref1 = options.settings) != null ? _ref1 : new BlocklyEditorSettings();
       this.project = (_ref2 = options.project) != null ? _ref2 : new Project();
       this.vent = vent;
+      this.startWithParent = true;
+      this.showOnAppStart = true;
+      this.addMainMenuIcon = true;
       this.icon = "icon-th-large";
       this.vent.on("project:loaded", this.resetEditor);
       this.vent.on("project:created", this.resetEditor);

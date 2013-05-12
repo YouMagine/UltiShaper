@@ -14,7 +14,6 @@ define(function(require) {
     var EPS, PIXELS_PER_ROUND, STATE, changeEvent, getAutoRotationAngle, getZoomScale, lastPosition, onMouseDown, onMouseMove, onMouseUp, onMouseWheel, panEnd, panStart, phiDelta, rotateDelta, rotateEnd, rotateStart, scale, scope, state, thetaDelta, zoomDelta, zoomEnd, zoomStart,
       _this = this;
 
-    THREE.EventDispatcher.call(this);
     this.object = object;
     this.domElement = (domElement !== undefined ? domElement : document);
     this.target = new THREE.Vector3();
@@ -239,5 +238,6 @@ define(function(require) {
     this.domElement.addEventListener("mousewheel", onMouseWheel, false);
     return this.domElement.addEventListener("DOMMouseScroll", onMouseWheel, false);
   };
+  OrbitControls.prototype = Object.create(THREE.EventDispatcher.prototype);
   return OrbitControls;
 });

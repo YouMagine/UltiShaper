@@ -34,6 +34,9 @@ define(function(require) {
       this.settings = (_ref1 = options.settings) != null ? _ref1 : new HierarchyEditorSettings();
       this.project = (_ref2 = options.project) != null ? _ref2 : new Project();
       this.vent = vent;
+      this.startWithParent = true;
+      this.showOnAppStart = true;
+      this.addMainMenuIcon = true;
       this.icon = "icon-list";
       this.vent.on("project:loaded", this.resetEditor);
       this.vent.on("project:created", this.resetEditor);
@@ -42,20 +45,24 @@ define(function(require) {
     }
 
     HierarchyEditor.prototype.init = function() {
-      if (this.appSettings != null) {
-        this.appSettings.registerSettingClass("HierarchyEditor", HierarchyEditorSettings);
-      }
-      this.addInitializer(function() {
+      /* 
+      if @appSettings?
+        @appSettings.registerSettingClass("HierarchyEditor", HierarchyEditorSettings)
+      */
+      return this.addInitializer(function() {
         return this.vent.trigger("app:started", "" + this.title, this);
       });
-      return reqRes.addHandler("HierarchyEditorSettingsView", function() {
-        return HierarchyEditorSettingsView;
-      });
+      /*reqRes.addHandler "HierarchyEditorSettingsView", ()->
+        return HierarchyEditorSettingsView
+      */
+
     };
 
     HierarchyEditor.prototype.onStart = function() {
       this.settings = this.appSettings.get("HierarchyEditor");
-      return this.showView();
+      if (this.showOnAppStart) {
+        return this.showView();
+      }
     };
 
     HierarchyEditor.prototype.showView = function() {
@@ -94,7 +101,9 @@ define(function(require) {
         this.dia.close();
         this.hierarchyEditorView = null;
       }
-      return this.showView();
+      if (this.showOnAppStart) {
+        return this.showView();
+      }
     };
 
     return HierarchyEditor;

@@ -75,6 +75,7 @@ define (require)->
         stores: @stores
         exporters: @exporters
         model : @project
+        settings: @settings
       #@headerRegion.show @menuView
       @menuView.render()
       @menuView.onDomRefresh()
@@ -142,8 +143,9 @@ define (require)->
       #@_setupKeyboardBindings()
       @visualEditor.start()
       for editorName,editorInst of @editors
-        console.log "starting #{editorName}Editor"
-        editorInst.start()
+        if editorInst.startWithParent
+          console.log "starting #{editorName}Editor"
+          editorInst.start()
       @projectManager.start()
       
     onAppStarted:(appName)->
@@ -188,9 +190,7 @@ define (require)->
       
       ### 
       deferredList = []
-      #dynamic load, problematic
-      for editorName in @editorsList
-        do(editorName)=>
+      #dynamic load, problematic ...not useable for now
           console.log "editorName",editorName
           editorPath = "./editors/#{editorName}Editor/#{editorName}Editor"
           console.log "editorPath: #{editorPath}"
@@ -198,8 +198,8 @@ define (require)->
             @editors[editorName] = new editorClass
               project: @project
               appSettings: @settings
-          
       ###    
+      
       CodeEditor = require './editors/codeEditor/codeEditor'
       @editors['code'] = new CodeEditor
         project: @project
@@ -209,8 +209,7 @@ define (require)->
       @editors['hierarchy'] = new HierarchyEditor
         project: @project
         appSettings: @settings
-       
-      
+     
       BlocklyEditor = require './editors/blocklyEditor/blocklyEditor'
       @editors['blockly'] = new BlocklyEditor
         project: @project

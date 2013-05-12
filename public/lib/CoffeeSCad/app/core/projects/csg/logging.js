@@ -46,11 +46,11 @@ define(function(require) {
       });
     }
   };
-  log.error = function(message, lineNumber) {
-    if (lineNumber == null) {
-      lineNumber = (new Error()).lineNumber;
-    }
+  log.error = function(message) {
+    var lineNumber;
+
     if (log.level <= log.ERROR) {
+      lineNumber = (new Error()).lineNumber;
       return log.entries.push({
         lvl: "ERROR",
         msg: "" + message,

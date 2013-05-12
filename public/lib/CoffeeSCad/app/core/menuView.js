@@ -4,7 +4,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var $, ExamplesView, MainMenuView, RecentFileView, RecentFilesView, mainMenuMasterTemplate, mainMenuTemplate, marionette, modelBinder, recentFileTemplate, vent, _, _ref, _ref1;
+  var $, ExamplesView, MainMenuView, RecentFileView, RecentFilesView, appVent, mainMenuMasterTemplate, mainMenuTemplate, marionette, modelBinder, recentFileTemplate, _, _ref;
 
   $ = require('jquery');
   _ = require('underscore');
@@ -13,7 +13,7 @@ define(function(require) {
   require('bootstrap');
   require('bootbox');
   require('notify');
-  vent = require('core/messaging/appVent');
+  appVent = require('core/messaging/appVent');
   mainMenuMasterTemplate = require("text!core/mainMenu.tmpl");
   mainMenuTemplate = _.template($(mainMenuMasterTemplate).filter('#mainMenuTmpl').html());
   recentFileTemplate = _.template($(mainMenuMasterTemplate).filter('#recentFileTmpl').html());
@@ -25,7 +25,7 @@ define(function(require) {
     MainMenuView.prototype.template = mainMenuTemplate;
 
     MainMenuView.prototype.regions = {
-      recentProjects: "#recentProjects",
+      recentsStub: "#recentProjects",
       examplesStub: "#examples",
       exportersStub: "#exporters"
     };
@@ -37,36 +37,36 @@ define(function(require) {
 
     MainMenuView.prototype.events = {
       "click .newProject": function() {
-        return vent.trigger("project:new");
+        return appVent.trigger("project:new");
       },
       "click .newFile": function() {
-        return vent.trigger("project:file:new");
+        return appVent.trigger("project:file:new");
       },
       "click .saveProjectAs": function() {
-        return vent.trigger("project:saveAs");
+        return appVent.trigger("project:saveAs");
       },
       "click .saveProject": function() {
-        return vent.trigger("project:save");
+        return appVent.trigger("project:save");
       },
       "click .loadProject": function() {
-        return vent.trigger("project:load");
+        return appVent.trigger("project:load");
       },
       "click .deleteProject": function() {
-        return vent.trigger("project:delete");
+        return appVent.trigger("project:delete");
       },
       "click .undo": "onUndoClicked",
       "click .redo": "onRedoClicked",
       "click .settings": function() {
-        return vent.trigger("settings:show");
+        return appVent.trigger("settings:show");
       },
       "click .showEditor": function() {
-        return vent.trigger("codeEditor:show");
+        return appVent.trigger("codeEditor:show");
       },
       "click .compileProject": function() {
-        return vent.trigger("project:compile");
+        return appVent.trigger("project:compile");
       },
       "click .geometryCreator": function() {
-        return vent.trigger("geometryEditor:show");
+        return appVent.trigger("geometryEditor:show");
       },
       "click .about": "showAbout"
     };
@@ -89,45 +89,48 @@ define(function(require) {
         _this = this;
 
       MainMenuView.__super__.constructor.call(this, options);
-      this.vent = vent;
+      this.appVent = appVent;
       this.editors = {};
       this.stores = (_ref = options.stores) != null ? _ref : {};
       this.exporters = (_ref1 = options.exporters) != null ? _ref1 : {};
-      this.vent.on("file:undoAvailable", this._onUndoAvailable);
-      this.vent.on("file:redoAvailable", this._onRedoAvailable);
-      this.vent.on("file:undoUnAvailable", this._onNoUndoAvailable);
-      this.vent.on("file:redoUnAvailable", this._onNoRedoAvailable);
-      this.vent.on("clearUndoRedo", this._clearUndoRedo);
-      this.vent.on("notify", this.onNotificationRequested);
-      this.vent.on("project:loaded", function() {
+      this.settings = options.settings;
+      this.appVent.on("file:undoAvailable", this._onUndoAvailable);
+      this.appVent.on("file:redoAvailable", this._onRedoAvailable);
+      this.appVent.on("file:undoUnAvailable", this._onNoUndoAvailable);
+      this.appVent.on("file:redoUnAvailable", this._onNoRedoAvailable);
+      this.appVent.on("clearUndoRedo", this._clearUndoRedo);
+      this.appVent.on("notify", this.onNotificationRequested);
+      this.appVent.on("project:loaded", function() {
         return _this._onNotificationRequested("Project:loaded");
       });
-      this.vent.on("project:saved", function() {
+      this.appVent.on("project:saved", function() {
         return _this._onNotificationRequested("Project:saved");
       });
-      this.vent.on("project:autoSaved", function() {
+      this.appVent.on("project:autoSaved", function() {
         return _this._onNotificationRequested("Project:autosave");
       });
-      this.vent.on("project:compiled", function() {
+      this.appVent.on("project:compiled", function() {
         return _this._onNotificationRequested("Project:compiled");
       });
-      this.vent.on("project:compile:error", function() {
+      this.appVent.on("project:compile:error", function() {
         return _this._onNotificationRequested("Project:compile ERROR check console for details!");
       });
-      this.vent.on("project:loaded", this.onProjectLoaded);
-      this.vent.on("app:started", this._onSubAppStarted);
+      this.appVent.on("app:started", this._onSubAppStarted);
     }
 
     MainMenuView.prototype._onNotificationRequested = function(message) {
-      return $('.notifications').notify({
-        message: {
-          text: message
-        },
-        fadeOut: {
-          enabled: true,
-          delay: 1000
-        }
-      }).show();
+      console.log("bla", this.settings.get("General").displayEventNotifications);
+      if (this.settings.get("General").displayEventNotifications) {
+        return $('.notifications').notify({
+          message: {
+            text: message
+          },
+          fadeOut: {
+            enabled: true,
+            delay: 1000
+          }
+        }).show();
+      }
     };
 
     MainMenuView.prototype._clearUndoRedo = function() {
@@ -154,21 +157,23 @@ define(function(require) {
     MainMenuView.prototype._onSubAppStarted = function(title, subApp) {
       var className, event, icon, subAppEl;
 
-      title = subApp.title;
-      icon = subApp.icon;
-      if (!title in this.editors) {
-        this.editors[title] = subApp;
+      if (subApp.addMainMenuIcon) {
+        title = subApp.title;
+        icon = subApp.icon;
+        if (!title in this.editors) {
+          this.editors[title] = subApp;
+        }
+        className = "open" + (title[0].toUpperCase() + title.slice(1));
+        subAppEl = "<li><a id=\"" + title + "Btn\" href=\"#\" rel=\"tooltip\" title=\"Open " + title + "\" class=" + className + "><i class=\"" + icon + "\"></i></a></li>";
+        $(subAppEl).insertAfter('#editorsMarker');
+        event = "" + title + ":show";
+        this.events["click ." + className] = (function(event) {
+          return function() {
+            return this.appVent.trigger(event);
+          };
+        })(event);
+        return this.delegateEvents();
       }
-      className = "open" + (title[0].toUpperCase() + title.slice(1));
-      subAppEl = "<li><a id=\"" + title + "Btn\" href=\"#\" rel=\"tooltip\" title=\"Open " + title + "\" class=" + className + "><i class=\"" + icon + "\"></i></a></li>";
-      $(subAppEl).insertAfter('#editorsMarker');
-      event = "" + title + ":show";
-      this.events["click ." + className] = (function(event) {
-        return function() {
-          return this.vent.trigger(event);
-        };
-      })(event);
-      return this.delegateEvents();
     };
 
     MainMenuView.prototype._addExporterEntries = function() {
@@ -182,7 +187,7 @@ define(function(require) {
         event = "" + index + "Exporter:start";
         this.events["click ." + className] = (function(event) {
           return function() {
-            return this.vent.trigger(event);
+            return this.appVent.trigger(event);
           };
         })(event);
         _results.push(this.ui.exportersStub.append("<li ><a href='#' class='" + className + "'>" + index + "</li>"));
@@ -203,14 +208,14 @@ define(function(require) {
           loginEvent = "" + index + "Store:login";
           this.events["click ." + loginClassName] = (function(loginEvent) {
             return function() {
-              return this.vent.trigger(loginEvent);
+              return this.appVent.trigger(loginEvent);
             };
           })(loginEvent);
           logoutClassName = "logout" + (index[0].toUpperCase() + index.slice(1));
           logoutEvent = "" + index + "Store:logout";
           this.events["click ." + logoutClassName] = (function(logoutEvent) {
             return function() {
-              return this.vent.trigger(logoutEvent);
+              return this.appVent.trigger(logoutEvent);
             };
           })(logoutEvent);
           (function(index) {
@@ -246,10 +251,10 @@ define(function(require) {
               }).show();
               return $(selector).replaceWith("<li id='" + loginClassName + "' ><a href='#' class='" + loginClassName + "'><i class='icon-signin' style='color:red'/>  " + index + " - Signed out</a></li>");
             };
-            _this.vent.on("" + index + "Store:loggedIn", function() {
+            _this.appVent.on("" + index + "Store:loggedIn", function() {
               return onLoggedIn();
             });
-            return _this.vent.on("" + index + "Store:loggedOut", function() {
+            return _this.appVent.on("" + index + "Store:loggedOut", function() {
               return onLoggedOut();
             });
           })(index);
@@ -273,14 +278,14 @@ define(function(require) {
 
     MainMenuView.prototype.onRedoClicked = function() {
       if (!($('#redoBtn').hasClass("disabled"))) {
-        return this.vent.trigger("file:redoRequest");
+        return this.appVent.trigger("file:redoRequest");
       }
     };
 
     MainMenuView.prototype.onUndoClicked = function() {
       if (!($('#undoBtn').hasClass("disabled"))) {
         console.log("triggering undo Request");
-        return this.vent.trigger("file:undoRequest");
+        return this.appVent.trigger("file:undoRequest");
       }
     };
 
@@ -335,14 +340,44 @@ define(function(require) {
   RecentFilesView = (function(_super) {
     __extends(RecentFilesView, _super);
 
-    function RecentFilesView() {
-      _ref1 = RecentFilesView.__super__.constructor.apply(this, arguments);
-      return _ref1;
+    RecentFilesView.prototype.tagName = "ul";
+
+    RecentFilesView.prototype.className = "dropdown-menu recentProjects";
+
+    RecentFilesView.prototype.itemView = RecentFileView;
+
+    function RecentFilesView(options) {
+      this._onProjectLoadedAndSaved = __bind(this._onProjectLoadedAndSaved, this);
+      var tmpCollection;
+
+      options = options || {};
+      tmpCollection = new Backbone.Collection();
+      tmpCollection.add({
+        name: "toto"
+      });
+      options.collection = tmpCollection;
+      RecentFilesView.__super__.constructor.call(this, options);
+      this.appVent = appVent;
+      this.appVent.on("project:saved", this._onProjectLoadedAndSaved);
+      this.appVent.on("project:loaded", this._onProjectLoadedAndSaved);
     }
+
+    RecentFilesView.prototype._onProjectLoadedAndSaved = function(project) {
+      console.log("save and load handler", project);
+      console.log(this.collection);
+      return this.collection.add(project);
+    };
+
+    RecentFilesView.prototype.comparator = function(project) {
+      var date;
+
+      date = new Date(project.lastModificationDate);
+      return date.getTime();
+    };
 
     return RecentFilesView;
 
-  })(Backbone.Marionette.ItemView);
+  })(Backbone.Marionette.CollectionView);
   ExamplesView = (function(_super) {
     __extends(ExamplesView, _super);
 
@@ -373,7 +408,7 @@ define(function(require) {
     }
 
     ExamplesView.prototype.onLoadExampleClicked = function(e) {
-      var Project, deferredList, exampleFullPath, exampleName, fileName, project, _fn, _i, _len, _ref2,
+      var Project, deferredList, exampleFullPath, exampleName, fileName, project, _fn, _i, _len, _ref1,
         _this = this;
 
       console.log("example clicked");
@@ -384,7 +419,7 @@ define(function(require) {
       project = new Project({
         name: exampleName
       });
-      _ref2 = this.examplesHash[exampleFullPath];
+      _ref1 = this.examplesHash[exampleFullPath];
       _fn = function(fileName) {
         var deferred, filePath, projectFile;
 
@@ -399,14 +434,14 @@ define(function(require) {
           return projectFile.content = fileContent;
         });
       };
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        fileName = _ref2[_i];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        fileName = _ref1[_i];
         _fn(fileName);
       }
       return $.when.apply($, deferredList).done(function() {
         project._clearFlags();
         project.trigger("loaded");
-        return vent.trigger("project:loaded", project);
+        return appVent.trigger("project:loaded", project);
       });
     };
 
@@ -433,7 +468,7 @@ define(function(require) {
         _this = this;
 
       createItem = function(jsonObj, $obj) {
-        var elem, sub, _i, _j, _len, _len1, _ref2;
+        var elem, sub, _i, _j, _len, _len1, _ref1;
 
         $obj = typeof $obj === "function" ? $obj(null) : void 0;
         if (jsonObj.name) {
@@ -454,9 +489,9 @@ define(function(require) {
         }
         if (jsonObj.categories) {
           sub = $('<ul>');
-          _ref2 = jsonObj.categories;
-          for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-            elem = _ref2[_j];
+          _ref1 = jsonObj.categories;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            elem = _ref1[_j];
             sub.append(createItem(elem));
           }
           $obj = $obj.append(sub);

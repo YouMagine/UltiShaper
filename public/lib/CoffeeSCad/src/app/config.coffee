@@ -6,7 +6,9 @@ require.config
       #env:'node'
       env: 'xhr'
   waitSeconds:200
-
+  
+  
+  #baseUrl: window.location.protocol + "//" + window.location.host + window.location.pathname.split("/").slice(0, -1).join("/")
   paths:
     #JavaScript folders.
     libs:             "../assets/js/libs"
@@ -18,7 +20,8 @@ require.config
     underscore:       "../assets/js/libs/underscore-min"
     backbone:         "../assets/js/libs/backbone"
     bootstrap:        "../assets/js/libs/bootstrap.min"
-    CodeMirror:       "../assets/js/libs/codemirror"
+    #ace:              "../assets/js/libs/ace"
+    
     CoffeeScript:     "../assets/js/libs/CoffeeScript"
     three:            "../assets/js/libs/three"
     detector:         "../assets/js/libs/detector"
@@ -43,6 +46,8 @@ require.config
     notify:           "../assets/js/plugins/bootstrap-notify"
     
     coffeelint:       "../assets/js/plugins/coffeelint"
+    
+    ### 
     coffee_synhigh:   "../assets/js/libs/codeMirror/mode/coffeescript/coffeescript"
     
     foldcode:         "../assets/js/plugins/codemirror/fold/foldcode"
@@ -54,7 +59,7 @@ require.config
     hint:             "../assets/js/plugins/codemirror/hint/show-hint"
     jsHint:           "../assets/js/plugins/codemirror/hint/coffeescad-hint"
     closeBrackets:    "../assets/js/plugins/codemirror/edit/closeBrackets/closeBrackets"
-    matchBrackets:    "../assets/js/plugins/codemirror/edit/matchBrackets/matchBrackets"
+    matchBrackets:    "../assets/js/plugins/codemirror/edit/matchBrackets/matchBrackets"###
     
     marionette:       "../assets/js/plugins/backbone.marionette.min"
     eventbinder:      "../assets/js/plugins/backbone.eventbinder.min"
@@ -74,6 +79,25 @@ require.config
     
     three_csg:        "../assets/js/plugins/ThreeCSG"
     combo_cam:        "../assets/js/plugins/CombinedCamera"
+    transformControls:"../assets/js/plugins/three/controls/transformControls"
+    
+    ObjectExport: "../assets/js/plugins/three/exporters/ObjectExport"
+    GeometryExporter: "../assets/js/plugins/three/exporters/GeometryExporter"
+    MaterialExporter: "../assets/js/plugins/three/exporters/MaterialExporter"
+    ObjectParser: "../assets/js/plugins/three/parsers/ObjectParser"
+    
+    CopyShader:       "../assets/js/plugins/three/CopyShader"
+    EffectComposer:   "../assets/js/plugins/three/EffectComposer"
+    RenderPass:       "../assets/js/plugins/three/RenderPass"
+    ShaderPass:       "../assets/js/plugins/three/ShaderPass"
+    DotScreenShader :   "../assets/js/plugins/three/DotScreenShader"
+    DotScreenPass :   "../assets/js/plugins/three/DotScreenPass"
+    FXAAShader: "../assets/js/plugins/three/FXAAShader"
+    EdgeShader: "../assets/js/plugins/three/EdgeShader"
+    EdgeShader2: "../assets/js/plugins/three/EdgeShader2"
+    VignetteShader: "../assets/js/plugins/three/VignetteShader"
+    BlendShader : "../assets/js/plugins/three/BlendShader"
+    AdditiveBlendShader : "../assets/js/plugins/three/AdditiveBlendShader"
     
     
   shim:
@@ -118,7 +142,8 @@ require.config
     #  exports:  "CoffeeScript"
     coffeelint:
       deps:    ["CoffeeScript"]
-          
+    
+    ###    
     CodeMirror:
       exports:  "CodeMirror"
     foldcode:
@@ -142,7 +167,7 @@ require.config
     closeBrackets: 
       deps:    ["CodeMirror"]
     matchBrackets:
-      deps:    ["CodeMirror"]
+      deps:    ["CodeMirror"]###
 
     three: 
       exports : "THREE"
@@ -152,9 +177,8 @@ require.config
     combo_cam: 
       deps:    ["three"]
       exports : "combo_cam"
-    orbit_ctrl:
-      deps:    ["three"]
-      exports : "orbit_ctrl"
+    transformControls:
+      deps: ["three"]
     detector: 
       exports : "Detector"
     stats:
@@ -162,6 +186,45 @@ require.config
     utils: 
       deps:    ["jquery"]
       exports : "normalizeEvent"
+    ObjectExport:
+      deps:["three","GeometryExporter","MaterialExporter"]  
+    GeometryExporter:
+      deps:["three"]
+    MaterialExporter:
+      deps:["three"]
+    
+    ObjectParser:
+      deps:["three"]
+      
+    
+    CopyShader:
+      deps:    ["three"]
+    EffectComposer:
+      deps:    ["CopyShader","ShaderPass","RenderPass"]
+    RenderPass:
+      deps:    ["CopyShader"]
+    ShaderPass:
+      deps:    ["CopyShader"]
+    DotScreenShader:
+      deps:    ["CopyShader"]
+    DotScreenPass :
+      deps:    ["CopyShader","DotScreenShader"]
+    FXAAShader :
+      deps:["CopyShader"] 
+    EdgeShader:
+      deps:["CopyShader"] 
+    EdgeShader2:
+      deps:["CopyShader"] 
+    VignetteShader:
+      deps:["CopyShader"]
+    BlendShader:
+      deps:["three"]
+    AdditiveBlendShader:
+      deps:["three"]
+      
+      
+      
+      
     jquery_ui:
       deps:    ["jquery"]
       exports : "jquery_ui"   
@@ -184,3 +247,4 @@ require.config
       exports : "Github"
     XMLWriter:
       exports: "XMLWriter"
+      

@@ -4,7 +4,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var Arrow, BaseHelper, BoundingCage, Grid, LabeledAxes, THREE, merge, utils;
+  var Arrow, BaseHelper, BoundingCage, Grid, LabeledAxes, SelectionHelper, THREE, captureScreen, geometryToline, merge, utils;
 
   THREE = require('three');
   utils = require('core/utils/utils');
@@ -378,7 +378,6 @@ define(function(require) {
       };
       options = merge(defaults, options);
       mesh = options.mesh, this.color = options.color, this.textColor = options.textColor, this.addLabels = options.addLabels;
-      console.log(this.size, this.step, this.color, this.opacity);
       color = new THREE.Color().setHex(this.color);
       try {
         bbox = mesh.geometry.boundingBox;
@@ -430,7 +429,6 @@ define(function(require) {
         selectionAxis.material.depthTest = false;
         selectionAxis.material.transparent = true;
         selectionAxis.position = mesh.position;
-        cage.add(selectionAxis);
         cage.add(widthArrow);
         cage.add(lengthArrow);
         cage.add(heightArrow);
@@ -444,10 +442,233 @@ define(function(require) {
     return BoundingCage;
 
   })(BaseHelper);
+  SelectionHelper = (function(_super) {
+    __extends(SelectionHelper, _super);
+
+    function SelectionHelper(options) {
+      this.highlightObjectAt = __bind(this.highlightObjectAt, this);
+      this.selectObjectAt = __bind(this.selectObjectAt, this);
+      this.get2DBB = __bind(this.get2DBB, this);
+      this._get3DBB = __bind(this._get3DBB, this);
+      this._unSelect = __bind(this._unSelect, this);
+      this._onSelect = __bind(this._onSelect, this);
+      this._unHover = __bind(this._unHover, this);
+      this._onHover = __bind(this._onHover, this);
+      var defaults;
+
+      SelectionHelper.__super__.constructor.call(this, options);
+      defaults = {
+        hiearchyRoot: null,
+        renderCallback: null,
+        camera: null,
+        viewWidth: 640,
+        viewHeight: 480
+      };
+      options = merge(defaults, options);
+      this.hiearchyRoot = options.hiearchyRoot, this.renderCallback = options.renderCallback, this.camera = options.camera, this.viewWidth = options.viewWidth, this.viewHeight = options.viewHeight;
+      this.options = options;
+      this.currentHover = null;
+      this.currentSelect = null;
+      this.selectionColor = 0xCC8888;
+      this.projector = new THREE.Projector();
+    }
+
+    SelectionHelper.prototype._onHover = function(selection) {
+      if (selection != null) {
+        this.currentHover = selection;
+        selection.currentHoverHex = selection.material.color.getHex();
+        selection.material.color.setHex(this.selectionColor);
+        return this.renderCallback();
+      }
+    };
+
+    SelectionHelper.prototype._unHover = function() {
+      if (this.currentHover) {
+        this.currentHover.material.color.setHex(this.currentHover.currentHoverHex);
+        this.currentHover = null;
+        return this.renderCallback();
+      }
+    };
+
+    SelectionHelper.prototype._onSelect = function(selection) {
+      this._unHover();
+      this.currentSelect = selection;
+      new BoundingCage({
+        mesh: selection,
+        color: this.options.color,
+        textColor: this.options.textColor
+      });
+      selection.currentSelectHex = selection.material.color.getHex();
+      selection.material.color.setHex(this.selectionColor);
+      return this.renderCallback();
+    };
+
+    SelectionHelper.prototype._unSelect = function() {
+      var selection;
+
+      if (this.currentSelect) {
+        selection = this.currentSelect;
+        selection.material.color.setHex(selection.currentSelectHex);
+        selection.remove(selection.cage);
+        selection.cage = null;
+        this.currentSelect = null;
+        return this.renderCallback();
+      }
+      /*
+            newMat = new  THREE.MeshLambertMaterial
+                color: 0xCC0000
+            @currentHover.origMaterial = @currentHover.material
+            @currentHover.material = newMat
+      */
+
+    };
+
+    SelectionHelper.prototype._get3DBB = function(object) {
+      if (object != null) {
+        if (object.geometry != null) {
+          if (object.geometry.boundingBox != null) {
+            return object.geometry.boundingBox;
+          } else {
+            object.geometry.computeBoundingBox();
+            return object.geometry.boundingBox;
+          }
+        }
+      }
+      return null;
+    };
+
+    SelectionHelper.prototype.get2DBB = function(object, width, height) {
+      var bbox3d, centerLeft, centerPercX, centerPercY, centerTop, max3d, maxLeft, maxPercX, maxPercY, maxTop, min3d, minLeft, minPercX, minPercY, minTop, objHeight, objLength, objWidth, pMax, pMin, pos, result;
+
+      if (object != null) {
+        bbox3d = this._get3DBB(object);
+        min3d = bbox3d.min.clone();
+        max3d = bbox3d.max.clone();
+        objLength = bbox3d.max.x - bbox3d.min.x;
+        objWidth = bbox3d.max.y - bbox3d.min.y;
+        objHeight = bbox3d.max.z - bbox3d.min.z;
+        pMin = this.projector.projectVector(min3d, this.camera);
+        pMax = this.projector.projectVector(max3d, this.camera);
+        minPercX = (pMin.x + 1) / 2;
+        minPercY = (-pMin.y + 1) / 2;
+        minLeft = minPercX * width;
+        minTop = minPercY * height;
+        maxPercX = (pMax.x + 1) / 2;
+        maxPercY = (-pMax.y + 1) / 2;
+        maxLeft = maxPercX * width;
+        maxTop = maxPercY * height;
+        pos = object.position.clone();
+        pos = this.projector.projectVector(pos, this.camera);
+        centerPercX = (pos.x + 1) / 2;
+        centerPercY = (-pos.y + 1) / 2;
+        centerLeft = centerPercX * width;
+        centerTop = centerPercY * height;
+        result = [centerLeft, centerTop, objLength, objWidth, objHeight];
+        return result;
+      }
+    };
+
+    SelectionHelper.prototype.selectObjectAt = function(x, y) {
+      var intersects, raycaster, v;
+
+      v = new THREE.Vector3((x / this.viewWidth) * 2 - 1, -(y / this.viewHeight) * 2 + 1, 0.5);
+      this.projector.unprojectVector(v, this.camera);
+      raycaster = new THREE.Raycaster(this.camera.position, v.sub(this.camera.position).normalize());
+      intersects = raycaster.intersectObjects(this.hiearchyRoot, true);
+      if (intersects.length > 0) {
+        if (intersects[0].object !== this.currentSelect) {
+          this._unSelect();
+          this._onSelect(intersects[0].object);
+          return this.currentSelect;
+        }
+      } else if (this.currentSelect != null) {
+        return this.currentSelect;
+      } else {
+        return this._unSelect();
+      }
+    };
+
+    SelectionHelper.prototype.highlightObjectAt = function(x, y) {
+      var intersects, raycaster, v;
+
+      v = new THREE.Vector3((x / this.viewWidth) * 2 - 1, -(y / this.viewHeight) * 2 + 1, 0.5);
+      this.projector.unprojectVector(v, this.camera);
+      raycaster = new THREE.Raycaster(this.camera.position, v.sub(this.camera.position).normalize());
+      intersects = raycaster.intersectObjects(this.hiearchyRoot, true);
+      if (intersects.length > 0) {
+        if (intersects[0].object !== this.currentHover) {
+          if (intersects[0].object.name !== "workplane") {
+            this._unHover();
+            return this._onHover(intersects[0].object);
+          }
+        }
+      } else {
+        return this._unHover();
+      }
+    };
+
+    return SelectionHelper;
+
+  })(BaseHelper);
+  captureScreen = function(domElement, width, height) {
+    var canvas, ctx, d, img, imgAsDataURL, srcImg,
+      _this = this;
+
+    if (width == null) {
+      width = 300;
+    }
+    if (height == null) {
+      height = 300;
+    }
+    if (!domElement) {
+      throw new Error("Cannot Do screeshot without canvas domElement");
+    }
+    srcImg = domElement.toDataURL("image/png");
+    canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    ctx = canvas.getContext('2d');
+    d = $.Deferred();
+    imgAsDataURL = null;
+    img = new Image();
+    img.onload = function() {
+      ctx.drawImage(img, 0, 0, width, height);
+      imgAsDataURL = canvas.toDataURL("image/png");
+      return d.resolve(imgAsDataURL);
+    };
+    img.src = srcImg;
+    return d;
+  };
+  geometryToline = function(geo) {
+    var a, b, c, d, face, geometry, i, vertices, _i, _ref;
+
+    geometry = new THREE.Geometry();
+    vertices = geometry.vertices;
+    for (i = _i = 0, _ref = geo.faces.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      face = geo.faces[i];
+      if (face instanceof THREE.Face3) {
+        a = geo.vertices[face.a].clone();
+        b = geo.vertices[face.b].clone();
+        c = geo.vertices[face.c].clone();
+        vertices.push(a, b, b, c, c, a);
+      } else if (face instanceof THREE.Face4) {
+        a = geo.vertices[face.a].clone();
+        b = geo.vertices[face.b].clone();
+        c = geo.vertices[face.c].clone();
+        d = geo.vertices[face.d].clone();
+        vertices.push(a, b, b, c, c, d, d, a);
+      }
+    }
+    geometry.computeLineDistances();
+    return geometry;
+  };
   return {
     "LabeledAxes": LabeledAxes,
     "Arrow": Arrow,
     "Grid": Grid,
-    "BoundingCage": BoundingCage
+    "BoundingCage": BoundingCage,
+    "SelectionHelper": SelectionHelper,
+    "captureScreen": captureScreen,
+    "geometryToline": geometryToline
   };
 });

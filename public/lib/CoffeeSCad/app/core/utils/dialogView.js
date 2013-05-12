@@ -18,6 +18,8 @@ define(function(require) {
 
     DialogView.prototype.el = "#none";
 
+    DialogView.prototype.className = "unselectable";
+
     DialogView.prototype.events = {
       "change .opacitySetter": "onOpacityChanged",
       "keyup .opacitySetter": "onOpacityChanged"
@@ -126,7 +128,7 @@ define(function(require) {
       this.bindUIElements();
       this.triggerMethod("render", this);
       this.triggerMethod("item:rendered", this);
-      this.$el.addClass("dialog floatpanel");
+      this.$el.addClass("dialog floatpanel unselectable");
       this.$el.css("width", this.width);
       this.$el.css("height", this.height);
       this.$el.css("left", this.position[0]);

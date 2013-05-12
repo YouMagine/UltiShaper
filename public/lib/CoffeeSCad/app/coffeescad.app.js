@@ -85,7 +85,8 @@ define(function(require) {
       this.menuView = new MenuView({
         stores: this.stores,
         exporters: this.exporters,
-        model: this.project
+        model: this.project,
+        settings: this.settings
       });
       this.menuView.render();
       return this.menuView.onDomRefresh();
@@ -172,8 +173,10 @@ define(function(require) {
       _ref = this.editors;
       for (editorName in _ref) {
         editorInst = _ref[editorName];
-        console.log("starting " + editorName + "Editor");
-        editorInst.start();
+        if (editorInst.startWithParent) {
+          console.log("starting " + editorName + "Editor");
+          editorInst.start();
+        }
       }
       return this.projectManager.start();
     };
@@ -233,9 +236,7 @@ define(function(require) {
       });
       /* 
       deferredList = []
-      #dynamic load, problematic
-      for editorName in @editorsList
-        do(editorName)=>
+      #dynamic load, problematic ...not useable for now
           console.log "editorName",editorName
           editorPath = "./editors/#{editorName}Editor/#{editorName}Editor"
           console.log "editorPath: #{editorPath}"

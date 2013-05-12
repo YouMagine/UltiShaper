@@ -273,6 +273,7 @@ define (require)->
         @model.loadProject(fileName)
     
     onRender:->
+      console.log "getting projects from #{@model.name}"
       @model.getProjectsName(@onProjectsFetched)
       #modelBinding
       @modelBinder.bind(@model, @el, @bindings)
@@ -285,7 +286,7 @@ define (require)->
           
       @delegateEvents()
       @ui.projects.slimScroll({size:"10px";height:"100px",alwaysVisible: true})
-      @$el.find('[rel=tooltip]').tooltip({'placement': 'right'})
+      #@$el.find('[rel=tooltip]').tooltip({'placement': 'right'})
     
     onClose:->
       #clean up events
