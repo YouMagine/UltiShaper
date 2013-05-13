@@ -42,10 +42,7 @@ define(function(require) {
       this.clearWorkspace = __bind(this.clearWorkspace, this);
       this.codeUpdateFunction = __bind(this.codeUpdateFunction, this);
       this._tearDownEventHandlers = __bind(this._tearDownEventHandlers, this);
-      this._setupEventHandlers = __bind(this._setupEventHandlers, this);
-      var keepers, newLanguage, x, _i, _ref;
-
-      BlocklyEditorView.__super__.constructor.call(this, options);
+      this._setupEventHandlers = __bind(this._setupEventHandlers, this);      BlocklyEditorView.__super__.constructor.call(this, options);
       this.settings = options.settings;
       this._setupEventHandlers();
       this.project = this.model;
@@ -59,11 +56,6 @@ define(function(require) {
       };
       this.app2 = null;
       this.codeLanguage = 'vol0.1';
-      keepers = 'shape_cube,shape_cylinder,shape_sphere,assembly_part,math_number,math_arithmetic'.split(',');
-      newLanguage = {};
-      for (x = _i = 0, _ref = keepers.length; 0 <= _ref ? _i < _ref : _i > _ref; x = 0 <= _ref ? ++_i : --_i) {
-        newLanguage[keepers[x]] = Blockly.Language[keepers[x]];
-      }
     }
 
     BlocklyEditorView.prototype._setupEventHandlers = function() {};
@@ -75,6 +67,12 @@ define(function(require) {
 
       this.skipMyUpdate = false;
       this.numUpdates = 0;
+      this.cursor_rot = [0, 0, 0];
+      this.cursor_trans = [0, 0, 0];
+      this.cursor_scale = [1, 1, 1];
+      window.cursor_rot = this.cursor_rot;
+      window.cursor_move = this.cursor_trans;
+      window.cursor_scale = this.cursor_scale;
       if (this.skipMyUpdate) {
         console.log("Skipping my update...", skipMyUpdate);
         return;
@@ -303,7 +301,7 @@ define(function(require) {
     BlocklyEditorView.prototype.onResizeStop = function() {
       console.log("blockly view resize stop");
       $('#blockly').css('width', $(window).width() - 20);
-      $('#svgDiv').height($(document).height() - 670);
+      $('#svgDiv').height($(document).height() - 640);
       Blockly.fireUiEvent(window, 'resize');
       return console.log(this);
     };

@@ -46,7 +46,12 @@ define (require)->
     codeUpdateFunction:=>
       @skipMyUpdate = false
       @numUpdates = 0
-      
+      @cursor_rot=[0,0,0]
+      @cursor_trans=[0,0,0]
+      @cursor_scale=[1,1,1]
+      window.cursor_rot=@cursor_rot
+      window.cursor_move=@cursor_trans
+      window.cursor_scale=@cursor_scale
       if @skipMyUpdate
         console.log "Skipping my update...", skipMyUpdate
         return

@@ -4,7 +4,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var $, Backbone, BlocklyEditor, BlocklyEditorSettings, BlocklyEditorView, DialogView, Project, marionette, reqRes, vent, _;
+  var $, Backbone, BlocklyEditor, BlocklyEditorRouter, BlocklyEditorSettings, BlocklyEditorSettingsView, BlocklyEditorView, DialogView, Project, marionette, reqRes, vent, _;
 
   $ = require('jquery');
   _ = require('underscore');
@@ -14,12 +14,14 @@ define(function(require) {
   reqRes = require('core/messaging/appReqRes');
   Project = require('core/projects/project');
   BlocklyEditorSettings = require('./blocklyEditorSettings');
+  BlocklyEditorSettingsView = require('./blocklyEditorSettingsView');
+  BlocklyEditorRouter = require("./blocklyEditorRouter");
   BlocklyEditorView = require('./blocklyEditorView');
   DialogView = require('core/utils/dialogView');
   BlocklyEditor = (function(_super) {
     __extends(BlocklyEditor, _super);
 
-    BlocklyEditor.prototype.title = "blocklyEditor";
+    BlocklyEditor.prototype.title = "BlocklyEditor";
 
     function BlocklyEditor(options) {
       this.resetEditor = __bind(this.resetEditor, this);
@@ -34,6 +36,9 @@ define(function(require) {
       this.settings = (_ref1 = options.settings) != null ? _ref1 : new BlocklyEditorSettings();
       this.project = (_ref2 = options.project) != null ? _ref2 : new Project();
       this.vent = vent;
+      this.router = new BlocklyEditorRouter({
+        controller: this
+      });
       this.startWithParent = true;
       this.showOnAppStart = true;
       this.addMainMenuIcon = true;
@@ -46,18 +51,18 @@ define(function(require) {
 
     BlocklyEditor.prototype.init = function() {
       if (this.appSettings != null) {
-        this.appSettings.registerSettingClass("blocklyEditor", BlocklyEditorSettings);
+        this.appSettings.registerSettingClass("BlocklyEditor", BlocklyEditorSettings);
       }
       this.addInitializer(function() {
         return this.vent.trigger("app:started", "" + this.title, this);
       });
-      return reqRes.addHandler("blocklyEditorSettingsView", function() {
-        return blocklyEditorSettingsView;
+      return reqRes.addHandler("BlocklyEditorSettingsView", function() {
+        return BlocklyEditorSettingsView;
       });
     };
 
     BlocklyEditor.prototype.onStart = function() {
-      this.settings = this.appSettings.get("blocklyEditor");
+      this.settings = this.appSettings.get("BlocklyEditor");
       return this.showView();
     };
 
@@ -65,7 +70,7 @@ define(function(require) {
       if (this.dia == null) {
         this.dia = new DialogView({
           elName: "blocklyEdit",
-          title: "Blockly",
+          title: "Blockly Drag-and-Drop 3D design",
           width: 500,
           height: 200,
           position: [325, 25],

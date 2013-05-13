@@ -3,22 +3,32 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(function(require) {
-  var Backbone, BlocklyEditorSettings;
+  var Backbone, BlocklyEditorSettings, buildProperties, _ref;
 
   Backbone = require('backbone');
+  buildProperties = require('core/utils/buildProperties');
   BlocklyEditorSettings = (function(_super) {
     __extends(BlocklyEditorSettings, _super);
+
+    function BlocklyEditorSettings() {
+      _ref = BlocklyEditorSettings.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    BlocklyEditorSettings.prototype.attributeNames = ['name', 'showTrashcan'];
+
+    buildProperties(BlocklyEditorSettings);
 
     BlocklyEditorSettings.prototype.idAttribute = 'name';
 
     BlocklyEditorSettings.prototype.defaults = {
       name: "blocklyEditor",
-      title: "blockly Editor"
+      title: "blockly Editor",
+      showTrashcan: true,
+      constructor: function(options) {
+        return BlocklyEditorSettings.__super__.constructor.call(this, options);
+      }
     };
-
-    function BlocklyEditorSettings(options) {
-      BlocklyEditorSettings.__super__.constructor.call(this, options);
-    }
 
     return BlocklyEditorSettings;
 
