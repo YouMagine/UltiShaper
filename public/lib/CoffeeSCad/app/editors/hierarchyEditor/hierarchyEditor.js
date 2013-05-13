@@ -35,7 +35,7 @@ define(function(require) {
       this.project = (_ref2 = options.project) != null ? _ref2 : new Project();
       this.vent = vent;
       this.startWithParent = true;
-      this.showOnAppStart = true;
+      this.showOnAppStart = false;
       this.addMainMenuIcon = true;
       this.icon = "icon-list";
       this.vent.on("project:loaded", this.resetEditor);

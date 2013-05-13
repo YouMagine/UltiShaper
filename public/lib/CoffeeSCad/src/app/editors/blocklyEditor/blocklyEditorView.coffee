@@ -36,14 +36,7 @@ define (require)->
       @colors = {selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255]}
       @app2 = null
       @codeLanguage = 'vol0.1'#or 'scad' for openscad
-      
-      #Whitelist of blocks to keep.
-      keepers = 'shape_cube,shape_cylinder,shape_sphere,assembly_part,math_number,math_arithmetic'.split(',')
-      newLanguage = {}
-      for x in [0...keepers.length]
-        newLanguage[keepers[x]] = Blockly.Language[keepers[x]]
-      #Blockly.Language = newLanguage;
-    
+          
     _setupEventHandlers: =>
       #appVent.on("project:compiled",@onProjectCompiled)
     
@@ -247,7 +240,7 @@ define (require)->
       console.log "blockly view resize stop"
       $('#blockly').css('width',$(window).width()-20)
       #$('#svgDiv').height(@$el.height()-100);
-      $('#svgDiv').height($(document).height()-670);
+      $('#svgDiv').height($(document).height()-640);
       Blockly.fireUiEvent(window, 'resize');
       console.log(this);
       

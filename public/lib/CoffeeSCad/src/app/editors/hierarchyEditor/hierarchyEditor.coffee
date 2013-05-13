@@ -28,7 +28,7 @@ define (require)->
       #  controller: @
       
       @startWithParent = true
-      @showOnAppStart = true
+      @showOnAppStart = false
       @addMainMenuIcon = true
       @icon = "icon-list"
       
