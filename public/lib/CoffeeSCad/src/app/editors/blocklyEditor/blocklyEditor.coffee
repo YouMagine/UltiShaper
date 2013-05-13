@@ -55,7 +55,7 @@ define (require)->
       
     showView:=>
       if not @dia?
-        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly", width:500, height:200,position:[325,25], dockable:true})
+        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly Drag-and-Drop 3D design", width:500, height:200,position:[325,25], dockable:true})
         @dia.render()
       
       if not @blocklyEditorView?
