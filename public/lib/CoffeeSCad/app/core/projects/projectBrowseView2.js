@@ -115,6 +115,9 @@ define(function(require) {
         _this.ui.projectFiles.html("<ul></ul>");
         for (_i = 0, _len = projectNames.length; _i < _len; _i++) {
           name = projectNames[_i];
+          if (name.length > 42) {
+            name = name.substr(0, 20) + "..." + name.substr(name.length - 20, 20);
+          }
           _this.ui.projectFiles.append("<li><a href='#' >" + name + "  </a></li>");
         }
         _this.delegateEvents();

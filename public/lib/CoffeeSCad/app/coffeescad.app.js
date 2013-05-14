@@ -39,7 +39,7 @@ define(function(require) {
       this._setupLanguage = __bind(this._setupLanguage, this);
       this._setupKeyboardBindings = __bind(this._setupKeyboardBindings, this);
       this.initLayout = __bind(this.initLayout, this);
-      var BomExporter, BrowserStore, DropBoxStore, StlExporter, exporter, name, _ref,
+      var BomExporter, BrowserStore, DropBoxStore, StlExporter, YouMagineStore, exporter, name, _ref,
         _this = this;
 
       CoffeeScadApp.__super__.constructor.call(this, options);
@@ -59,8 +59,10 @@ define(function(require) {
       this.exporters["bom"] = new BomExporter();
       DropBoxStore = require('./stores/dropbox/dropBoxStore');
       BrowserStore = require('./stores/browser/browserStore');
+      YouMagineStore = require('./stores/youmagine/youMagineStore');
       this.stores["Dropbox"] = new DropBoxStore();
       this.stores["browser"] = new BrowserStore();
+      this.stores["YouMagine"] = new YouMagineStore();
       $(window).bind('beforeunload', this.onAppClosing);
       this.vent.on("app:started", this.onAppStarted);
       this.vent.on("settings:show", this.onSettingsShow);

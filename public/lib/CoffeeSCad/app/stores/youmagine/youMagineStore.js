@@ -68,9 +68,12 @@ define(function(require) {
 
     YouMagineStore.prototype.checkForTokenInterval = 1000;
 
+    YouMagineStore.prototype.designOnline = [];
+
     function YouMagineStore(options) {
       this._sourceFetchHandler = __bind(this._sourceFetchHandler, this);
       this._readFile = __bind(this._readFile, this);
+      this._fetchFileListForDesign = __bind(this._fetchFileListForDesign, this);
       this._getProjectFiles = __bind(this._getProjectFiles, this);
       this._removeFile = __bind(this._removeFile, this);
       this._addToProjectsList = __bind(this._addToProjectsList, this);
@@ -90,6 +93,7 @@ define(function(require) {
       this.receiveTokenMessage = __bind(this.receiveTokenMessage, this);
       this.logout = __bind(this.logout, this);
       this.setLoggedIn = __bind(this.setLoggedIn, this);
+      this.authCheck = __bind(this.authCheck, this);
       this.login = __bind(this.login, this);
       var defaults;
 
@@ -113,22 +117,31 @@ define(function(require) {
       var login_succeeded;
 
       console.log("youmagine logging in...");
-      console.log("is there a token cookie?");
-      this.token = $.cookie('youmagine_token');
-      this.username = $.cookie('youmagine_user');
-      this.user_id = $.cookie('youmagine_user_id');
-      this.screen_name = $.cookie('youmagine_screen_name');
       login_succeeded = false;
+      this.authCheck();
       if (this.token !== null) {
         console.log("There's a token cookie (" + this.token + "). Welcome " + this.screen_name + "!");
         console.log("does the token work?");
-        this.listDesigns();
+        return this.listDesigns();
       } else {
         this.authRequestWindow = window.open('http://www.youmagine.com/integrations/ultishaper/authorized_integrations/new?redirect_url=http://localhost:3000/youmagine/get_token&deny_url=http://localhost:3000/youmagine/get_token', '', 'width=450,height=500');
         this.authRequestWindow.focus();
         window.clearInterval(this.checkForTokenPID);
         this.checkForTokenPID = window.setInterval(this.receiveTokenMessage, this.checkForTokenInterval);
-        console.log(this.checkForTokenPID);
+        return console.log(this.checkForTokenPID);
+      }
+    };
+
+    YouMagineStore.prototype.authCheck = function() {
+      this.token = $.cookie('youmagine_token');
+      this.username = $.cookie('youmagine_user');
+      this.user_id = $.cookie('youmagine_user_id');
+      this.screen_name = $.cookie('youmagine_screen_name');
+      console.log("youmagine authCheck");
+      if (this.token !== null) {
+        console.log("There's a token cookie (" + this.token + "). Welcome " + this.screen_name + "!");
+        console.log("does the token work?");
+        this.listDesigns();
       }
       if (this.loggedIn !== true) {
         return console.log("youmagine login failed.");
@@ -188,10 +201,9 @@ define(function(require) {
       });
     };
 
-    YouMagineStore.prototype.authCheck = function() {};
-
     YouMagineStore.prototype.listDesignsCallback = function(data) {
       console.log("listDesignsCallback()");
+      this.designOnline = data;
       console.log(data);
       if (data.length) {
         return this.setLoggedIn();
@@ -207,7 +219,7 @@ define(function(require) {
     };
 
     YouMagineStore.prototype.getProjectsName = function(callback) {
-      var error, projectsList;
+      var design, error, projectsList, _i, _len, _ref;
 
       try {
         projectsList = localStorage.getItem("" + this.storeURI);
@@ -218,6 +230,13 @@ define(function(require) {
           projectsList = [];
         }
         this.projectsList = projectsList;
+        console.log("projectsList: =========", projectsList);
+        _ref = this.designOnline;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          design = _ref[_i];
+          console.log(design.slug);
+          projectsList.unshift(design.slug);
+        }
         this._getAllProjectsHelper();
         /* 
         projectNames = []
@@ -532,25 +551,78 @@ define(function(require) {
       projectURI = "" + this.storeURI + "-" + projectName;
       filesURI = "" + projectURI + "-files";
       fileNames = localStorage.getItem(filesURI);
-      fileNames = fileNames.split(',');
+      if (fileNames === null) {
+        console.log("need to fetch the file info from YM.");
+        return this._fetchFileListForDesign(projectName);
+      } else {
+        fileNames = fileNames.split(',');
+      }
       return fileNames;
     };
 
+    YouMagineStore.prototype._fetchFileListForDesign = function(designSlug) {
+      var req, url,
+        _this = this;
+
+      console.log("fetching file list for " + designSlug + " synchronously...");
+      jQuery.ajaxSetup({
+        async: false
+      });
+      url = "" + this.apiURL + "/designs/" + designSlug + "/documents.json";
+      console.log("url = " + url);
+      req = $.getJSON(url, {
+        auth_token: this.token
+      }, function(data, resp) {
+        var design, num, _results;
+
+        window.myData = [];
+        _results = [];
+        for (num in data) {
+          design = data[num];
+          console.log('design', design);
+          _results.push(window.myData.push(design.file.url));
+        }
+        return _results;
+      });
+      console.log("fetched list: ", window.myData);
+      jQuery.ajaxSetup({
+        async: true
+      });
+      return window.myData;
+    };
+
     YouMagineStore.prototype._readFile = function(projectName, fileName) {
-      var fileData, fileNames, fileUri, filesURI, projectURI, rawData;
+      var fileData, fileNames, fileUri, filesURI, projectURI, rawData, req,
+        _this = this;
 
       projectURI = "" + this.storeURI + "-" + projectName;
       filesURI = "" + projectURI + "-files";
       fileNames = localStorage.getItem(filesURI);
-      fileNames = fileNames.split(',');
-      if (__indexOf.call(fileNames, fileName) >= 0) {
-        fileUri = "" + filesURI + "-" + fileName;
-        fileData = localStorage.getItem(fileUri);
-        rawData = JSON.parse(fileData);
-        console.log("raw file Data", rawData);
-        return rawData["content"];
+      if (fileNames !== null) {
+        fileNames = fileNames.split(',');
+        if (__indexOf.call(fileNames, fileName) >= 0) {
+          fileUri = "" + filesURI + "-" + fileName;
+          fileData = localStorage.getItem(fileUri);
+          rawData = JSON.parse(fileData);
+          console.log("raw file Data", rawData);
+          return rawData["content"];
+        } else {
+          throw new Error("no such file");
+        }
       } else {
-        throw new Error("no such file");
+        console.log('---------fetching file from youmagine -------');
+        jQuery.ajaxSetup({
+          async: false
+        });
+        console.log("url = " + fileName);
+        req = $.get(fileName, null, function(data, resp) {
+          window.myData = null;
+          return console.log('design data:', data);
+        });
+        console.log("fetched list: ", window.myData);
+        return jQuery.ajaxSetup({
+          async: true
+        });
       }
     };
 

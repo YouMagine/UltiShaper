@@ -98,7 +98,11 @@ define(function(require) {
         compiler: this.compiler
       });
       this.project.addFile({
-        name: this.project.get("name") + ".coffee",
+        name: this.project.get("name") + ".ultishape",
+        content: "<xml><block type=\"shape_cube\" inline=\"true\" x=\"4\" y=\"9\"><title name=\"CENTEROBJECT\">TRUE</title><value name=\"width\"><block type=\"math_number\"><title name=\"NUM\">42</title></block></value><value name=\"depth\"><block type=\"math_number\"><title name=\"NUM\">10</title></block></value><value name=\"height\"><block type=\"math_number\"><title name=\"NUM\">10</title></block></value></block></xml>"
+      });
+      this.project.addFile({
+        name: "generated.coffee",
         content: "myCube = new Cube({size:20}).color([0.9,0.5,0.1])\nassembly.add(myCube)"
       });
       this.project.addFile({

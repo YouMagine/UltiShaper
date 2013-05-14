@@ -53,8 +53,12 @@ define (require)->
       #stores 
       DropBoxStore = require './stores/dropbox/dropBoxStore'
       BrowserStore = require './stores/browser/browserStore'
+      YouMagineStore = require './stores/youmagine/youMagineStore'
       @stores["Dropbox"] = new DropBoxStore()
       @stores["browser"] = new BrowserStore()
+      @stores["YouMagine"] = new YouMagineStore()
+
+
       
       #events
       $(window).bind('beforeunload',@onAppClosing)

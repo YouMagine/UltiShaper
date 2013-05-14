@@ -10,7 +10,7 @@ define (require)->
   class ProjectFile extends Backbone.Model
     idAttribute: 'name'
     defaults:
-      name:     "testFile.coffee"
+      name:     "testFile.ultishape"
       content:  ""
       isActive: false
       isSaveAdvised: false
@@ -129,7 +129,7 @@ define (require)->
       
     addFile:(options)->
       file = new ProjectFile
-        name: options.name ? @name+".coffee"
+        name: options.name ? @name+".ultishape"
         content: options.content ? " \n\n"
       @_addFile(file)   
       return file
@@ -210,16 +210,17 @@ define (require)->
       
     _onNameChanged:(model, name)=>
       try
-        mainFile = @rootFolder.get(@previous('name')+".coffee")
+        mainFile = @rootFolder.get(@previous('name')+".ultishape")
         if mainFile?
           console.log "project name changed from #{@previous('name')} to #{name}"
-          mainFile.name = "#{name}.coffee"
+          mainFile.name = "#{name}.ultishape"
       catch error
         console.log "error in rename : #{error}"
     
     _onFilesReset:()=>
       #add various event bindings, reorder certain specific files
-      mainFileName ="#{@name}.coffee"
+      mainFileName ="#{@name}.ultishape"
+      console.log mainFileName, ' is the main filename?!?!?!!'
       ### 
       mainFile = @rootFolder.get(mainFileName)
       @rootFolder.remove(mainFileName)

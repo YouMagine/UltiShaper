@@ -43,6 +43,7 @@ define (require)->
     checkForTokenTimes: 30
     checkForTokenTimesLeft: 30
     checkForTokenInterval: 1000
+    designOnline: []
 
     
     constructor:(options)->
@@ -71,12 +72,8 @@ define (require)->
       
     login:=>
       console.log "youmagine logging in..."
-      console.log "is there a token cookie?"
-      @token = $.cookie 'youmagine_token'
-      @username = $.cookie 'youmagine_user'
-      @user_id = $.cookie 'youmagine_user_id'
-      @screen_name = $.cookie 'youmagine_screen_name'
       login_succeeded = false
+      @authCheck()
 
       if @token isnt null
         console.log "There's a token cookie (#{@token}). Welcome #{@screen_name}!"
@@ -89,11 +86,16 @@ define (require)->
           @checkForTokenPID = window.setInterval(@receiveTokenMessage, @checkForTokenInterval)
           console.log @checkForTokenPID
 
-        # if @listDesigns() is false
-          # console.log "Couldnt list designs. Cant use Youmagine."
-        # else @setLoggedIn
-      # test the token
-
+    authCheck:=>
+      @token = $.cookie 'youmagine_token'
+      @username = $.cookie 'youmagine_user'
+      @user_id = $.cookie 'youmagine_user_id'
+      @screen_name = $.cookie 'youmagine_screen_name'
+      console.log "youmagine authCheck"
+      if @token isnt null
+        console.log "There's a token cookie (#{@token}). Welcome #{@screen_name}!"
+        console.log "does the token work?"
+        @listDesigns()
 
       # @loggedIn = true
       if @loggedIn != true
@@ -144,10 +146,10 @@ define (require)->
         # @listDesignsCallback(data)
 # `$.getJSON("#{@apiURL}/designs.json?auth_token=dYhhiT2h9ZSghBAYsb5C", function(data) { console.log(data); })`
 
-    authCheck:()->
 
     listDesignsCallback:(data)=>
       console.log "listDesignsCallback()"
+      @designOnline = data
       console.log data
       if data.length
         @setLoggedIn()
@@ -168,7 +170,10 @@ define (require)->
         else
           projectsList = []
         @projectsList = projectsList
-        
+        console.log "projectsList: =========",projectsList
+        for design in @designOnline
+          console.log design.slug
+          projectsList.unshift design.slug
         @_getAllProjectsHelper()
         #kept for now
         ### 
@@ -443,22 +448,58 @@ define (require)->
       projectURI = "#{@storeURI}-#{projectName}"
       filesURI = "#{projectURI}-files"
       fileNames = localStorage.getItem(filesURI)
-      fileNames = fileNames.split(',')
+      if fileNames is null
+        console.log "need to fetch the file info from YM."
+        # $.when ????
+        return @_fetchFileListForDesign(projectName)
+
+      else
+        fileNames = fileNames.split(',')
       return fileNames
+
+    _fetchFileListForDesign:(designSlug)=>
+      console.log "fetching file list for #{designSlug} synchronously..."
+      jQuery.ajaxSetup({async:false});
+      url = "#{@apiURL}/designs/#{designSlug}/documents.json"
+      console.log "url = #{url}"
+      req = $.getJSON url, {auth_token:@token}, (data, resp) =>
+        window.myData = []
+        for num,design of data
+          console.log 'design',design
+          window.myData.push design.file.url
+
+      console.log("fetched list: ",window.myData)
+      jQuery.ajaxSetup({async:true});
+      return window.myData
+
       
     _readFile:(projectName, fileName)=>
       projectURI = "#{@storeURI}-#{projectName}"
       filesURI = "#{projectURI}-files"
       fileNames = localStorage.getItem(filesURI)
-      fileNames = fileNames.split(',')
-      if fileName in fileNames
-        fileUri = "#{filesURI}-#{fileName}"
-        fileData = localStorage.getItem(fileUri)
-        rawData = JSON.parse(fileData)
-        console.log "raw file Data", rawData
-        return rawData["content"]
+      if fileNames isnt null
+        fileNames = fileNames.split(',')
+        if fileName in fileNames
+          fileUri = "#{filesURI}-#{fileName}"
+          fileData = localStorage.getItem(fileUri)
+          rawData = JSON.parse(fileData)
+          console.log "raw file Data", rawData
+          return rawData["content"]
+        else
+          throw new Error("no such file")
       else
-        throw new Error("no such file")
+        #fixme: although its probably a tiny XML file, synchronous downloading is probably a horrible thing
+        # TODO ;)
+        console.log '---------fetching file from youmagine -------'
+        jQuery.ajaxSetup({async:false});
+        console.log "url = #{fileName}"
+        req = $.get fileName,null, (data, resp) =>
+          window.myData = null
+          console.log 'design data:',data
+          # window.myData.push design.file.url
+
+        console.log("fetched list: ",window.myData)
+        jQuery.ajaxSetup({async:true});
       
       
     _sourceFetchHandler:([store, projectName, path, deferred])=>

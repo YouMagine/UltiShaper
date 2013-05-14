@@ -63,7 +63,7 @@ define(function(require) {
     BlocklyEditorView.prototype._tearDownEventHandlers = function() {};
 
     BlocklyEditorView.prototype.codeUpdateFunction = function() {
-      var allFields, code, codeLanguage, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainFile, str, variables, xml;
+      var allFields, code, codeLanguage, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainCoffeeFile, projectMainFile, str, variables, xml;
 
       this.skipMyUpdate = false;
       this.numUpdates = 0;
@@ -73,6 +73,7 @@ define(function(require) {
       window.cursor_rot = this.cursor_rot;
       window.cursor_move = this.cursor_trans;
       window.cursor_scale = this.cursor_scale;
+      window.colors = this.colors;
       if (this.skipMyUpdate) {
         console.log("Skipping my update...", skipMyUpdate);
         return;
@@ -135,8 +136,11 @@ define(function(require) {
         code = Blockly.Generator.workspaceToCode("JavaScript");
         code = "$fs=0.4;\n$fa=5;\n" + code;
       }
-      projectMainFile = this.project.rootFolder.get("" + this.project.name + ".coffee");
-      projectMainFile.content = code;
+      projectMainFile = this.project.rootFolder.get("" + this.project.name + ".ultishape");
+      projectMainFile.content = xml;
+      projectMainCoffeeFile = this.project.rootFolder.get("generated.coffee");
+      projectMainCoffeeFile.content = code;
+      console.log(code);
       if (this.app2 && this.app2.loadCode) {
         return this.app2.loadCode(code);
       }

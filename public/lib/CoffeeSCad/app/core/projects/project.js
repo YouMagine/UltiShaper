@@ -19,7 +19,7 @@ define(function(require) {
     ProjectFile.prototype.idAttribute = 'name';
 
     ProjectFile.prototype.defaults = {
-      name: "testFile.coffee",
+      name: "testFile.ultishape",
       content: "",
       isActive: false,
       isSaveAdvised: false,
@@ -208,7 +208,7 @@ define(function(require) {
       var file, _ref, _ref1;
 
       file = new ProjectFile({
-        name: (_ref = options.name) != null ? _ref : this.name + ".coffee",
+        name: (_ref = options.name) != null ? _ref : this.name + ".ultishape",
         content: (_ref1 = options.content) != null ? _ref1 : " \n\n"
       });
       this._addFile(file);
@@ -319,10 +319,10 @@ define(function(require) {
       var error, mainFile;
 
       try {
-        mainFile = this.rootFolder.get(this.previous('name') + ".coffee");
+        mainFile = this.rootFolder.get(this.previous('name') + ".ultishape");
         if (mainFile != null) {
           console.log("project name changed from " + (this.previous('name')) + " to " + name);
-          return mainFile.name = "" + name + ".coffee";
+          return mainFile.name = "" + name + ".ultishape";
         }
       } catch (_error) {
         error = _error;
@@ -333,7 +333,8 @@ define(function(require) {
     Project.prototype._onFilesReset = function() {
       var file, mainFileName, _i, _len, _ref;
 
-      mainFileName = "" + this.name + ".coffee";
+      mainFileName = "" + this.name + ".ultishape";
+      console.log(mainFileName, ' is the main filename?!?!?!!');
       /* 
       mainFile = @rootFolder.get(mainFileName)
       @rootFolder.remove(mainFileName)

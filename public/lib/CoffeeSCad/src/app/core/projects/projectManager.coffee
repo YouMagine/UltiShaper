@@ -69,7 +69,12 @@ define (require)->
       @project = new Project
         compiler:@compiler
       @project.addFile
-        name: @project.get("name")+".coffee"
+        name: @project.get("name")+".ultishape"
+        content:"""
+        <xml><block type="shape_cube" inline="true" x="4" y="9"><title name="CENTEROBJECT">TRUE</title><value name="width"><block type="math_number"><title name="NUM">42</title></block></value><value name="depth"><block type="math_number"><title name="NUM">10</title></block></value><value name="height"><block type="math_number"><title name="NUM">10</title></block></value></block></xml>
+        """
+      @project.addFile
+        name: "generated.coffee"
         content:"""
         myCube = new Cube({size:20}).color([0.9,0.5,0.1])
         assembly.add(myCube)

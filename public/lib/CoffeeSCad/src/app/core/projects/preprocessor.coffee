@@ -44,20 +44,20 @@ define (require) ->
         #  @lintProject(project)
         
         @project = project
-        mainFileName = @project.name+".coffee"
-        mainFile = @project.rootFolder.get(mainFileName)
-        if not mainFile?
+        coffeeFileName = "generated.coffee"
+        coffeeFile = @project.rootFolder.get(coffeeFileName)
+        if not coffeeFile?
           throw new Error("Missing main file (needs to have the same name as the project containing it)")
           
-        mainFileCode = mainFile.content
+        coffeeFileCode = coffeeFile.content
         
         reqRes.addHandler("getlocalFileOrProjectCode",@_localSourceFetchHandler)
         
         
         @patternReplacers= []
-        @processedResult = mainFileCode
+        @processedResult = coffeeFileCode
         
-        @processIncludes(mainFileName, mainFileCode)
+        @processIncludes(coffeeFileName, coffeeFileCode)
       catch error
         @deferred.reject(error)
       

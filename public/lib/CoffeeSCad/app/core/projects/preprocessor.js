@@ -47,7 +47,7 @@ define(function(require) {
     };
 
     PreProcessor.prototype.process = function(project, coffeeToJs, lint) {
-      var error, mainFile, mainFileCode, mainFileName,
+      var coffeeFile, coffeeFileCode, coffeeFileName, error,
         _this = this;
 
       coffeeToJs = coffeeToJs || false;
@@ -58,16 +58,16 @@ define(function(require) {
       this.deferred = $.Deferred();
       try {
         this.project = project;
-        mainFileName = this.project.name + ".coffee";
-        mainFile = this.project.rootFolder.get(mainFileName);
-        if (mainFile == null) {
+        coffeeFileName = "generated.coffee";
+        coffeeFile = this.project.rootFolder.get(coffeeFileName);
+        if (coffeeFile == null) {
           throw new Error("Missing main file (needs to have the same name as the project containing it)");
         }
-        mainFileCode = mainFile.content;
+        coffeeFileCode = coffeeFile.content;
         reqRes.addHandler("getlocalFileOrProjectCode", this._localSourceFetchHandler);
         this.patternReplacers = [];
-        this.processedResult = mainFileCode;
-        this.processIncludes(mainFileName, mainFileCode);
+        this.processedResult = coffeeFileCode;
+        this.processIncludes(coffeeFileName, coffeeFileCode);
       } catch (_error) {
         error = _error;
         this.deferred.reject(error);

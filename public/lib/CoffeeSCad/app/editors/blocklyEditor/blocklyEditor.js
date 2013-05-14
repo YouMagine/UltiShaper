@@ -24,6 +24,7 @@ define(function(require) {
     BlocklyEditor.prototype.title = "BlocklyEditor";
 
     function BlocklyEditor(options) {
+      this.loadBlocks = __bind(this.loadBlocks, this);
       this.resetEditor = __bind(this.resetEditor, this);
       this.hideView = __bind(this.hideView, this);
       this.showView = __bind(this.showView, this);
@@ -53,6 +54,7 @@ define(function(require) {
       if (this.appSettings != null) {
         this.appSettings.registerSettingClass("BlocklyEditor", BlocklyEditorSettings);
       }
+      this.loadBlocks();
       this.addInitializer(function() {
         return this.vent.trigger("app:started", "" + this.title, this);
       });
@@ -103,7 +105,36 @@ define(function(require) {
         this.dia.close();
         this.blocklyEditorView = null;
       }
+      this.loadBlocks();
       return this.showView();
+    };
+
+    BlocklyEditor.prototype.loadBlocks = function() {
+      var ext, fileParts, model, modelId, _i, _len, _ref, _results;
+
+      console.log('-----------------=================----------------');
+      _ref = this.project.rootFolder.models;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        model = _ref[_i];
+        fileParts = model.id.split('.');
+        ext = fileParts[fileParts.length - 1];
+        modelId = fileParts[0];
+        if (modelId === this.project.id) {
+          window.xmlStr = model.storedContent;
+          _results.push(setTimeout(function() {
+            var xml;
+
+            try {
+              xml = Blockly.Xml.textToDom(window.xmlStr);
+              return Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+            } catch (_error) {}
+          }, 10));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
 
     return BlocklyEditor;

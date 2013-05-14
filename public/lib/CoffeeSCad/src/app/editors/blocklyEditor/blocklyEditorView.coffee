@@ -52,6 +52,7 @@ define (require)->
       window.cursor_rot=@cursor_rot
       window.cursor_move=@cursor_trans
       window.cursor_scale=@cursor_scale
+      window.colors = @colors
       if @skipMyUpdate
         console.log "Skipping my update...", skipMyUpdate
         return
@@ -106,9 +107,14 @@ define (require)->
         code = "$fs=0.4;\n$fa=5;\n" + code
         
       #get the project's main file
-      projectMainFile = @project.rootFolder.get("#{@project.name}.coffee")
+      projectMainFile = @project.rootFolder.get("#{@project.name}.ultishape")
+      projectMainFile.content = xml
+
+      #get the project's coffeeSCAD file
+      projectMainCoffeeFile = @project.rootFolder.get("generated.coffee")
       #set the code : all view will get the propagated content automagically
-      projectMainFile.content = code
+      projectMainCoffeeFile.content = code
+      console.log code
       #document.getElementById("codearea").value = code
       @app2.loadCode code  if @app2 and @app2.loadCode 
     
