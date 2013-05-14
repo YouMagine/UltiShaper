@@ -174,15 +174,9 @@ define (require)->
       domChild = dom.childNodes[0]
       selectedBlock = Blockly.selected
       console.log "pre paste"
-      
-      #Blockly.selected.workspace.paste(domChild);
       Blockly.mainWorkspace.paste domChild
       console.log "after paste"
       if selectedBlock isnt null
-        
-        # xmlStr = '<xml><block type="polygons_extrude" inline="true" x="-10" y="16"><value name="extrudeZ"><block type="math_number"><title name="NUM">20</title></block></value><statement name="shapeToExtrude"><block type="polygons_polygon"><title name="polyName">polyline</title><statement name="pointList"><block type="polygons_point" inline="true"><next><block type="polygons_point" inline="true"><value name="tX"><block type="math_number"><title name="NUM">10</title></block></value><next><block type="polygons_point" inline="true"><value name="tY"><block type="math_number"><title name="NUM">10</title></block></value></block></next></block></next></block></statement></block></statement></block></xml>';
-        # xmlStr = '<xml><block type="shape_sphere" inline="true" x="21" y="-15"><value name="radius"><block type="math_number"><title name="NUM">10</title></block></value><next><block type="shape_sphere" inline="true"><value name="radius"><block type="math_number"><title name="NUM">20</title></block></value></block></next></block></xml>';
-        # xmlStr = '<xml><block type="shape_sphere" inline="true" x="0" y="0"></block></xml>';
         topBlocks = Blockly.mainWorkspace.getTopBlocks()
         if insertBlockBefore is false
           if topBlocks.length > 1

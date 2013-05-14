@@ -9,14 +9,14 @@ define (require)->
   Project = require 'core/projects/project'
   
   BlocklyEditorSettings = require './blocklyEditorSettings'
-  #blocklyEditorSettingsView = require './blocklyEditorSettingsView'
-  #blocklyEditorRouter = require "./blocklyEditorRouter"
+  BlocklyEditorSettingsView = require './blocklyEditorSettingsView'
+  BlocklyEditorRouter = require "./blocklyEditorRouter"
   BlocklyEditorView = require './blocklyEditorView'
   DialogView = require 'core/utils/dialogView'
 
  
   class BlocklyEditor extends Backbone.Marionette.Application
-    title: "blocklyEditor"
+    title: "BlocklyEditor"
     
     constructor:(options)->
       super options
@@ -24,8 +24,8 @@ define (require)->
       @settings = options.settings ? new BlocklyEditorSettings()
       @project= options.project ? new Project()
       @vent = vent
-      #@router = new blocklyEditorRouter
-      #  controller: @
+      @router = new BlocklyEditorRouter
+        controller: @
       @startWithParent = true
       @showOnAppStart = true
       @addMainMenuIcon = true
@@ -40,22 +40,22 @@ define (require)->
       
     init:=>
       if @appSettings?
-        @appSettings.registerSettingClass("blocklyEditor", BlocklyEditorSettings)
+        @appSettings.registerSettingClass("BlocklyEditor", BlocklyEditorSettings)
         
       @addInitializer ->
         @vent.trigger "app:started", "#{@title}",@
       
       #if requested we send back the type of SettingsView to use for this specific sub app
-      reqRes.addHandler "blocklyEditorSettingsView", ()->
-        return blocklyEditorSettingsView
+      reqRes.addHandler "BlocklyEditorSettingsView", ()->
+        return BlocklyEditorSettingsView
         
     onStart:()=>
-      @settings = @appSettings.get("blocklyEditor")
+      @settings = @appSettings.get("BlocklyEditor")
       @showView()
       
     showView:=>
       if not @dia?
-        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly Drag-and-Drop 3D design", width:500, height:200,position:[325,25], dockable:true})
+        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly Drag-and-Drop 3D design", width:500, height:200,position:[25,25], dockable:true})
         @dia.render()
       
       if not @blocklyEditorView?
