@@ -134,7 +134,7 @@ Blockly.JavaScript.polygons_polygon = function() {
     if(str === '') continue; // skip empty item
     code += str.trim()+",";
   }
-  code = 'fromPoints(['+code+pointList.shift().trim()+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
+  code = 'CAGBase.fromPoints(['+code+pointList.shift().trim()+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
   console.log('points:',pointList,'code',code);
   if(codeLanguage == 'vol0.1')
     return '';
