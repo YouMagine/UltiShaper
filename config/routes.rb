@@ -1,5 +1,7 @@
 UltiShaper::Application.routes.draw do
 
+  post "youmagine/get_token"
+  get "youmagine/connect_success"
 
   resources :translations
 
