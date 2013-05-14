@@ -181,9 +181,10 @@ define (require)->
         console.log data
         
     showAbout:(ev)=>
-      bootbox.dialog """<b>Coffeescad v0.322</b> (pre-alpha)<br/><br/>
-      Licenced under the MIT Licence<br/>
-      @2012-2013 by Mark 'kaosat-dev' Moissette
+      bootbox.dialog """<b>Coffeescad / UltiShaper v0.322 </b> (pre-alpha)<br/><br/>
+      UltiShaper (blockly parts) by Erik de Bruijn and Mark Moissette of <a href="http://www.Ultimaker.com">Ultimaker</a>.
+      <br/><br/>Licenced under the MIT Licence<br/>
+      @2012-2013 by Mark 'kaosat-dev' Moissette and contributors
       """, [
           label: "Ok"
           class: "btn-inverse"

@@ -10,9 +10,6 @@
 LANG = LANG_EN_EN;
 
 var codeLanguage = "coffeescad0.1"
-var cursor_rot=[0,0,0];
-var cursor_trans=[0,0,0];
-var cursor_scale=[1,1,1];
 var colors = {selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255]};
 
 re = /l=([^&]*)/g;
@@ -70,11 +67,9 @@ function var_to_number(varStr){
   <script data-main="lib/CoffeeSCad/app/config" src="lib/CoffeeSCad/assets/js/libs/require.min.js"></script>
   <script src="lib/CoffeeSCad/assets/js/libs/ace/ace.js"></script>
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/font-awesome.css">
-  <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/codemirror.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/backbone.forms.default.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/backbone.forms.bootstrap.css">
   <link rel="stylesheet" href="lib/CoffeeSCad/assets/css/ui-lightness/jquery-ui-1.10.1.custom.min.css">
-  <link rel="stylesheet" href="lib/CoffeeSCad/assets/js/libs/codeMirror/theme/lesser-dark.css"/>
   <link id="mainTheme" rel="stylesheet" href="lib/CoffeeSCad/assets/css/style/coffeescad/bootstrap.css">
 	
   

@@ -73,7 +73,7 @@ define(function(require) {
           title: "Blockly Drag-and-Drop 3D design",
           width: 500,
           height: 200,
-          position: [325, 25],
+          position: [25, 25],
           dockable: true
         });
         this.dia.render();
