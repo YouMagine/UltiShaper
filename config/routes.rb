@@ -1,5 +1,6 @@
 UltiShaper::Application.routes.draw do
 
+
   resources :translations
 
   match 'translations_for/:language' => 'translations#index'
