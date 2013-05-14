@@ -42,9 +42,9 @@ define (require)->
       if @appSettings?
         @appSettings.registerSettingClass("BlocklyEditor", BlocklyEditorSettings)
         
+      @loadBlocks()
       @addInitializer ->
         @vent.trigger "app:started", "#{@title}",@
-      
       #if requested we send back the type of SettingsView to use for this specific sub app
       reqRes.addHandler "BlocklyEditorSettingsView", ()->
         return BlocklyEditorSettingsView
@@ -74,11 +74,34 @@ define (require)->
     resetEditor:(newProject)=>
       console.log "resetting Blockly editor"
       @project = newProject
+      # console.log "============new project: ",newProject
+
       if @dia?
         console.log "closing current Blockly editor"
         @dia.close()
         @blocklyEditorView = null
         
+      @loadBlocks()
       @showView()
   
+    loadBlocks:()=>
+      console.log '-----------------=================----------------'
+      for model in @project.rootFolder.models
+        # console.log "========= models::: ",model,model.id
+        fileParts = model.id.split '.'
+        ext = fileParts[fileParts.length-1]
+        modelId = fileParts[0]
+        # console.log 'ext',ext
+        # console.log 'project id',@project.id,'model id = ',modelId
+        if modelId is @project.id
+          # console.log "adding content",model.storedContent
+          window.xmlStr = model.storedContent
+          setTimeout(()->
+            try
+              # console.log window.xmlStr
+              xml = Blockly.Xml.textToDom(window.xmlStr);
+              Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml)
+          ,10);
+      
+
   return BlocklyEditor
