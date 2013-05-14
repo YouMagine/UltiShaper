@@ -49,6 +49,7 @@ Contributors
 =============
 Derrick Oswald
 Jim Wygralak
+Erik de Bruijn of [Ultimaker](http://www.ultimaker.com)
 
 
 Features
