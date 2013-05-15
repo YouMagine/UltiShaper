@@ -346,7 +346,12 @@ define (require)->
       
       fileNames = @_getProjectFiles(projectName)
       for fileName in fileNames
+        console.log fileName,' is being filtered ==++++++++++=='
         content = @_readFile(projectName,fileName)
+        if fileName.substr(0,7) is 'http://' || fileName.substr(0,8) is 'https://'
+          console.log fileName,'before'
+          fileName = fileName.split('/')[fileName.split('/').length-1]
+          console.log fileName,'after'
         project.addFile
           content : content
           name : fileName
@@ -492,14 +497,18 @@ define (require)->
         # TODO ;)
         console.log '---------fetching file from youmagine -------'
         jQuery.ajaxSetup({async:false});
-        console.log "url = #{fileName}"
-        req = $.get fileName,null, (data, resp) =>
-          window.myData = null
+        newUrl = "http://my.ultimaker.net/tests/myproxy/?url=" + escape fileName
+        req = $.get newUrl,null, (data, resp) =>
+          window.myData = data
           console.log 'design data:',data
           # window.myData.push design.file.url
 
         console.log("fetched list: ",window.myData)
         jQuery.ajaxSetup({async:true});
+        serializer = new XMLSerializer()
+        str = serializer.serializeToString(window.myData)
+        console.log str
+        return str 
       
       
     _sourceFetchHandler:([store, projectName, path, deferred])=>

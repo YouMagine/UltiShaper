@@ -107,11 +107,18 @@ define (require)->
         code = "$fs=0.4;\n$fa=5;\n" + code
         
       #get the project's main file
-      projectMainFile = @project.rootFolder.get("#{@project.name}.ultishape")
+      fName = "#{@project.name}.ultishape"
+      projectMainFile = @project.rootFolder.get(fName)
+      if projectMainFile is null
+        console.log 'Couldnt get ',"@project.rootFolder.get(#{@project.name}.ultishape)"
       projectMainFile.content = xml
 
       #get the project's coffeeSCAD file
       projectMainCoffeeFile = @project.rootFolder.get("generated.coffee")
+      if projectMainCoffeeFile is undefined
+        console.log 'Couldnt get ',"@project.rootFolder.get(generated.coffee"
+        @project.addFile({name: 'generated.coffee',content:''})
+        projectMainCoffeeFile = @project.rootFolder.get("generated.coffee")
       #set the code : all view will get the propagated content automagically
       projectMainCoffeeFile.content = code
       console.log code
