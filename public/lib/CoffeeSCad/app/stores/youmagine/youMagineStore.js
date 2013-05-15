@@ -428,7 +428,13 @@ define(function(require) {
       fileNames = this._getProjectFiles(projectName);
       for (_i = 0, _len = fileNames.length; _i < _len; _i++) {
         fileName = fileNames[_i];
+        console.log(fileName, ' is being filtered ==++++++++++==');
         content = this._readFile(projectName, fileName);
+        if (fileName.substr(0, 7) === 'http://' || fileName.substr(0, 8) === 'https://') {
+          console.log(fileName, 'before');
+          fileName = fileName.split('/')[fileName.split('/').length - 1];
+          console.log(fileName, 'after');
+        }
         project.addFile({
           content: content,
           name: fileName
@@ -592,7 +598,7 @@ define(function(require) {
     };
 
     YouMagineStore.prototype._readFile = function(projectName, fileName) {
-      var fileData, fileNames, fileUri, filesURI, projectURI, rawData, req,
+      var fileData, fileNames, fileUri, filesURI, newUrl, projectURI, rawData, req, serializer, str,
         _this = this;
 
       projectURI = "" + this.storeURI + "-" + projectName;
@@ -614,15 +620,19 @@ define(function(require) {
         jQuery.ajaxSetup({
           async: false
         });
-        console.log("url = " + fileName);
-        req = $.get(fileName, null, function(data, resp) {
-          window.myData = null;
+        newUrl = "http://my.ultimaker.net/tests/myproxy/?url=" + escape(fileName);
+        req = $.get(newUrl, null, function(data, resp) {
+          window.myData = data;
           return console.log('design data:', data);
         });
         console.log("fetched list: ", window.myData);
-        return jQuery.ajaxSetup({
+        jQuery.ajaxSetup({
           async: true
         });
+        serializer = new XMLSerializer();
+        str = serializer.serializeToString(window.myData);
+        console.log(str);
+        return str;
       }
     };
 

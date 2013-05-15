@@ -63,7 +63,7 @@ define(function(require) {
     BlocklyEditorView.prototype._tearDownEventHandlers = function() {};
 
     BlocklyEditorView.prototype.codeUpdateFunction = function() {
-      var allFields, code, codeLanguage, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainCoffeeFile, projectMainFile, str, variables, xml;
+      var allFields, code, codeLanguage, fName, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainCoffeeFile, projectMainFile, str, variables, xml;
 
       this.skipMyUpdate = false;
       this.numUpdates = 0;
@@ -136,9 +136,21 @@ define(function(require) {
         code = Blockly.Generator.workspaceToCode("JavaScript");
         code = "$fs=0.4;\n$fa=5;\n" + code;
       }
-      projectMainFile = this.project.rootFolder.get("" + this.project.name + ".ultishape");
+      fName = "" + this.project.name + ".ultishape";
+      projectMainFile = this.project.rootFolder.get(fName);
+      if (projectMainFile === null) {
+        console.log('Couldnt get ', "@project.rootFolder.get(" + this.project.name + ".ultishape)");
+      }
       projectMainFile.content = xml;
       projectMainCoffeeFile = this.project.rootFolder.get("generated.coffee");
+      if (projectMainCoffeeFile === void 0) {
+        console.log('Couldnt get ', "@project.rootFolder.get(generated.coffee");
+        this.project.addFile({
+          name: 'generated.coffee',
+          content: ''
+        });
+        projectMainCoffeeFile = this.project.rootFolder.get("generated.coffee");
+      }
       projectMainCoffeeFile.content = code;
       console.log(code);
       if (this.app2 && this.app2.loadCode) {
