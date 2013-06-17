@@ -62,10 +62,10 @@ define (require)->
         inputs = inputManager.list()
         i = 0
         while inputs.length > i
-          if xml.indexOf(@inputs[i].uuid) is -1
+          if xml.indexOf(inputs[i].uuid) is -1
             console.log inputManager.list()
-            console.log "Was : ", @inputs[i], "removed?"
-            $("#input" + @inputs[i].uuid, planeSvg.document).remove()
+            console.log "Was : ", inputs[i], "removed?"
+            $("#input" + inputs[i].uuid, planeSvg.document).remove()
             inputs.splice i, 1
             console.log inputManager.list()
           i++
