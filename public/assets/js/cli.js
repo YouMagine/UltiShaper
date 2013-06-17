@@ -441,7 +441,7 @@ function runCmd(enterEvent){
       if(i==selectedIndex)
       {
         if(enterEvent)
-        args = ($('#quickSearchDiv input').attr('value') + '').trim().split(' ');
+          args = ($('#quickSearchDiv input').attr('value') + '').trim().split(' ');
         console.log('performing match # '+selectedIndex + ': '+phrase,'args:',args);
         if(typeof matchingPhrases[phrase] == 'function')
           matchingPhrases[phrase].call(null,args);
@@ -480,7 +480,7 @@ function updateQuickSearchHtml() {
     selectedIndex = $(this).attr('myIndex');
     console.log('clicked item',selectedIndex);
     $('#quickSearchDiv input').attr('value',$(this).val());// FIXME: get value from matchingPhrases, not from HTML element.
-    runCmd(true);
+    runCmd(false);
   });
   $('#qsResults .qsItem').on('hover',function(){
     $('.qsSelected').removeClass('qsSelected');
