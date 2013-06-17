@@ -2,7 +2,6 @@
 var matchPhrases = [];
 var matchingPhrases = [];
 
-
 var keyLog = [];
 var prevKey;
 var selectedIndex = 0;
@@ -198,8 +197,7 @@ function myKeyEvent(e){
       charNum = quickSearchVal.length;
       argumentIndex = (quickSearchVal.match(/ +/g)||[]).length;
   }
-  
-  
+  console.log("key:",keyCode,e,'arg',argumentIndex);
   switch(keyCode) {
     case 90:// Ctrl-Z / cmd-Z
       if(e.metaKey || e.ctrlKey) {
@@ -223,29 +221,45 @@ function myKeyEvent(e){
       $('#qsResults').hide();
     break;
     case 40://arrow down
-      if(e.shiftKey) {return matchingPhrases['nextBlock'].call(null,null);}
+      if(e.shiftKey) {return matchPhrases['nextBlock'].call(null,null);}
       if(!focus) return;
       selectedIndex++;
       return updateQuickSearchHtml();
     case 38://arrow up
-      if(e.shiftKey) {return matchingPhrases['previousBlock'].call(null,null);}
+      if(e.shiftKey) {return matchPhrases['previousBlock'].call(null,null);}
       if(!focus) return;
       selectedIndex--;
       return updateQuickSearchHtml();
     case 37://arrow left
-      if(e.shiftKey) {return matchingPhrases['leftBlock'].call(null,null);}
+      if(e.shiftKey) {return matchPhrases['leftBlock'].call(null,null);}
       break;
     case 39://arrow right
-      if(e.shiftKey) {return matchingPhrases['rightBlock'].call(null,null);}
+      if(e.shiftKey) {return matchPhrases['rightBlock'].call(null,null);}
       break;
     case 32:// spacebar
       return updateQuickSearchHtml();
     case 8: // backspace
       // FIXME: should repeat the pruning process...
+      // charNum--;
       charNum--;
       console.log($('#quickSearchDiv input').val());
+      console.log('after reset: ',matchingPhrases,'changing keyCode from ',keyCode);
+      charAtN = $('#quickSearchDiv input').val().length - 2;
+      console.log('to: ',keyCode,'code at charN',charAtN,'in str:',$('#quickSearchDiv input').val());
+      v = $('#quickSearchDiv input').val();
+      newVal = v.substring(0,charNum);
+      console.log('setting val to ',newVal);
+      $('#quickSearchDiv input').val(newVal);
       resetMatches();
-      console.log('after reset: ',matchingPhrases);
+      console.log('pruneCli(keyCode==',keyCode,',charAtN==',charAtN,');');
+      var i = 0;
+      while(i <= (charAtN)) {
+        keyCode = $('#quickSearchDiv input').val().toUpperCase().charCodeAt(i);
+        pruneCli(keyCode,i);
+        i++;
+      }
+      updateQuickSearchHtml();
+      return false;
     break;
     case 51:// a # sign, for numbers
       if(e.shiftKey) {
@@ -256,11 +270,13 @@ function myKeyEvent(e){
       }
     break;
     case 191:
-    if(e.shiftKey)
-        insertBlockBefore = true;
-    else 
       insertBlockBefore = false;
-    $('#quickSearchDiv input').focus();
+      if(e.shiftKey)
+          insertBlockBefore = true;
+      resetMatches();
+      $('#quickSearchDiv input').focus();
+      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
+      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},50);
     break;
     case 9: // tab
       // supplement the quicksearch input with the top result
@@ -284,6 +300,10 @@ function myKeyEvent(e){
       argumentIndex++; // entering next argument.
 
       return;
+    case 13: // enter
+      runCmd(true);
+    break;
+
   }
   focus = $('#quickSearchDiv input').is(":focus");
   if(!focus) {
@@ -364,59 +384,51 @@ function myKeyEvent(e){
     return;
 
   }
-  pruneCli(keyCode);
-
-  switch(keyCode) {
-    case 191: // slash forward (/)
-      if(e.shiftKey)
-        insertBlockBefore = true;
-      resetMatches();
-      $('#quickSearchDiv input').focus();
-      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},1);
-      setTimeout(function(){$('#quickSearchDiv input').attr('value','')},50);
-      break;
-    case 13: // enter
-      runCmd(true);
-    break;
-    default:
-      console.log("key:",keyCode,e,'arg',argumentIndex);
-      // var s = "";
-      // for (i in matchingPhrases) {
-      //    s += i + ", ";
-      // }
-      // console.log('phrases left: '+s);
-    break;
+  charAtN = $('#quickSearchDiv input').val().length - 1;
+  console.log('charAt:',charAtN,'input:',$('#quickSearchDiv input').val());
+  if(keyCode > 64 && keyCode <= 91) {
+    console.log("pruning, because key is",keyCode);
+    pruneCli(keyCode);
   }
+  else
+    pruneCli(keyCode,charAtN);
+
   updateQuickSearchHtml();
 
     // prevKey = e;
 }
-function pruneCli(keyCode){
+function pruneCli(keyCode,charAtN){
     // start pruning process
-  var myChar = String.fromCharCode(keyCode).toLowerCase();
-  if(keyCode === 0 || keyCode === 8) { //null or backspace
-    if(charNum > 0) {
-      charNum--;
-      var qsVal = $('#quickSearchDiv input').val();
-      myChar = qsVal[charNum];
+  var myChar;
+  myChar = String.fromCharCode(keyCode).toLowerCase();
+  charNum = $('#quickSearchDiv input').val().length + 1;
+  console.log('pruneCli(..,',typeof charAtN,')');
+  if(typeof charAtN === 'number') {
+    console.log("charAtN was specified and = ",charAtN);
+    // charNum--;
+    charNum = charAtN + 1;
+
+    // if(charAtN<0)
+      // myChar = $('#quickSearchDiv input').attr('value').charAt(charAtN);
+  }
+  if(charNum == 0) { resetMatches(); return }
+  var qsVal = $('#quickSearchDiv input').val();
+  // myChar = qsVal.charAt(charNum);
       console.log('qsVal:',qsVal, "myChar is now ",myChar,'charnum',charNum);
-    } else return;
-    console.log('mychar:',myChar);
-}
   for(var phrase in matchingPhrases){
     var firstOccur = phrase.indexOf(myChar.toLowerCase());
     
     // console.log('phrase: ',phrase,'cmd:',matchPhrases[phrase],' char:',phrase.substring(0,1),' ',firstOccur));
-    if(firstOccur == charNum)
+    if(firstOccur == (charNum-1))
     {
       selectedIndex = 0;
 
     } else {
         if(argumentIndex > 0) {
-          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')',argumentIndex+' argument. Not pruning.');
+          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+(charNum-1)+')',argumentIndex+' argument. Not pruning.');
       }
         else {
-          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+charNum+')',argumentIndex+' argument. Pruned!!!!');
+          console.log(myChar,' occurs in ',phrase,' at char ',firstOccur,' (now at char '+(charNum-1)+')',argumentIndex+' argument. Pruned!!!!');
           if(keyCode != 13)
             delete matchingPhrases[phrase]; // prune matching phrases
       }
@@ -473,12 +485,12 @@ function updateQuickSearchHtml() {
     selectedIndex = $(this).attr('myIndex');
     console.log('clicked item',selectedIndex);
     $('#quickSearchDiv input').attr('value',$(this).val());// FIXME: get value from matchingPhrases, not from HTML element.
-    runCmd();
+    runCmd(true);
   });
   $('#qsResults .qsItem').on('hover',function(){
     $('.qsSelected').removeClass('qsSelected');
     $(this).addClass('qsSelected');
-    selectedIndex = $(this).attr('myIndex');
+    selectedIndex = Number($(this).attr('myIndex'));
   });
   $('#qsResults').show();
 
