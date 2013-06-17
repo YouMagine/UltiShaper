@@ -262,8 +262,8 @@ matchPhrases['cylinder [d=10] [h=10]'] = function(args){
 
 
 Blockly.JavaScript.shape_cone = function() {
-  var value_diameter1 = Blockly.JavaScript.valueToCode(this, 'diameter1', Blockly.JavaScript.ORDER_ATOMIC) || 5;
-  var value_diameter2 = Blockly.JavaScript.valueToCode(this, 'diameter2', Blockly.JavaScript.ORDER_ATOMIC) || 10;
+  var value_diameter1 = Blockly.JavaScript.valueToCode(this, 'diameter1', Blockly.JavaScript.ORDER_ATOMIC) || 2;
+  var value_diameter2 = Blockly.JavaScript.valueToCode(this, 'diameter2', Blockly.JavaScript.ORDER_ATOMIC) || 12;
   var value_height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_ATOMIC) || 10;
   var center_object = this.getTitleValue('CENTEROBJECT') == 'TRUE';
   var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
@@ -275,7 +275,7 @@ Blockly.JavaScript.shape_cone = function() {
   if(codeLanguage == 'coffeescad0.1') {
     if(center_object) centerStr=',center:[0,0,0]';
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    return 'new Cylinder({d2:'+value_diameter1+',d1:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+scaleStr+selectedStr+';';
+    return 'new Cylinder({d1:'+value_diameter1+',d2:'+value_diameter2+',h:'+value_height+'}'+centerStr+')'+scaleStr+selectedStr+';';
   }
   if(codeLanguage == 'vol0.1')
     return '';
