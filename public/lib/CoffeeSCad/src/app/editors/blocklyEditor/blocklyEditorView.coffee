@@ -87,16 +87,11 @@ define (require)->
         variables = Blockly.Variables.allVariables()
         code = Blockly.Generator.workspaceToCode("JavaScript")
         joinShapesList = code.split(";")
-        pre = ""
-        post = ""
-        while joinShapesList.length > 2
+        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\n"
+        while joinShapesList.length > 0
           str = joinShapesList.shift()
-          continue  if str.substring(0, 4) is "var " # skip variable assignments
-          # if(joinShapesList.current()=='')
-          pre += str.trim() + ".union("
-          post += ")"
-        code = pre + joinShapesList.shift().trim() + post
-        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\nassembly.add(#{code})" 
+          continue if str.trim().length == 0
+          code += "\nassembly.add("+str.trim()+")\n"
         
       if codeLanguage is "vol0.1"
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">"
