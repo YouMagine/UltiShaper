@@ -198,6 +198,8 @@ function myKeyEvent(e){
       argumentIndex = (quickSearchVal.match(/ +/g)||[]).length;
   }
   console.log("key:",keyCode,e,'arg',argumentIndex);
+  focus = $('#quickSearchDiv input').is(":focus");
+
   switch(keyCode) {
     case 90:// Ctrl-Z / cmd-Z
       if(e.metaKey || e.ctrlKey) {
@@ -241,6 +243,8 @@ function myKeyEvent(e){
     case 8: // backspace
       // FIXME: should repeat the pruning process...
       // charNum--;
+      if(!focus) return;
+      if(e.shiftKey) return; // dont run it on 'delete' on mac (shift-backspace)
       charNum--;
       console.log($('#quickSearchDiv input').val());
       console.log('after reset: ',matchingPhrases,'changing keyCode from ',keyCode);
@@ -280,6 +284,7 @@ function myKeyEvent(e){
     break;
     case 9: // tab
       // supplement the quicksearch input with the top result
+      if(!focus) return;
       console.log("trying to supplement argument "+argumentIndex+" with selected result at index",selectedIndex);
       var i=0;for(var phrase in matchingPhrases) {
         if(i==selectedIndex)
@@ -301,11 +306,11 @@ function myKeyEvent(e){
 
       return;
     case 13: // enter
+      if(!focus) return;
       runCmd(true);
     break;
 
   }
-  focus = $('#quickSearchDiv input').is(":focus");
   if(!focus) {
     // console.log("arg"+ argumentIndex+': abort.');
     // TODO add minus sign
@@ -354,15 +359,7 @@ function myKeyEvent(e){
               // Blockly.selected.inputList[0].titleRow[0].showEditor_();
             }
             else if(Blockly.FieldTextInput.htmlInput_ === null) {
-              // Blockly.FieldTextInput.htmlInput_.blur();
-              // setTimeout(function(){
-                // if(Blockly.FieldTextInput.htmlInput_)
-                  // $(Blockly.FieldTextInput.htmlInput_).blur();
                 Blockly.selected.inputList[0].titleRow[0].showEditor_();
-
-// 
-              // },1000);
-              
             }
             // htmlInput_
             // Blockly.bindEvent_(htmlInput, 'blur', this, this.onHtmlInputBlur_);
@@ -374,8 +371,6 @@ function myKeyEvent(e){
         }
 
         } 
-
-
 
     }
 
