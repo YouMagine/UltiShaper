@@ -58,6 +58,7 @@ define(function(require) {
       this.addInitializer(function() {
         return this.vent.trigger("app:started", "" + this.title, this);
       });
+      console.log("app:started " + this.title);
       return reqRes.addHandler("BlocklyEditorSettingsView", function() {
         return BlocklyEditorSettingsView;
       });
@@ -72,7 +73,7 @@ define(function(require) {
       if (this.dia == null) {
         this.dia = new DialogView({
           elName: "blocklyEdit",
-          title: "Blockly Drag-and-Drop 3D design",
+          title: "Drag-and-Drop 3D design",
           width: 500,
           height: 200,
           position: [25, 25],

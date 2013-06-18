@@ -45,6 +45,7 @@ define (require)->
       @loadBlocks()
       @addInitializer ->
         @vent.trigger "app:started", "#{@title}",@
+      console.log "app:started #{@title}"
       #if requested we send back the type of SettingsView to use for this specific sub app
       reqRes.addHandler "BlocklyEditorSettingsView", ()->
         return BlocklyEditorSettingsView
@@ -55,7 +56,7 @@ define (require)->
       
     showView:=>
       if not @dia?
-        @dia = new DialogView({elName:"blocklyEdit", title: "Blockly Drag-and-Drop 3D design", width:500, height:200,position:[25,25], dockable:true})
+        @dia = new DialogView({elName:"blocklyEdit", title: "Drag-and-Drop 3D design", width:500, height:200,position:[25,25], dockable:true})
         @dia.render()
       
       if not @blocklyEditorView?

@@ -28,6 +28,7 @@ define (require)->
       @_setupEventHandlers()
       
       @project = @model
+      $('#externalEditor').width('600px');
       
           
     _setupEventHandlers: =>
@@ -41,12 +42,13 @@ define (require)->
     
     codeUpdateFunction:=>
     	# handle data update
+
     
     clearWorkspace: =>
     
     onRender:=>
       console.log "onRender()"
-    
+
     onDomRefresh:()=>
       console.log "onDomRefresh()"
       # Blockly.inject(document.getElementById('svgDiv'),{ path: 'lib/blockly/',toolbox: toolbox })
@@ -54,9 +56,12 @@ define (require)->
       
     onResizeStart:=>
       console.log "external editor view resize start"
-      
+
     onResizeStop:=>
       console.log "external editor view resize stop"
+      w = $('#externalEditor').width()+'px';
+      console.log "setting width to #{w}"
+      $('#externalEditorIframe').width(w);
       # $('#blockly').css('width',$(window).width()-20)
       #$('#svgDiv').height(@$el.height()-100);
       # $('#svgDiv').height($(document).height()-640);

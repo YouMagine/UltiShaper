@@ -1,5 +1,11 @@
 var local = {};
 
+$(window).resize(function() {
+	console.log('osped:resize() to ',$(window).width());
+	console.log('local:',local);
+});
+
+
 $().ready(function () {
 	local.gridSize = 8;
 	local.subGridSize = 8;

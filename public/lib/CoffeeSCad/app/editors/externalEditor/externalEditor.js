@@ -47,6 +47,7 @@ define(function(require) {
       this.vent.on("project:loaded", this.resetEditor);
       this.vent.on("project:created", this.resetEditor);
       this.vent.on("ExternalEditor:show", this.showView);
+      this.vent.on("ExternalEditor:hide", this.hideView);
       this.init();
     }
 
@@ -96,7 +97,9 @@ define(function(require) {
     };
 
     ExternalEditor.prototype.hideView = function() {
-      return this.dia.hideDialog();
+      if (this.dia) {
+        return this.dia.hideDialog();
+      }
     };
 
     ExternalEditor.prototype.resetEditor = function(newProject) {

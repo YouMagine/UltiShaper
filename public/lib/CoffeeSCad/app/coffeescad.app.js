@@ -49,7 +49,7 @@ define(function(require) {
       this.projectManager = new ProjectManager({
         appSettings: this.settings
       });
-      this.editorsList = ["code", "hierarchy", "blockly"];
+      this.editorsList = ["code", "hierarchy", "blockly", "externalPath"];
       this.editors = {};
       this.exporters = {};
       this.stores = {};
@@ -225,7 +225,7 @@ define(function(require) {
     };
 
     CoffeeScadApp.prototype.onInitializeBefore = function() {
-      var BlocklyEditor, CodeEditor, HierarchyEditor, VisualEditor;
+      var BlocklyEditor, CodeEditor, ExternalEditor, HierarchyEditor, VisualEditor;
 
       console.log("before init");
       VisualEditor = require('./editors/visualEditor/visualEditor');
@@ -261,6 +261,12 @@ define(function(require) {
       BlocklyEditor = require('./editors/blocklyEditor/blocklyEditor');
       this.editors['blockly'] = new BlocklyEditor({
         project: this.project,
+        appSettings: this.settings
+      });
+      ExternalEditor = require('./editors/externalEditor/externalEditor');
+      this.editors['externalPath'] = new ExternalEditor({
+        project: this.project,
+        title: '2D sketching and tracing',
         appSettings: this.settings
       });
       return this.settings.fetch();

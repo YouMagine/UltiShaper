@@ -39,6 +39,7 @@ define (require)->
       @vent.on("project:loaded",@resetEditor)
       @vent.on("project:created",@resetEditor)
       @vent.on("ExternalEditor:show",@showView)
+      @vent.on("ExternalEditor:hide",@hideView)
       @init()
 
       #@addRegions @regions
@@ -76,7 +77,8 @@ define (require)->
         @dia.showDialog()
       
     hideView:=>
-      @dia.hideDialog()
+      if @dia
+        @dia.hideDialog()
       
     resetEditor:(newProject)=>
       console.log "resetting external editor"

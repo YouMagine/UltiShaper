@@ -37,7 +37,7 @@ define (require)->
       @projectManager = new ProjectManager
         appSettings: @settings
       
-      @editorsList = ["code","hierarchy","blockly"]
+      @editorsList = ["code","hierarchy","blockly","externalPath"]
       @editors = {}
       @exporters = {}
       @stores = {}
@@ -217,6 +217,12 @@ define (require)->
       BlocklyEditor = require './editors/blocklyEditor/blocklyEditor'
       @editors['blockly'] = new BlocklyEditor
         project: @project
+        appSettings: @settings
+
+      ExternalEditor = require './editors/externalEditor/externalEditor'
+      @editors['externalPath'] = new ExternalEditor
+        project: @project
+        title: '2D sketching and tracing'
         appSettings: @settings
                  
       @settings.fetch()

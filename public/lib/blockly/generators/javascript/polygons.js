@@ -1,5 +1,5 @@
-
 Blockly.JavaScript.polygons_sketch = function() {
+  var uuid = this.getTitleValue('uuid');
   var code = this.getTitleValue('code') || '[0,0],[10,0],[0,10]';
   if(typeof canvas2d === 'object') {
     // FIXME: This is just a proof of concept way of allowing the inter-browser communications.
@@ -8,17 +8,35 @@ Blockly.JavaScript.polygons_sketch = function() {
       $(document).bind('SKETCH_CHANGED', myUpdateFunction);
     }
     code = canvas2d.getPolyLineStr();
+    if(Blockly.selected == this)
+      canvas2d.addBlock(this);
   }
-  if(Blockly.selected == this)
-    canvas2d.addBlock(this);
-  skipMyUpdate = 'sketch';
-  this.setTitleValue(code,'code');
-  setTimeout(function(){skipMyUpdate = false;},200);
+
+  // create a new sketch input:
+  var sketch = new MySketchInput(code);
+  sketch.setUUID(uuid);
+  if(inputManager.getInputByUUID(uuid) === null) {
+      // console.log('uuid not found... adding the sketch to inputs.');
+      inputManager.addSketch(sketch);
+  } else {
+      // uuid was found. sketch was created before. Use that one.
+      sketch = inputManager.getInputByUUID(uuid);
+  }
+  val = sketch.val;
+
+  // if(val != code) {
+    // TODO: figure out if code (blockly) has changed: push data to external editor
+    // TODO: otherwise, pull from external editor.
+    console.log("sketch.val:",val,'code(blockly):',code);
+    skipMyUpdate = 'sketch';
+    this.setTitleValue(val,'code');
+    setTimeout(function(){skipMyUpdate = false;},200);
+  // }
 
   code = code.replace(/\/\*[^\*]*\*\//g,"");
   code = code.replace(/polygon\(\[/g,""); // remove polygon([ from string
   code = code.replace(/\]\);?/g,""); // remove ]); from string
-  code = 'fromPoints(['+code+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
+  code = 'CAGBase.fromPoints(['+code.trim()+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
 
   console.log("sketch code = ",code);
   if(codeLanguage == 'vol0.1')
@@ -36,14 +54,18 @@ Blockly.Language.polygons_sketch = {
   category: ucfirst(getLang('polygons')),
   helpUrl: 'http://www.example.com/',
   init: function() {
+    // var uuidField = new Blockly.HiddenField(uuid());
+    var uuidField = new Blockly.Field(uuid());
     this.setColour(230);
     this.appendDummyInput()
         .appendTitle(new Blockly.FieldImage("assets/img/2dsketch.png", 25, 24))
         .appendTitle("Sketch");
     this.appendDummyInput()
-        .appendTitle("coordinate code")
+        .appendTitle("points")
         .appendTitle(new Blockly.FieldTextInput('[0,0],[10,0],[0,10]',
         ""), 'code');
+    this.appendDummyInput()
+        .appendTitle(uuidField, "uuid");
     this.setTooltip('A a polyline from a sketch.');
     this.setInputsInline(true);
     this.setPreviousStatement(true);

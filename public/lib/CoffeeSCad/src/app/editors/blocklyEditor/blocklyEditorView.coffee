@@ -29,6 +29,8 @@ define (require)->
       @_setupEventHandlers()
       
       @project = @model
+
+      @vent = appVent
       
       @cursor_rot=[0,0,0]
       @cursor_trans=[0,0,0]
@@ -61,23 +63,34 @@ define (require)->
       if typeof inputManager is "object"
         inputs = inputManager.list()
         i = 0
+        numSketches = 0
+        @sketchVal = '' 
+        if window.externalEditor and window.externalEditor.$
+          @sketchVal = window.externalEditor.$('#exportArea').val();
+          console.log 'SKETCHVALLLLLLL!!!!', @sketchVal
         while inputs.length > i
+          console.log "inputs[i].setVal to #{@sketchVal}"
+          if @sketchVal != ''
+            inputs[i].setVal @sketchVal
+          if inputs[i].isType('sketch')
+            @vent.trigger 'ExternalEditor:show', "test",@
+            numSketches++
+
           if xml.indexOf(inputs[i].uuid) is -1
             console.log inputManager.list()
             console.log "Was : ", inputs[i], "removed?"
-            $("#input" + inputs[i].uuid, planeSvg.document).remove()
+            # TODO: replace with better way to maintain those fields...
+            # $("#input" + inputs[i].uuid, planeSvg.document).remove()
             inputs.splice i, 1
             console.log inputManager.list()
           i++
-      allFields = inputManager.list()
-      $("#inputPane").show()
-      if allFields.length > 0
-        $("#inputModal").show()
-      else
-        $("#inputModal").hide()
+      if numSketches == 0 or inputs.length == 0
+        @vent.trigger 'ExternalEditor:hide', "test",@
+
       hist.addEntry xml  unless typeof hist is "undefined"
       langDropbox = document.getElementById("lang")
-      
+
+
       myVars = undefined
       codeLanguage = $("#langDropbox").val()
       codeLanguage = "coffeescad0.1"  unless typeof codeLanguage is "string"

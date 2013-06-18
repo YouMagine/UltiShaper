@@ -46,6 +46,7 @@ define(function(require) {
       this.settings = options.settings;
       this._setupEventHandlers();
       this.project = this.model;
+      this.vent = appVent;
       this.cursor_rot = [0, 0, 0];
       this.cursor_trans = [0, 0, 0];
       this.cursor_scale = [1, 1, 1];
@@ -56,6 +57,7 @@ define(function(require) {
       };
       this.app2 = null;
       this.codeLanguage = 'vol0.1';
+      window.skipMyUpdate = false;
     }
 
     BlocklyEditorView.prototype._setupEventHandlers = function() {};
@@ -63,9 +65,8 @@ define(function(require) {
     BlocklyEditorView.prototype._tearDownEventHandlers = function() {};
 
     BlocklyEditorView.prototype.codeUpdateFunction = function() {
-      var allFields, code, codeLanguage, fName, i, inputs, joinShapesList, langDropbox, myVars, post, pre, projectMainCoffeeFile, projectMainFile, str, variables, xml;
+      var code, codeLanguage, fName, i, inputs, joinShapesList, langDropbox, myVars, numSketches, projectMainCoffeeFile, projectMainFile, str, variables, xml;
 
-      this.skipMyUpdate = false;
       this.numUpdates = 0;
       this.cursor_rot = [0, 0, 0];
       this.cursor_trans = [0, 0, 0];
@@ -74,7 +75,7 @@ define(function(require) {
       window.cursor_move = this.cursor_trans;
       window.cursor_scale = this.cursor_scale;
       window.colors = this.colors;
-      if (this.skipMyUpdate) {
+      if (skipMyUpdate) {
         console.log("Skipping my update...", skipMyUpdate);
         return;
       }
@@ -82,23 +83,32 @@ define(function(require) {
       if (typeof inputManager === "object") {
         inputs = inputManager.list();
         i = 0;
+        numSketches = 0;
+        this.sketchVal = '';
+        if (window.externalEditor && window.externalEditor.$) {
+          this.sketchVal = window.externalEditor.$('#exportArea').val();
+          console.log('SKETCHVALLLLLLL!!!!', this.sketchVal);
+        }
         while (inputs.length > i) {
-          if (xml.indexOf(this.inputs[i].uuid) === -1) {
+          console.log("inputs[i].setVal to " + this.sketchVal);
+          if (this.sketchVal !== '') {
+            inputs[i].setVal(this.sketchVal);
+          }
+          if (inputs[i].isType('sketch')) {
+            this.vent.trigger('ExternalEditor:show', "test", this);
+            numSketches++;
+          }
+          if (xml.indexOf(inputs[i].uuid) === -1) {
             console.log(inputManager.list());
-            console.log("Was : ", this.inputs[i], "removed?");
-            $("#input" + this.inputs[i].uuid, planeSvg.document).remove();
+            console.log("Was : ", inputs[i], "removed?");
             inputs.splice(i, 1);
             console.log(inputManager.list());
           }
           i++;
         }
       }
-      allFields = inputManager.list();
-      $("#inputPane").show();
-      if (allFields.length > 0) {
-        $("#inputModal").show();
-      } else {
-        $("#inputModal").hide();
+      if (numSketches === 0 || inputs.length === 0) {
+        this.vent.trigger('ExternalEditor:hide', "test", this);
       }
       if (typeof hist !== "undefined") {
         hist.addEntry(xml);
@@ -114,18 +124,14 @@ define(function(require) {
         variables = Blockly.Variables.allVariables();
         code = Blockly.Generator.workspaceToCode("JavaScript");
         joinShapesList = code.split(";");
-        pre = "";
-        post = "";
-        while (joinShapesList.length > 2) {
+        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\n";
+        while (joinShapesList.length > 0) {
           str = joinShapesList.shift();
-          if (str.substring(0, 4) === "var ") {
+          if (str.trim().length === 0) {
             continue;
           }
-          pre += str.trim() + ".union(";
-          post += ")";
+          code += "\nassembly.add(" + str.trim() + ")\n";
         }
-        code = pre + joinShapesList.shift().trim() + post;
-        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\nassembly.add(" + code + ")";
       }
       if (codeLanguage === "vol0.1") {
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">";

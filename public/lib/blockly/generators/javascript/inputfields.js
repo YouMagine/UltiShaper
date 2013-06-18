@@ -6,6 +6,12 @@ function MySliderInput(sliderType,sliderLabel,val,minVal,maxVal,stepIncrement) {
     this.minVal = minVal;
     this.maxVal = maxVal;
     this.stepIncrement = stepIncrement;
+    this.isType = function(query) {
+        if(typeof query === 'undefined')
+            return 'slider';
+        if (query == 'slider') return true;
+        else return false;
+    };
     this.update = function (options) {
         // this.sliderType = options.sliderType;
         this.sliderLabel = options.sliderLabel;
@@ -28,6 +34,28 @@ function MySliderInput(sliderType,sliderLabel,val,minVal,maxVal,stepIncrement) {
     };
 }
 
+function MySketchInput(val) {
+    this.uuid = uuid();
+    this.val = val;
+    this.setVal = function (val) {
+        this.lastVal = this.val; // remember last value
+        this.val = val;
+        return this;
+    };
+    this.setUUID = function (val) {
+        this.uuid = val;
+    };
+    this.isType = function(query) {
+        if(typeof query === 'undefined')
+            return 'sketch';
+        if (query == 'sketch') return true;
+        else return false;
+    };
+    this.toString = function () {
+        return 'Sketch with name '+this.sliderLabel+' and value '+this.val;
+    };
+}
+
 function InputManager() {
     this.myInputs = [];
 
@@ -35,6 +63,12 @@ function InputManager() {
         this.myInputs.push(sliderInput);
         this.numFields++;
         return sliderInput.uuid;
+        // return a 'uuid'
+    };
+    this.addSketch = function (sketchInput) {
+        this.myInputs.push(sketchInput);
+        this.numFields++;
+        return sketchInput.uuid;
         // return a 'uuid'
     };
     this.getInputByUUID = function (uuidQuery) {

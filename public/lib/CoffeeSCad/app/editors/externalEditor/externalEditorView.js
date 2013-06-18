@@ -44,6 +44,7 @@ define(function(require) {
       this.settings = options.settings;
       this._setupEventHandlers();
       this.project = this.model;
+      $('#externalEditor').width('600px');
     }
 
     ExternalEditorView.prototype._setupEventHandlers = function() {
@@ -71,7 +72,12 @@ define(function(require) {
     };
 
     ExternalEditorView.prototype.onResizeStop = function() {
-      return console.log("external editor view resize stop");
+      var w;
+
+      console.log("external editor view resize stop");
+      w = $('#externalEditor').width() + 'px';
+      console.log("setting width to " + w);
+      return $('#externalEditorIframe').width(w);
     };
 
     ExternalEditorView.prototype.onClose = function() {
