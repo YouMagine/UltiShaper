@@ -101,7 +101,7 @@ define (require)->
         variables = Blockly.Variables.allVariables()
         code = Blockly.Generator.workspaceToCode("JavaScript")
         joinShapesList = code.split(";")
-        code = "# coffeescad0.33\nrot=[0,0,0];tr=[0,0,0];";
+        code = "# coffeescad0.33\nrot=[0,0,0];tr=[0,0,0];scale=[1,1,1];";
         code += "colors={selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255],subtracting:[0.4,0.4,0.0,0.6]}\n"
         while joinShapesList.length > 0
           str = joinShapesList.shift()

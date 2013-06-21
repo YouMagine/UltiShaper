@@ -193,6 +193,73 @@ Blockly.Language.pattern_repeat = {
   }
 };
 
+Blockly.JavaScript.pattern_grid = function() {
+  var statements = Blockly.JavaScript.statementToCode(this, 'STATEMENTS');
+  var xCount = Blockly.JavaScript.valueToCode(this, 'XCOUNT', Blockly.JavaScript.ORDER_ATOMIC) || "(2)";
+  var yCount = Blockly.JavaScript.valueToCode(this, 'YCOUNT', Blockly.JavaScript.ORDER_ATOMIC) || "(2)";
+  var zCount = Blockly.JavaScript.valueToCode(this, 'ZCOUNT', Blockly.JavaScript.ORDER_ATOMIC) || "(1)";
+  var spaceX = Blockly.JavaScript.valueToCode(this, 'SPACEX', Blockly.JavaScript.ORDER_ATOMIC) || "(15)";
+  var spaceY = Blockly.JavaScript.valueToCode(this, 'SPACEY', Blockly.JavaScript.ORDER_ATOMIC) || "(15)";
+  var spaceZ = Blockly.JavaScript.valueToCode(this, 'SPACEZ', Blockly.JavaScript.ORDER_ATOMIC) || "(15)";
+  xCount = Math.round(1*xCount.substring(1,xCount.length-1));
+  yCount = Math.round(1*yCount.substring(1,yCount.length-1));
+  zCount = Math.round(1*zCount.substring(1,zCount.length-1));
+  spaceX = Math.round(1*spaceX.substring(1,spaceX.length-1));
+  spaceY = Math.round(1*spaceY.substring(1,spaceY.length-1));
+  spaceZ = Math.round(1*spaceZ.substring(1,spaceZ.length-1));
+  if(codeLanguage == 'coffeescad0.1') {
+    code = '';
+    code = "initialTr = tr;";
+    // var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
+    var selectedStr = '';
+    statementsList = statements.split(';');
+    console.log('Going to repeat on [X,Y,Z] ',xCount,yCount,zCount,':',statementsList);
+    for (var iX = 0; iX < xCount; iX++) {
+      for (var iY = 0; iY < yCount; iY++) {
+        for (var iZ = 0; iZ < zCount; iZ++) {
+          for (var j=0;j<statementsList.length;j++)
+          {
+            if(statementsList[j].trim().length === 0)
+              continue;
+            code += 'tr = [initialTr[0]+'+iX*spaceX+',initialTr[1]+'+iY*spaceY+',initialTr[2]+'+iZ*spaceZ+'];';//' #'+iX+','+iY+','+iZ+"\n";
+            code += statementsList[j]+';';
+          }
+          // statements = statements + statements;
+        }
+      }
+    }
+    code += "tr = initialTr;";
+    return code;
+  }
+};
+// Repeat Operators
+Blockly.Language.pattern_grid = {
+  category: 'pattern',
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput("XCOUNT")
+        .setCheck(Number)
+        .appendTitle(new Blockly.FieldImage("http://www.gstatic.com/codesite/ph/images/star_on.gif", 15, 15))
+        .appendTitle("Grid repeat on: X");
+    this.appendValueInput("YCOUNT")
+        .appendTitle(getLang('Y'));
+    this.appendValueInput("ZCOUNT")
+        .appendTitle(getLang('Z'));
+    this.appendValueInput("SPACEX")
+        .appendTitle(getLang('Space between: on X'));
+    this.appendValueInput("SPACEY")
+        .appendTitle(getLang('Y'));
+    this.appendValueInput("SPACEZ")
+        .appendTitle(getLang('Z'));
+    this.appendStatementInput("STATEMENTS");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Repeat shapes');
+  }
+};
+
 Blockly.JavaScript.pattern_fan_out = function() {
   var statements = Blockly.JavaScript.statementToCode(this, 'STATEMENTS');
   var axis = this.getTitleValue('AXIS') || 'Z';
@@ -213,11 +280,12 @@ Blockly.JavaScript.pattern_fan_out = function() {
     // var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     var selectedStr = '';
     for (var i = 1; i <= repeat; i++) {
+      code += 'rot['+axisNr+'] = rot['+axisNr+']+'+rotate+';';
       for (var j=0;j<statementsList.length;j++)
       {
         if(statementsList[j].trim().length === 0)
           continue;
-        code += 'rot['+axisNr+'] = rot['+axisNr+']+'+rotate+';';
+
         code += statementsList[j]+';';
       }
       // statements = statements + statements;
