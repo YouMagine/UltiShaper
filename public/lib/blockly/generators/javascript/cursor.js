@@ -5,19 +5,19 @@ Blockly.JavaScript.cursor_rotate = function() {
   var rZ = var_to_number(Blockly.JavaScript.valueToCode(this, 'rZ', Blockly.JavaScript.ORDER_ATOMIC)) || 0;
   // todo: assemble javaScript into code variable.
   var code = '';
-  if(name == 'rotateTo')
+  if(name == 'rotateTo') {
     cursor_rot= [0,0,0];
+    code = 'rot=['+rX+','+rY+','+rZ+'];';
+  } else {
+    code = 'rot=[rot[0]+('+rX+'%360),rot[1]+('+rY+'%360),rot[2]+('+rZ+'%360)];';
+  }
+
   cursor_rot[0] = cursor_rot[0] + rX;
   console.log('type:',name,'rX:',rX,'cursor_rot',cursor_rot,'from blockly:',var_to_number(Blockly.JavaScript.valueToCode(this, 'rX', Blockly.JavaScript.ORDER_ATOMIC)));
   cursor_rot[1] = cursor_rot[1] + rY;
   cursor_rot[2] = cursor_rot[2] + rZ;
-  // todo: change order_none to the correct strength.
-  if(codeLanguage == 'coffeescad0.1') {
-    return '';//rot=['+rX+','+rY+','+rZ+'];';
-  }
-  if(codeLanguage == 'vol0.1')
-    return '';
-  else return code; // scad
+  return code;
+
 };
 Blockly.Language.cursor_rotate = {
   category: ucfirst(getLang('cursor')),
@@ -77,7 +77,12 @@ Blockly.JavaScript.cursor_move = function() {
   // console.log('type:',name,'tX:',tX,'cursor_move',cursor_move);
   // todo: change order_none to the correct strength.
   if(codeLanguage == 'coffeescad0.1') {
-    return '';//rot=['+rX+','+rY+','+rZ+'];';
+    if(name == 'rotateTo') {
+      cursor_move= [0,0,0];
+      code = 'tr=['+tX+','+tY+','+tZ+'];';
+    } else {
+      code = 'tr=[tr[0]+'+tX+',tr[1]+'+tY+',tr[2]+'+tZ+'];';
+    }
   }
   if(codeLanguage == 'vol0.1')
     return '';
@@ -129,7 +134,7 @@ Blockly.JavaScript.cursor_scale = function() {
   // todo: assemble javaScript into code variable.
   cursor_scale = [X,Y,Z];
   if(codeLanguage == 'coffeescad0.1') {
-    return '';//rot=['+rX+','+rY+','+rZ+'];';
+    return 'scale=['+X+','+Y+','+Z+'];';
   }
   if(codeLanguage == 'vol0.1')
     return '';

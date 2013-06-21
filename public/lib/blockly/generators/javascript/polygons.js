@@ -36,7 +36,7 @@ Blockly.JavaScript.polygons_sketch = function() {
   code = code.replace(/\/\*[^\*]*\*\//g,"");
   code = code.replace(/polygon\(\[/g,""); // remove polygon([ from string
   code = code.replace(/\]\);?/g,""); // remove ]); from string
-  code = 'CAGBase.fromPoints(['+code.trim()+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
+  code = 'new CAGBase.fromPoints(['+code.trim()+']).translate(tr).rotate(rot).scale(scale)';
 
   console.log("sketch code = ",code);
   if(codeLanguage == 'vol0.1')
@@ -156,7 +156,7 @@ Blockly.JavaScript.polygons_polygon = function() {
     if(str === '') continue; // skip empty item
     code += str.trim()+",";
   }
-  code = 'CAGBase.fromPoints(['+code+pointList.shift().trim()+']).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])';
+  code = 'new CAGBase.fromPoints(['+code+pointList.shift().trim()+']).translate(tr).rotate(rot).scale(scale)';
   console.log('points:',pointList,'code',code);
   if(codeLanguage == 'vol0.1')
     return '';
