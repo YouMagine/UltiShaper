@@ -60,6 +60,7 @@ define (require)->
         return
       # console.log('codeUpdateFunction() ran '+(numUpdates++)+' times');
       xml = utils.getXML()
+      console.log({xmlData:xml});
       if typeof inputManager is "object"
         inputs = inputManager.list()
         i = 0
@@ -110,7 +111,7 @@ define (require)->
             code += "\nassembly.add(newPart)\n"
           else 
             code += "\n"+str.trim()+"\n"
-        
+
       if codeLanguage is "vol0.1"
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">"
         code += Blockly.Generator.workspaceToCode("JavaScript")
