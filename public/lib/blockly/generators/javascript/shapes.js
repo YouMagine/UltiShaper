@@ -109,14 +109,17 @@ Blockly.JavaScript.assembly_part = function() {
       else
         codeRemove += "\n"+boolPartsName+".union("+str+")";
       if(coffeescadOperation == 'subtract') {
-       ghostParts += "\nassembly.add("+str+".color(colors.subtracting))";
+       ghostParts += "\nassembly.add("+str+".color(colors.subtracting)) #ghost of "+partName;
       }
       isFirstPart = false;
     }
-    codeRemove += "\n"+partName+"."+coffeescadOperation+"("+boolPartsName+")";
+    if(codeRemove.length)
+      codeRemove += "\n"+partName+"."+coffeescadOperation+"("+boolPartsName+")";
     code = "\n# Part: "+name+"\n"+codeAdd + "\n"+codeRemove;
-    code += "\nassembly.add("+partName+");";
-   code += "\n# Ghosts:"+ghostParts;
+    if(codeAdd.length)
+      code += "\nassembly.add("+partName+");";
+    if(ghostParts)
+      code += "\n# Ghosts:"+ghostParts;
     console.log({code:code, add: codeAdd, remove: codeRemove, length: removeShapesList.length});
     code = code.replace(new RegExp( "\n\\s+", "g" ),"\n");
     return code.trim();
