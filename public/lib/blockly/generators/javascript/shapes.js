@@ -150,6 +150,46 @@ Blockly.Language.assembly_part = {
 };
 
 
+Blockly.JavaScript.pattern_repeat = function() {
+  var statements = Blockly.JavaScript.statementToCode(this, 'STATEMENTS');
+  var times = Blockly.JavaScript.valueToCode(this, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || "(3)";
+  times = Math.round(1*times.substring(1,times.length-1));
+  if(codeLanguage == 'coffeescad0.1') {
+    code = '';
+    // var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
+    var selectedStr = '';
+    statementsList = statements.split(';');
+    console.log('Going to repeat ',times,' times:',statementsList);
+    for (var i = 1; i <= times; i++) {
+      for (var j=0;j<statementsList.length;j++)
+      {
+        code += statementsList[j]+';';
+      }
+      // statements = statements + statements;
+    }
+    return code;
+  }
+};
+// Repeat Operators
+Blockly.Language.pattern_repeat = {
+  category: 'pattern',
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput("TIMES")
+        .setCheck(Number)
+        .appendTitle(new Blockly.FieldImage("http://www.gstatic.com/codesite/ph/images/star_on.gif", 15, 15))
+        .appendTitle("Repeat");
+    this.appendDummyInput()
+        .appendTitle(getLang('times'));
+    this.appendStatementInput("STATEMENTS");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Repeat shapes');
+  }
+};
+
 
 Blockly.JavaScript.shape_sphere = function() {
   var value_diameter = Blockly.JavaScript.valueToCode(this, 'diameter', Blockly.JavaScript.ORDER_ATOMIC) || 10;
