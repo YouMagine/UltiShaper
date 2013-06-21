@@ -35,9 +35,10 @@ define (require)->
       @cursor_rot=[0,0,0]
       @cursor_trans=[0,0,0]
       @cursor_scale=[1,1,1]
-      @colors = {selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255]}
+      @colors = selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255],subtracting:[0.4,0.4,0.0,0.6]
       @app2 = null
       @codeLanguage = 'vol0.1'#or 'scad' for openscad
+      window.skipMyUpdate = false
           
     _setupEventHandlers: =>
       #appVent.on("project:compiled",@onProjectCompiled)
@@ -46,7 +47,6 @@ define (require)->
       #appVent.off("project:compiled",@onProjectCompiled)
     
     codeUpdateFunction:=>
-      @skipMyUpdate = false
       @numUpdates = 0
       @cursor_rot=[0,0,0]
       @cursor_trans=[0,0,0]
@@ -55,7 +55,7 @@ define (require)->
       window.cursor_move=@cursor_trans
       window.cursor_scale=@cursor_scale
       window.colors = @colors
-      if @skipMyUpdate
+      if skipMyUpdate
         console.log "Skipping my update...", skipMyUpdate
         return
       # console.log('codeUpdateFunction() ran '+(numUpdates++)+' times');
@@ -100,11 +100,16 @@ define (require)->
         variables = Blockly.Variables.allVariables()
         code = Blockly.Generator.workspaceToCode("JavaScript")
         joinShapesList = code.split(";")
-        code = "# coffeescad0.33\n\nrot=[0,0,0]\ntr=[0,0,0]\n"
+        code = "# coffeescad0.33\nrot=[0,0,0];tr=[0,0,0];";
+        code += "colors={selected:[0.6,0.5,0.2],unselected:[124/256,153/256,96/255],limegreen:[122/256,182/256,69/255],subtracting:[0.4,0.4,0.0,0.6]}\n"
         while joinShapesList.length > 0
           str = joinShapesList.shift()
           continue if str.trim().length == 0
-          code += "\nassembly.add("+str.trim()+")\n"
+          if str.trim().substring(0,4) == 'new '
+            code += "\nnewPart = "+str.trim()
+            code += "\nassembly.add(newPart)\n"
+          else 
+            code += "\n"+str.trim()+"\n"
         
       if codeLanguage is "vol0.1"
         code = "<" + "?xml version=\"1.0\" ?" + ">\n <VOL VersionMajor=\"1\" VersionMinor=\"2\">\n     <Parameters />\n     <uformia.base.Model.20110605 Name=\"43\">"

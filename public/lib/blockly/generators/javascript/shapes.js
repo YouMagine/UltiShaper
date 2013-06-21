@@ -36,13 +36,9 @@ Blockly.JavaScript.assembly_part = function() {
   var removeShapes = Blockly.JavaScript.statementToCode(this, 'SHAPESREMOVE');
   var booleanType = this.getTitleValue('booleanType');
   var scaleStr = '.scale(['+cursor_scale[0]+','+cursor_scale[1]+','+cursor_scale[2]+'])';
-  code = '//part block: '+name+'\n'+booleanType+'() {\n//Add\nunion(){\n'+addShapes+'\n}\n//Remove\n'+removeShapes+'\n}';
-  if(codeLanguage == 'vol0.1')
-    return ''; // put blend bools here
   if(codeLanguage == 'coffeescad0.1') {
-    code = '';
+    code = ''; var coffeescadOperation = '';
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    var coffeescadOperation = '';
     switch(booleanType){
       case 'union':
         coffeescadOperation = 'union';break;
@@ -51,29 +47,83 @@ Blockly.JavaScript.assembly_part = function() {
       case 'intersection':
         coffeescadOperation = 'intersect';break;
     }
+    partName = "newPart"+Math.round(Math.random()*100000);
     addShapesList = addShapes.split(';');
-    var pre =''; var post='';
-    while(addShapesList.length > 2) {
-      var str = addShapesList.shift();
-      if(str.substring(0,4)=='var ')
-        continue; // skip variable assignments
-      pre += str.trim()+".union("; post += ")";
+    codeAdd = ''; isFirstPart = true;
+    console.log('Adding:',addShapesList,addShapesList.length);
+    partNameRegEx =/newPart[0-9]{1,5}/;
+    while(addShapesList.length > 1) {
+      str = addShapesList.shift().trim();
+      if(str.substring(0,8) == '# Part: '){
+        console.log("Holy cow... this one has nested content...");
+        nestedPartName = partNameRegEx.exec(str)[0];
+        partName = nestedPartName;
+        partWithoutAddingStr = partWithoutAddingRegEx.exec(str)[0];
+        str = str.replace(new RegExp( "assembly.add.*", "g" ),"");
+
+        codeAdd += "\n"+str;
+
+        console.log("Adding nested part ("+nestedPartName+") to this part instead of to assembly:",str);
+        continue;
+      }
+      console.log("Add... what to do with str:",str);
+      if(str.trim().substring(0,4) != 'new ') {
+        codeAdd += "\n"+str;
+        continue;
+      }
+      if(isFirstPart === true)
+        codeAdd += "\n"+partName+" = "+str;
+      else
+        codeAdd += "\n"+partName+".union("+str+")";
+      isFirstPart = false;
     }
-    codeAdd = pre+addShapesList.shift().trim()+post;
+
     removeShapesList = removeShapes.split(';');
-    pre =''; post='';
-    while(removeShapesList.length > 2) {
-      pre += removeShapesList.shift().trim()+".union("; post += ")";
+    console.log('Removing:',removeShapesList);
+    codeRemove = '';ghostParts = '';isFirstPart = true;
+    boolPartsName = "boolParts"+Math.round(Math.random()*100000);
+    while(removeShapesList.length > 1) {
+      console.log('Removelist left:',removeShapesList,'codeRemove:',codeRemove);
+      str = removeShapesList.shift().trim();
+      if(str.substring(0,8) == '# Part: '){
+        console.log("Holy cow... this bool has nested content...",str);
+        nestedPartName = partNameRegEx.exec(str)[0];
+        partWithoutAddingStr = partWithoutAddingRegEx.exec(str)[0];
+        str = str.replace(new RegExp( "assembly.add.*", "g" ),"");
+
+        codeAdd += "\n"+str;
+        if(isFirstPart === true)
+          codeAdd += "\n"+boolPartsName+" = "+nestedPartName;
+        else
+          codeAdd += "\n"+boolPartsName+".add(nestedPartName)";
+        console.log("What to do with nested part ("+nestedPartName+"):",str);
+        continue;
+      }
+      if(str.trim().substring(0,4) != 'new ')
+      {
+        codeRemove += "\n"+str;
+        continue;
+      }
+      if(isFirstPart === true)
+        codeRemove += "\n"+boolPartsName+" = "+str;
+      else
+        codeRemove += "\n"+boolPartsName+".union("+str+")";
+      if(coffeescadOperation == 'subtract') {
+       ghostParts += "\nassembly.add("+str+".color(colors.subtracting))";
+      }
+      isFirstPart = false;
     }
-    codeRemove = pre+removeShapesList.shift().trim()+post;
-    // console.log({add: codeAdd, remove: codeRemove, length: removeShapesList.length});
-    if(codeRemove.trim() === '')
-      return codeAdd.trim()+scaleStr+selectedStr+';'; // if there's nothing to bool with, don't bool.
-    else
-      return codeAdd+"."+coffeescadOperation+"("+codeRemove+")"+scaleStr+selectedStr+";";
+    codeRemove += "\n"+partName+"."+coffeescadOperation+"("+boolPartsName+")";
+    code = "\n# Part: "+name+"\n"+codeAdd + "\n"+codeRemove;
+    code += "\nassembly.add("+partName+");";
+   code += "\n# Ghosts:"+ghostParts;
+    console.log({code:code, add: codeAdd, remove: codeRemove, length: removeShapesList.length});
+    code = code.replace(new RegExp( "\n\\s+", "g" ),"\n");
+    return code.trim();
   }
-  else return code; // scad
 };
+
+
 // Shape Boolean Operators
 Blockly.Language.assembly_part = {
   category: ucfirst(getLang('assembly')),
@@ -114,7 +164,7 @@ Blockly.JavaScript.shape_sphere = function() {
     return '<uformia.base.Sphere.20110605 Name="43a" centerX="0" centerY="0" centerZ="0" radiusX="'+value_diameter+'" radiusY="'+value_diameter+'" radiusZ="'+value_diameter+'"></uformia.base.Sphere.20110605>';
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
-    return 'new Sphere({d:'+value_diameter+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+selectedStr+scaleStr+';\n';
+    return 'new Sphere({d:'+value_diameter+'}).translate(tr).rotate(rot)'+selectedStr+scaleStr+';\n';
   }
   else
     return 'sphere(r='+value_diameter+');\n';
@@ -162,7 +212,7 @@ Blockly.JavaScript.shape_cube = function() {
   if(codeLanguage == 'coffeescad0.1') {
     var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
     if(center_object) centerStr=',center:[0,0,0]';
-    return 'new Cube({size:['+value_width+','+value_depth+','+value_height+']'+centerStr+'}).translate(['+cursor_move[0]+','+cursor_move[1]+','+cursor_move[2]+']).rotate(['+cursor_rot[0]+','+cursor_rot[1]+','+cursor_rot[2]+'])'+scaleStr+selectedStr+';\n';
+    return 'new Cube({size:['+value_width+','+value_depth+','+value_height+']'+centerStr+'}).translate(tr).rotate(rot)'+scaleStr+selectedStr+';\n';
   }
   else
   return code; //[code, Blockly.JavaScript.ORDER_NONE];
