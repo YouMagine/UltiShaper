@@ -77,7 +77,7 @@ Blockly.JavaScript.cursor_move = function() {
   // console.log('type:',name,'tX:',tX,'cursor_move',cursor_move);
   // todo: change order_none to the correct strength.
   if(codeLanguage == 'coffeescad0.1') {
-    if(name == 'rotateTo') {
+    if(name == 'moveTo') {
       cursor_move= [0,0,0];
       code = 'tr=['+tX+','+tY+','+tZ+'];';
     } else {
