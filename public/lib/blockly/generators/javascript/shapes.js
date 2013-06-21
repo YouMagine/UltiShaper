@@ -193,6 +193,64 @@ Blockly.Language.pattern_repeat = {
   }
 };
 
+Blockly.JavaScript.pattern_fan_out = function() {
+  var statements = Blockly.JavaScript.statementToCode(this, 'STATEMENTS');
+  var axis = this.getTitleValue('AXIS') || 'Z';
+  var repeat = Blockly.JavaScript.valueToCode(this, 'REPEAT', Blockly.JavaScript.ORDER_ATOMIC) || 3;
+  var angle = Blockly.JavaScript.valueToCode(this, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || "(360)";
+  angle = 1*angle.substring(1,angle.length-1);
+  repeat = 1*repeat.substring(1,repeat.length-1);
+  statementsList = statements.split(';');
+  // TODO: only count shapes.
+  count = statementsList.length-1;
+  if(repeat === 0)
+    repeat = 1;
+  rotate = angle/repeat;
+  console.log('Polar array has '+count+' elements, repeating '+repeat+', going to rotate ',rotate,' degrees for a total of ',angle);
+  axisNr = '2'; if(axis == 'X') axisNr = '0'; if(axis == 'Y') axisNr = '1';
+  if(codeLanguage == 'coffeescad0.1') {
+    code = '';
+    // var selectedStr = blockIsSelected(this,'bubbletoshape') ? '.color(colors.selected)' : '.color(colors.unselected)';
+    var selectedStr = '';
+    for (var i = 1; i <= repeat; i++) {
+      for (var j=0;j<statementsList.length;j++)
+      {
+        if(statementsList[j].trim().length === 0)
+          continue;
+        code += 'rot['+axisNr+'] = rot['+axisNr+']+'+rotate+';';
+        code += statementsList[j]+';';
+      }
+      // statements = statements + statements;
+    }
+    return code;
+  }
+};
+
+// Repeat Operators
+Blockly.Language.pattern_fan_out = {
+  category: 'pattern',
+  helpUrl: 'http://www.example.com/',
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput("ANGLE")
+        .setCheck(Number)
+        .appendTitle(new Blockly.FieldImage("http://www.gstatic.com/codesite/ph/images/star_on.gif", 15, 15))
+        .appendTitle("Fan out around")
+        .appendTitle(new Blockly.FieldDropdown([[ucfirst(getLang('X axis')), "X"], [ucfirst(getLang('Y axis')), "Y"], [ucfirst(getLang('Z axis')), "Z"]]), "AXIS");
+    this.appendDummyInput()
+        .appendTitle(getLang('degrees'));
+    this.appendValueInput("REPEAT")
+        .appendTitle(getLang("Repeat"))
+        .setCheck(Number);
+    this.appendDummyInput()
+        .appendTitle("time(s)");
+    this.appendStatementInput("STATEMENTS");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Spread the pattern by rotation');
+  }
+};
 
 Blockly.JavaScript.shape_sphere = function() {
   var value_diameter = Blockly.JavaScript.valueToCode(this, 'diameter', Blockly.JavaScript.ORDER_ATOMIC) || 10;
