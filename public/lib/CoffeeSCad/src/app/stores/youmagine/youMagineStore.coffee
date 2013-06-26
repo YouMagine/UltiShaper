@@ -57,6 +57,7 @@ define (require)->
       @vent = vent
       @vent.on("YouMagineStore:login", @login)
       @vent.on("YouMagineStore:logout", @logout)
+      @vent.on("project:saved",@pushSavedProject)
       
       #experimental
       # @lib = new BrowserLibrary()
@@ -270,11 +271,133 @@ define (require)->
       
       localStorage.setItem(projectURI,strinfigiedProject)
       
-      @vent.trigger("project:saved",project)
+      # @vent.trigger("project:saved",project)
       if firstSave
         project._clearFlags()
       project.trigger("save", project)
+      @vent.trigger("project:saved",project)
       
+    pushSavedProject:(project)=>
+      # New function that's run after a save. Responds to project:saved
+      console.log 'going to push project to youmagine.',project
+      # jQuery.ajaxSetup({async:false});
+      window.apiURL = @apiURL
+      url = "#{window.apiURL}/designs.json?auth_token=#{@token}"
+      url = "#{@apiURL}/designs/60.json?auth_token=#{@token}"
+      # url = "#{@apiURL}/designs.json"
+      # console.log "url = #{url}"
+      window.auth_token = @token
+      data =
+        'design[name]': project.name
+        'design[description]': 'Made with the <b>Ultishaper</b>!!'
+        'design[license]': 'cc'
+
+      #filesList = []
+      filesList = project.rootFolder.models
+# 
+      # for index, file of filesList
+      #   fileName = file.id
+      #   fileContent = file.content
+      #   ext = fileName.split('.').pop().toLowerCase()
+      #   if ext isnt 'ultishape' && ext isnt 'png'
+      #     console.log 'Phase 1: NOT UPLOADING:',fileName
+      #   else
+      #     console.log 'Phase 1: UPLOADING:',fileName
+      #     data = []
+      #     i = 0;
+
+# is actually a string i nboth cases... binary or ascii
+
+            # aBlob = new Blob(atob(fileContent), {
+              # type: 'image/png'
+          #   });
+
+          #   console.log aBlob
+
+# 
+      # console.log "JSON to POST: ",data
+      # req = $.post url, data, (data, resp,jqXHRObj) =>
+      type = 'PUT'
+      req = $.ajax url, 
+        data: data
+        type: type
+        success: (data, resp,jqXHRObj) ->
+          console.log "#Response: #{resp} !!!!!!",data,jqXHRObj
+          # if data.id?
+          for index, file of filesList
+            fileName = file.id
+            fileContent = file.content
+            ext = fileName.split('.').pop().toLowerCase()
+            if ext isnt 'ultishape' && ext isnt 'png'
+              console.log 'Phase 2: NOT UPLOADING:',fileName
+            else
+              console.log 'Phase 2: UPLOADING:',fileName
+              dataB64 = []
+              i = 0;
+
+              while ( i++ < fileContent.length)
+                dataB64.push(fileContent.charAt(i))
+
+              console.log 'fileContent is a ' + typeof fileContent,'Content:',fileContent.substring(0,30)
+
+              if ext is 'ultishape'
+                aBlob = new Blob(dataB64, {
+                  type: 'application/xml'
+                });
+                entityType = 'documents'
+                fd = new FormData
+                fd.append('document[name]', fileName);
+                # fd.append('document[filename]', fileName);
+                fd.append('document[description]', 'The main UltiShaper design file.');
+                fd.append('document[file]', aBlob,fileName);
+
+
+              if ext is 'png'
+                console.log 'b64toBlob'
+                aBlob = b64toBlob(fileContent.substring(22,fileContent.length),'image/png');
+                console.log {txt:'b64toBlob result:',result:aBlob}
+                entityType = 'images'
+                fd = new FormData
+                fd.append('image[name]', fileName);
+                fd.append('image[description]', 'Design made with the UltiShaper.');
+                fd.append('image[file]', aBlob,fileName);
+
+              url = "http://api.youmagine.com/designs/60/" + entityType + ".json?auth_token=#{window.auth_token}"
+              console.log "Posting to ",url
+              $.ajax url,
+                type: 'POST'
+                data: fd
+                processData: false
+                contentType: false
+                cache: false
+                done: ->
+                  console.log 'FormData post: ',data
+                error:(a,b,c) ->
+                  console.log 'failed: ',a,b,c,a.responseText
+      #     if true
+      #       data.id = 60
+      #       docData =
+      #         'document[name]': 'testfile.ultishape'
+      #         'document[description]': 'testUlti <b>Shape</b>'
+      #         'file': '<xml>test</xml>'
+      #       url = "#{window.apiURL}/designs/60/documents.json?auth_token=#{window.auth_token}"
+      #       console.log 'POSTING data:',docData,'to url ',url
+      #       req = $.ajax url, 
+      #         data: docData
+      #         type: 'POST'
+      #         error: (jqXHRObj,textStatus,errorThrown) ->
+      #           console.log textStatus,jqXHRObj.responseText,jqXHRObj,errorThrown
+      #         success: (data, resp,jqXHRObj) ->
+      #           console.log "#Response to post: #{resp} #{jqXHRObj.responseText}!!!!!!",data,jqXHRObj
+      # console.log 'request: ',req
+        # for num,design of data
+          # console.log 'design',design
+          # window.myData.push design.file.url
+
+      # console.log("fetched list: ",window.myData)
+      # jQuery.ajaxSetup({async:true});
+
+
     
     autoSaveProject:(srcProject)=>
       #used for autoSaving projects
@@ -495,6 +618,7 @@ define (require)->
       else
         #fixme: although its probably a tiny XML file, synchronous downloading is probably a horrible thing
         # TODO ;)
+        # TODO replace with URL: http://api.youmagine.com/documents/{id}/download
         console.log '---------fetching file from youmagine -------'
         jQuery.ajaxSetup({async:false});
         newUrl = "http://my.ultimaker.net/tests/myproxy/?url=" + escape fileName

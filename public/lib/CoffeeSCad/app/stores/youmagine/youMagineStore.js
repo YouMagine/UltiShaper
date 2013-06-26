@@ -83,6 +83,7 @@ define(function(require) {
       this.deleteProject = __bind(this.deleteProject, this);
       this.loadProject = __bind(this.loadProject, this);
       this.autoSaveProject = __bind(this.autoSaveProject, this);
+      this.pushSavedProject = __bind(this.pushSavedProject, this);
       this.saveProject = __bind(this.saveProject, this);
       this.saveProject_ = __bind(this.saveProject_, this);
       this.getProjectFiles = __bind(this.getProjectFiles, this);
@@ -108,6 +109,7 @@ define(function(require) {
       this.vent = vent;
       this.vent.on("YouMagineStore:login", this.login);
       this.vent.on("YouMagineStore:logout", this.logout);
+      this.vent.on("project:saved", this.pushSavedProject);
       this.projectsList = [];
       console.log("fetched lib", this.lib);
       reqRes.addHandler("getbrowserFileOrProjectCode", this._sourceFetchHandler);
@@ -335,11 +337,94 @@ define(function(require) {
       }
       strinfigiedProject = JSON.stringify(attributes);
       localStorage.setItem(projectURI, strinfigiedProject);
-      this.vent.trigger("project:saved", project);
       if (firstSave) {
         project._clearFlags();
       }
-      return project.trigger("save", project);
+      project.trigger("save", project);
+      return this.vent.trigger("project:saved", project);
+    };
+
+    YouMagineStore.prototype.pushSavedProject = function(project) {
+      var data, filesList, req, type, url;
+
+      console.log('going to push project to youmagine.', project);
+      window.apiURL = this.apiURL;
+      url = "" + window.apiURL + "/designs.json?auth_token=" + this.token;
+      url = "" + this.apiURL + "/designs/60.json?auth_token=" + this.token;
+      window.auth_token = this.token;
+      data = {
+        'design[name]': project.name,
+        'design[description]': 'Made with the <b>Ultishaper</b>!!',
+        'design[license]': 'cc'
+      };
+      filesList = project.rootFolder.models;
+      type = 'PUT';
+      return req = $.ajax(url, {
+        data: data,
+        type: type,
+        success: function(data, resp, jqXHRObj) {
+          var aBlob, dataB64, entityType, ext, fd, file, fileContent, fileName, i, index, _results;
+
+          console.log("#Response: " + resp + " !!!!!!", data, jqXHRObj);
+          _results = [];
+          for (index in filesList) {
+            file = filesList[index];
+            fileName = file.id;
+            fileContent = file.content;
+            ext = fileName.split('.').pop().toLowerCase();
+            if (ext !== 'ultishape' && ext !== 'png') {
+              _results.push(console.log('Phase 2: NOT UPLOADING:', fileName));
+            } else {
+              console.log('Phase 2: UPLOADING:', fileName);
+              dataB64 = [];
+              i = 0;
+              while (i++ < fileContent.length) {
+                dataB64.push(fileContent.charAt(i));
+              }
+              console.log('fileContent is a ' + typeof fileContent, 'Content:', fileContent.substring(0, 30));
+              if (ext === 'ultishape') {
+                aBlob = new Blob(dataB64, {
+                  type: 'application/xml'
+                });
+                entityType = 'documents';
+                fd = new FormData;
+                fd.append('document[name]', fileName);
+                fd.append('document[description]', 'The main UltiShaper design file.');
+                fd.append('document[file]', aBlob, fileName);
+              }
+              if (ext === 'png') {
+                console.log('b64toBlob');
+                aBlob = b64toBlob(fileContent.substring(22, fileContent.length), 'image/png');
+                console.log({
+                  txt: 'b64toBlob result:',
+                  result: aBlob
+                });
+                entityType = 'images';
+                fd = new FormData;
+                fd.append('image[name]', fileName);
+                fd.append('image[description]', 'Design made with the UltiShaper.');
+                fd.append('image[file]', aBlob, fileName);
+              }
+              url = "http://api.youmagine.com/designs/60/" + entityType + (".json?auth_token=" + window.auth_token);
+              console.log("Posting to ", url);
+              _results.push($.ajax(url, {
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                cache: false,
+                done: function() {
+                  return console.log('FormData post: ', data);
+                },
+                error: function(a, b, c) {
+                  return console.log('failed: ', a, b, c, a.responseText);
+                }
+              }));
+            }
+          }
+          return _results;
+        }
+      });
     };
 
     YouMagineStore.prototype.autoSaveProject = function(srcProject) {
