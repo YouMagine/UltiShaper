@@ -312,7 +312,7 @@ define (require)->
             else
               console.log 'Phase 2: UPLOADING:',fileName
               dataB64 = []
-              i = 0;
+              i = -1;
 
               while ( i++ < fileContent.length)
                 dataB64.push(fileContent.charAt(i))
@@ -353,30 +353,6 @@ define (require)->
                   console.log 'FormData post: ',data
                 error:(a,b,c) ->
                   console.log 'failed: ',a,b,c,a.responseText
-      #     if true
-      #       data.id = 60
-      #       docData =
-      #         'document[name]': 'testfile.ultishape'
-      #         'document[description]': 'testUlti <b>Shape</b>'
-      #         'file': '<xml>test</xml>'
-      #       url = "#{window.apiURL}/designs/60/documents.json?auth_token=#{window.auth_token}"
-      #       console.log 'POSTING data:',docData,'to url ',url
-      #       req = $.ajax url, 
-      #         data: docData
-      #         type: 'POST'
-      #         error: (jqXHRObj,textStatus,errorThrown) ->
-      #           console.log textStatus,jqXHRObj.responseText,jqXHRObj,errorThrown
-      #         success: (data, resp,jqXHRObj) ->
-      #           console.log "#Response to post: #{resp} #{jqXHRObj.responseText}!!!!!!",data,jqXHRObj
-      # console.log 'request: ',req
-        # for num,design of data
-          # console.log 'design',design
-          # window.myData.push design.file.url
-
-      # console.log("fetched list: ",window.myData)
-      # jQuery.ajaxSetup({async:true});
-
-
     
     autoSaveProject:(srcProject)=>
       #used for autoSaving projects
