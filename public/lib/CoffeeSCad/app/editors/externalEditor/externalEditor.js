@@ -24,7 +24,9 @@ define(function(require) {
     ExternalEditor.prototype.title = "ExternalEditor";
 
     function ExternalEditor(options) {
+      this.loadData = __bind(this.loadData, this);
       this.resetEditor = __bind(this.resetEditor, this);
+      this.setSketchNeedsReload = __bind(this.setSketchNeedsReload, this);
       this.hideView = __bind(this.hideView, this);
       this.showView = __bind(this.showView, this);
       this.onStart = __bind(this.onStart, this);
@@ -42,12 +44,14 @@ define(function(require) {
       this.startWithParent = true;
       this.showOnAppStart = false;
       this.addMainMenuIcon = false;
+      this.sketchNeedsReload = true;
       this.icon = "icon-th-large";
       this.myTitle = (_ref3 = options.title) != null ? _ref3 : 'External Editor';
       this.vent.on("project:loaded", this.resetEditor);
       this.vent.on("project:created", this.resetEditor);
       this.vent.on("ExternalEditor:show", this.showView);
       this.vent.on("ExternalEditor:hide", this.hideView);
+      this.vent.on("ExternalEditor:sketchNeedsReload", this.setSketchNeedsReload);
       this.init();
     }
 
@@ -90,16 +94,22 @@ define(function(require) {
         });
       }
       if (this.dia.currentView == null) {
-        return this.dia.show(this.externalEditorView);
+        this.dia.show(this.externalEditorView);
       } else {
-        return this.dia.showDialog();
+        this.dia.showDialog();
       }
+      return this.loadData();
     };
 
     ExternalEditor.prototype.hideView = function() {
       if (this.dia) {
         return this.dia.hideDialog();
       }
+    };
+
+    ExternalEditor.prototype.setSketchNeedsReload = function() {
+      console.log("setting sketchNeedsReload to true");
+      return this.sketchNeedsReload = true;
     };
 
     ExternalEditor.prototype.resetEditor = function(newProject) {
@@ -110,8 +120,63 @@ define(function(require) {
         this.dia.close();
         this.ExternalEditorView = null;
       }
-      this.loadBlocks();
+      window.loadData = this.loadData;
+      setTimeout(function() {
+        try {
+          return loadData();
+        } catch (_error) {}
+      }, 200);
       return this.showView();
+    };
+
+    ExternalEditor.prototype.loadData = function() {
+      var block, code, inputTitle, uuid, _i, _input, _len, _ref, _results;
+
+      console.log('externalEditor:loadData() e.g. for loading a sketchs path');
+      if (this.sketchNeedsReload === false) {
+        return;
+      }
+      console.log("sketchNeedsReload is true, loading of data from blocks.");
+      _ref = Blockly.mainWorkspace.getAllBlocks();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        block = _ref[_i];
+        if (block.type && block.type === "polygons_sketch") {
+          _results.push((function() {
+            var _j, _k, _len1, _len2, _ref1, _ref2, _results1;
+
+            _ref1 = block.inputList;
+            _results1 = [];
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              _input = _ref1[_j];
+              _ref2 = _input.titleRow;
+              for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+                inputTitle = _ref2[_k];
+                if (inputTitle.name === "code") {
+                  code = inputTitle.text_;
+                }
+                if (inputTitle.name === "uuid") {
+                  uuid = inputTitle.text_;
+                }
+              }
+              if (code && uuid) {
+                console.log("Found both uuid " + uuid + " and the code (" + code + ") for a sketch.");
+              }
+              $("#exportArea", frames['externalEditor'].document).val(code);
+              if (frames['externalEditor'].loadCode) {
+                frames['externalEditor'].loadCode();
+                _results1.push(this.sketchNeedsReload = false);
+              } else {
+                _results1.push(void 0);
+              }
+            }
+            return _results1;
+          }).call(this));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
 
     return ExternalEditor;

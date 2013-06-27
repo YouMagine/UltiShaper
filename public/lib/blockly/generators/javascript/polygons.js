@@ -18,6 +18,7 @@ Blockly.JavaScript.polygons_sketch = function() {
   if(inputManager.getInputByUUID(uuid) === null) {
       // console.log('uuid not found... adding the sketch to inputs.');
       inputManager.addSketch(sketch);
+      
   } else {
       // uuid was found. sketch was created before. Use that one.
       sketch = inputManager.getInputByUUID(uuid);

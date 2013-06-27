@@ -173,7 +173,7 @@ define (require)->
         @projectsList = projectsList
         console.log "projectsList: =========",projectsList
         for design in @designOnline
-          console.log design.slug
+          # console.log design.slug
           projectsList.unshift design.slug
         @_getAllProjectsHelper()
         #kept for now
@@ -292,31 +292,10 @@ define (require)->
         'design[description]': 'Made with the <b>Ultishaper</b>!!'
         'design[license]': 'cc'
 
-      #filesList = []
       filesList = project.rootFolder.models
-# 
-      # for index, file of filesList
-      #   fileName = file.id
-      #   fileContent = file.content
-      #   ext = fileName.split('.').pop().toLowerCase()
-      #   if ext isnt 'ultishape' && ext isnt 'png'
-      #     console.log 'Phase 1: NOT UPLOADING:',fileName
-      #   else
-      #     console.log 'Phase 1: UPLOADING:',fileName
-      #     data = []
-      #     i = 0;
+      # use PUT for 're-saving'
+      # use POST for 'adding a resource'
 
-# is actually a string i nboth cases... binary or ascii
-
-            # aBlob = new Blob(atob(fileContent), {
-              # type: 'image/png'
-          #   });
-
-          #   console.log aBlob
-
-# 
-      # console.log "JSON to POST: ",data
-      # req = $.post url, data, (data, resp,jqXHRObj) =>
       type = 'PUT'
       req = $.ajax url, 
         data: data

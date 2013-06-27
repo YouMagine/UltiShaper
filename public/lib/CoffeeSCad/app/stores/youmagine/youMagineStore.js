@@ -236,7 +236,6 @@ define(function(require) {
         _ref = this.designOnline;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           design = _ref[_i];
-          console.log(design.slug);
           projectsList.unshift(design.slug);
         }
         this._getAllProjectsHelper();
