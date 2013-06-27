@@ -4,8 +4,73 @@ $(window).resize(function() {
 	console.log('osped:resize() to ',$(window).width());
 	console.log('local:',local);
 });
+console.log("ospedv2");
 
-
+	function loadCode() {
+		console.log('loadCode()');
+		var str = $("#exportArea").val();
+		if (str == local.oldExportStr) return;
+		
+		local.oldExportStr = str;
+		
+		for(var i=0; i<local.paths.length; i++)
+		{
+			for(var j=0; j<local.paths[i].points.length; j++)
+			{
+				if (local.paths[i].points[j].box != undefined)
+					local.paths[i].points[j].box.remove();
+			}
+			local.paths[i].path.remove();
+		}
+		local.paths = new Array();
+		local.selectedIdx = -1;
+		optionStr = "";
+		
+		var startIdx = str.indexOf("[[");
+		var p = 0;
+		var prevEnd = 0;
+		while (startIdx > -1)
+		{
+			var endIdx = str.indexOf("]]", startIdx);
+			if (endIdx > -1)
+			{
+				local.paths[p] = {points: new Array(), prefix: str.substr(prevEnd, startIdx - prevEnd), postfix: ""};
+				prevEnd = endIdx + 2;
+				var polyString = str.substr(startIdx + 2, endIdx - startIdx - 2).split("],[");
+				for(var i=0;i<polyString.length;i++)
+				{
+					var n = polyString[i].split(",");
+					var x = parseInt(n[0]);
+					var y = parseInt(n[1]);
+					local.paths[p].points.push({x: x, y: y, type: 0, nextCP: {x: 0, y: 0}, prevCP: {x: 0, y: 0}});
+					if (polyString[i].indexOf("/*") > 0)
+					{
+						var point = local.paths[p].points[local.paths[p].points.length - 1];
+						var extra = polyString[i].substr(polyString[i].indexOf("/*") + 2);
+						extra = extra.substr(0, extra.length - 2);
+						n = extra.split(":");
+						point.type = parseInt(n[0]);
+						n = n[1].split(",");
+						point.prevCP = {x: parseInt(n[0]), y: parseInt(n[1])};
+						point.nextCP = {x: parseInt(n[2]), y: parseInt(n[3])};
+					}
+				}
+				local.paths[p].path = local.drawArea.path("").attr("stroke-width", 2);
+				updatePath(local.paths[p]);
+				p++;
+				optionStr += "<option>Path:" + p;
+			}
+			startIdx = str.indexOf("[[", startIdx + 1);
+		}
+		if (p > 0)
+			local.paths[p-1].postfix = str.substr(prevEnd);
+		
+		optionStr += "<option>[New]";
+		$("#pathListbox").html(optionStr);
+		$("#pathListbox").prop("selectedIndex", 0);
+		local.currentPath = 0;
+		$("#pathListbox").change();
+	}
 $().ready(function () {
 	local.gridSize = 8;
 	local.subGridSize = 8;
@@ -111,70 +176,9 @@ $().ready(function () {
 			local.paths[local.currentPath].path.attr("stroke-width", 3);
 		}
 	});
-	$("#exportArea").keyup(function() {
-		var str = $("#exportArea").val();
-		if (str == local.oldExportStr) return;
-		
-		local.oldExportStr = str;
-		
-		for(var i=0; i<local.paths.length; i++)
-		{
-			for(var j=0; j<local.paths[i].points.length; j++)
-			{
-				if (local.paths[i].points[j].box != undefined)
-					local.paths[i].points[j].box.remove();
-			}
-			local.paths[i].path.remove();
-		}
-		local.paths = new Array();
-		local.selectedIdx = -1;
-		optionStr = "";
-		
-		var startIdx = str.indexOf("[[");
-		var p = 0;
-		var prevEnd = 0;
-		while (startIdx > -1)
-		{
-			var endIdx = str.indexOf("]]", startIdx);
-			if (endIdx > -1)
-			{
-				local.paths[p] = {points: new Array(), prefix: str.substr(prevEnd, startIdx - prevEnd), postfix: ""};
-				prevEnd = endIdx + 2;
-				var polyString = str.substr(startIdx + 2, endIdx - startIdx - 2).split("],[");
-				for(var i=0;i<polyString.length;i++)
-				{
-					var n = polyString[i].split(",");
-					var x = parseInt(n[0]);
-					var y = parseInt(n[1]);
-					local.paths[p].points.push({x: x, y: y, type: 0, nextCP: {x: 0, y: 0}, prevCP: {x: 0, y: 0}});
-					if (polyString[i].indexOf("/*") > 0)
-					{
-						var point = local.paths[p].points[local.paths[p].points.length - 1];
-						var extra = polyString[i].substr(polyString[i].indexOf("/*") + 2);
-						extra = extra.substr(0, extra.length - 2);
-						n = extra.split(":");
-						point.type = parseInt(n[0]);
-						n = n[1].split(",");
-						point.prevCP = {x: parseInt(n[0]), y: parseInt(n[1])};
-						point.nextCP = {x: parseInt(n[2]), y: parseInt(n[3])};
-					}
-				}
-				local.paths[p].path = local.drawArea.path("").attr("stroke-width", 2);
-				updatePath(local.paths[p]);
-				p++;
-				optionStr += "<option>Path:" + p;
-			}
-			startIdx = str.indexOf("[[", startIdx + 1);
-		}
-		if (p > 0)
-			local.paths[p-1].postfix = str.substr(prevEnd);
-		
-		optionStr += "<option>[New]";
-		$("#pathListbox").html(optionStr);
-		$("#pathListbox").prop("selectedIndex", 0);
-		local.currentPath = 0;
-		$("#pathListbox").change();
-	});
+	$("#exportArea").keyup(loadCode);
+
+
 	
 	//Functionality for loading an image behind the grid to trace over.
 	$("#traceImageURL").keyup(function() {

@@ -33,6 +33,7 @@ define (require)->
       @startWithParent = true
       @showOnAppStart = false
       @addMainMenuIcon = false
+      @sketchNeedsReload = true
       @icon = "icon-th-large"
       @myTitle = options.title ? 'External Editor'
       
@@ -40,6 +41,7 @@ define (require)->
       @vent.on("project:created",@resetEditor)
       @vent.on("ExternalEditor:show",@showView)
       @vent.on("ExternalEditor:hide",@hideView)
+      @vent.on("ExternalEditor:sketchNeedsReload",@setSketchNeedsReload)
       @init()
 
       #@addRegions @regions
@@ -75,10 +77,15 @@ define (require)->
         @dia.show(@externalEditorView)
       else
         @dia.showDialog()
+      @loadData()
       
     hideView:=>
       if @dia
         @dia.hideDialog()
+
+    setSketchNeedsReload:=>
+      console.log "setting sketchNeedsReload to true"
+      @sketchNeedsReload = true
       
     resetEditor:(newProject)=>
       console.log "resetting external editor"
@@ -90,27 +97,31 @@ define (require)->
         @dia.close()
         @ExternalEditorView = null
         
-      @loadBlocks()
+      window.loadData = @loadData
+      setTimeout(()->
+        try
+          loadData()
+      ,200);
       @showView()
   
-    # loadBlocks:()=>
-    #   console.log '-----------------=================----------------'
-    #   for model in @project.rootFolder.models
-    #     # console.log "========= models::: ",model,model.id
-    #     fileParts = model.id.split '.'
-    #     ext = fileParts[fileParts.length-1]
-    #     modelId = fileParts[0]
-    #     # console.log 'ext',ext
-    #     # console.log 'project id',@project.id,'model id = ',modelId
-    #     if modelId is @project.id
-    #       # console.log "adding content",model.storedContent
-    #       window.xmlStr = model.storedContent
-    #       setTimeout(()->
-    #         try
-    #           # console.log window.xmlStr
-    #           xml = Blockly.Xml.textToDom(window.xmlStr);
-    #           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml)
-    #       ,10);
-      
+    loadData:()=>
+      console.log 'externalEditor:loadData() e.g. for loading a sketchs path'
+      if @sketchNeedsReload == false
+        return;
+      console.log "sketchNeedsReload is true, loading of data from blocks."
+      for block in Blockly.mainWorkspace.getAllBlocks()
+        if block.type && block.type == "polygons_sketch"
+          for _input in block.inputList
+            for inputTitle in _input.titleRow
+              if inputTitle.name == "code"
+                code = inputTitle.text_
+              if inputTitle.name == "uuid"
+                uuid = inputTitle.text_
+            if(code && uuid)
+              console.log "Found both uuid #{uuid} and the code (#{code}) for a sketch."
+            $("#exportArea",frames['externalEditor'].document).val(code)
+            if(frames['externalEditor'].loadCode)
+              frames['externalEditor'].loadCode()
+              @sketchNeedsReload = false
 
   return ExternalEditor
