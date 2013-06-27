@@ -314,12 +314,12 @@ define (require)->
               dataB64 = []
               i = -1;
 
-              while ( i++ < fileContent.length)
-                dataB64.push(fileContent.charAt(i))
 
               console.log 'fileContent is a ' + typeof fileContent,'Content:',fileContent.substring(0,30)
 
               if ext is 'ultishape'
+                while ( i++ < fileContent.length)
+                  dataB64.push(fileContent.charAt(i))
                 aBlob = new Blob(dataB64, {
                   type: 'application/xml'
                 });
