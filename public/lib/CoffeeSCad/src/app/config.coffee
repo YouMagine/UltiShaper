@@ -32,6 +32,8 @@ require.config
     github:           "../assets/js/libs/github"
     
     XMLWriter:        "../assets/js/libs/XMLWriter-1.0.0"
+    jszip:            "../assets/js/libs/jszip"
+    "jszip-deflate" : "../assets/js/libs/jszip-deflate"
     
     
     #plugins
@@ -44,22 +46,11 @@ require.config
     bootbox:          "../assets/js/plugins/bootbox.min"
     contextMenu:      "../assets/js/plugins/bootstrap-contextmenu"
     notify:           "../assets/js/plugins/bootstrap-notify"
+    colorpicker:      "../assets/js/plugins/bootstrap-colorpicker"
+    slider:           "../assets/js/plugins/bootstrap-slider"
     
     coffeelint:       "../assets/js/plugins/coffeelint"
     
-    ### 
-    coffee_synhigh:   "../assets/js/libs/codeMirror/mode/coffeescript/coffeescript"
-    
-    foldcode:         "../assets/js/plugins/codemirror/fold/foldcode"
-    indent_fold:      "../assets/js/plugins/codemirror/fold/indent-fold"
-    search:           "../assets/js/plugins/codemirror/search/search"
-    search_cursor:    "../assets/js/plugins/codemirror/search/searchcursor"
-    match_high:       "../assets/js/plugins/codemirror/search/match-highlighter"
-    dialog:           "../assets/js/plugins/codemirror/dialog/dialog"
-    hint:             "../assets/js/plugins/codemirror/hint/show-hint"
-    jsHint:           "../assets/js/plugins/codemirror/hint/coffeescad-hint"
-    closeBrackets:    "../assets/js/plugins/codemirror/edit/closeBrackets/closeBrackets"
-    matchBrackets:    "../assets/js/plugins/codemirror/edit/matchBrackets/matchBrackets"###
     
     marionette:       "../assets/js/plugins/backbone.marionette.min"
     eventbinder:      "../assets/js/plugins/backbone.eventbinder.min"
@@ -73,13 +64,22 @@ require.config
     "backbone-forms" :           "../assets/js/plugins/backbone.forms"
     forms_bootstrap : "../assets/js/plugins/backbone.forms.bootstrap"
     forms_list      : "../assets/js/plugins/backbone.forms.list"  
-    forms_custom    : "../assets/js/plugins/backbone.forms.custom"  
+    forms_custom    : "../assets/js/plugins/backbone/backbone.forms.keybindings"  
     backbone_nested:  "../assets/js/plugins/backbone.nested.min"
+    
+    Mousetrap :         "../assets/js/plugins/backbone/mousetrap"#key bindings
+    Mousetrap_global:   "../assets/js/plugins/backbone/mousetrap-global-bind.min"
+    backbone_mousetrap:        "../assets/js/plugins/backbone/backbone.mousetrap" #key bindings, backbone
     
     
     three_csg:        "../assets/js/plugins/ThreeCSG"
     combo_cam:        "../assets/js/plugins/CombinedCamera"
     transformControls:"../assets/js/plugins/three/controls/transformControls"
+    OrbitControls:    "../assets/js/plugins/three/controls/OrbitControls"
+    
+    RenderManager:    "../assets/js/plugins/three/extras/RenderManager"
+    
+    ArrowHelper2:      "../assets/js/plugins/three/helpers/ArrowHelper"
     
     ObjectExport: "../assets/js/plugins/three/exporters/ObjectExport"
     GeometryExporter: "../assets/js/plugins/three/exporters/GeometryExporter"
@@ -98,6 +98,9 @@ require.config
     VignetteShader: "../assets/js/plugins/three/VignetteShader"
     BlendShader : "../assets/js/plugins/three/BlendShader"
     AdditiveBlendShader : "../assets/js/plugins/three/AdditiveBlendShader"
+    BrightnessContrastShader : "../assets/js/plugins/three/BrightnessContrastShader"
+    
+    EdgeShader3: "../assets/js/plugins/three/shaders/EdgeShader3"
     
     
   shim:
@@ -113,6 +116,10 @@ require.config
     contextMenu:
       dep: ["bootstrap"]
     notify:
+      dep:["bootstrap"]
+    colorpicker: 
+      dep:["bootstrap"]
+    slider: 
       dep:["bootstrap"]
       
     'backbone':
@@ -138,37 +145,19 @@ require.config
     backbone_nested:
       deps:["backbone"]
     
+    Mousetrap:
+      deps: []
+    Mousetrap_global:
+      deps:["Mousetrap"]
+    backbone_mousetrap:
+      deps:["backbone","Mousetrap"]
+    
+    
     #CoffeeScript:
     #  exports:  "CoffeeScript"
     coffeelint:
       deps:    ["CoffeeScript"]
     
-    ###    
-    CodeMirror:
-      exports:  "CodeMirror"
-    foldcode:
-      deps:    ["CodeMirror"]
-    indent_fold:
-      deps:    ["CodeMirror","foldcode"]
-    coffee_synhigh:
-      deps:    ["CodeMirror"]
-    jsHint:
-      deps:    ["CodeMirror","hint"]
-    search:
-      deps:    ["CodeMirror"]
-    search_cursor:
-      deps:    ["CodeMirror"]
-    dialog:
-      deps:    ["CodeMirror"]
-    match_high:
-      deps:    ["CodeMirror","search","search_cursor"]
-    hint:
-      deps:    ["CodeMirror"]
-    closeBrackets: 
-      deps:    ["CodeMirror"]
-    matchBrackets:
-      deps:    ["CodeMirror"]###
-
     three: 
       exports : "THREE"
     three_csg: 
@@ -179,6 +168,10 @@ require.config
       exports : "combo_cam"
     transformControls:
       deps: ["three"]
+    OrbitControls:  
+      deps: ["three"]
+    ArrowHelper2:
+      deps: ["three"]  
     detector: 
       exports : "Detector"
     stats:
@@ -195,7 +188,9 @@ require.config
     
     ObjectParser:
       deps:["three"]
-      
+    
+    RenderManager:
+      deps:    ["three"]
     
     CopyShader:
       deps:    ["three"]
@@ -206,6 +201,8 @@ require.config
     ShaderPass:
       deps:    ["CopyShader"]
     DotScreenShader:
+      deps:    ["CopyShader"]
+    BrightnessContrastShader:
       deps:    ["CopyShader"]
     DotScreenPass :
       deps:    ["CopyShader","DotScreenShader"]
@@ -219,7 +216,11 @@ require.config
       deps:["CopyShader"]
     BlendShader:
       deps:["three"]
+      
     AdditiveBlendShader:
+      deps:["three"]
+      
+    EdgeShader3:
       deps:["three"]
       
       
@@ -247,4 +248,9 @@ require.config
       exports : "Github"
     XMLWriter:
       exports: "XMLWriter"
+    
+    jszip:
+      exports:"jszip"
+    "jszip-deflate":
+      deps:["jszip"]
       
