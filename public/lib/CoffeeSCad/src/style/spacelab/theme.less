@@ -1,47 +1,7 @@
-// coffeescad 2.3.1
-// based on Bootswatch spacelab
+// Spacelab 2.3.1
+// Bootswatch
 // -----------------------------------------------------
-/*Nice colors:#c54c4f, #da3610*, #fea60b
- *Nice grid color #00DDDD
- * #253565
- * rgb(255, 194, 0)
- * 
- */
-/*Things worth considering adding to the overall style: (cleaner, more minimal look)
-#header 
-element.style {
-height: 15px;
-padding-top: 0px;
-border-top: 0px;
-}
-no box shadow
 
-different rounding for tabs
-reduced padding in tabs
-
-#content
-element.style {
-position: fixed;
-top: 35px;
-left: 5px;
-}*/
-
-/*various overrides*/
-@import "./modals.less";
-@import "./dropdowns.less";
-@import "./mixins.less";
-@import "./buttons.less";
-/*custom*/
-@import "./slider.less";
-@import "./dialogs.less";
-@import "./dock.less";
-@import "./loader.less";
-@import "./utilities.less";
-@import "./codeEditor.less";
-@import "./paramsEditor.less";
-@import "./visualEditor.less";
-@import "./icons.less";
-@import "./projectBrowser.less";
 
 // TYPOGRAPHY
 // -----------------------------------------------------
@@ -50,38 +10,15 @@ left: 5px;
 
 // SCAFFOLDING
 // -----------------------------------------------------
-// Body reset
-// -------------------------
-
-body {
-  margin: 0;
-  font-family: @baseFontFamily;
-  font-size: @baseFontSize;
-  line-height: @baseLineHeight;
-  color: @textColor;
-  background-color: @bodyBackground;
-  
-  min-height:100%;
-  height:100%;
-  overflow:hidden;
-}
-
-html, body {
-    height: 100%;
-}
-
 
 // NAVBAR
 // -----------------------------------------------------
 
 .navbar {
 
-  /*padding-top: 0px;
-  border-top: 0px;*/
-
 	.brand {
 
-		text-shadow: none;
+		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 		.transition(color ease-in-out .2s);
 
 		&:hover {
@@ -92,7 +29,7 @@ html, body {
 
 	.nav > li > a {
 		padding: 11px 10px 8px;
-		text-shadow: none;
+		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 		.transition(color ease-in-out .2s);
 
 		&:hover {
@@ -123,7 +60,7 @@ html, body {
 	&-inverse {
 
 		.brand {
-			text-shadow: none;
+			text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 
 			&:hover {
 				color: @white;
@@ -131,7 +68,7 @@ html, body {
 		}
 
 		.nav > li > a {
-			text-shadow: none;
+			text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 		}
 
 		.nav li.dropdown.open > .dropdown-toggle .caret,
@@ -225,8 +162,6 @@ div.subnav {
 	}
 }
 
-
-
 // NAV
 // -----------------------------------------------------
 
@@ -259,18 +194,6 @@ div.subnav {
 
 // BUTTONS
 // -----------------------------------------------------
-/*popovers*/
-.popover
-{
-  border-radius:0px;
-  margin-left: -48px;
-  margin-top: 5px;
-}
-.popover-content
-{
-  padding:0px;
-}
-
 
 // TABLES
 // -----------------------------------------------------
@@ -304,32 +227,6 @@ div.subnav {
 	.formFieldState(@blue, @blue, @infoBackground);
 }
 
-/*settings*/
-.control-group
-{
-  padding: 0px;
-  padding-top:0px;
-  border:0px;
-}
-legend
-{
-  font-size: 1em;
-  line-height: 1em;
-  font-weight: bold;
-}
-
-legend + .control-group
-{
-  margin-top: 2px;
-}
-
-.form-horizontal .control-group
-{
-  margin-bottom: 5px;
-}
-
-
-
 // DROPDOWNS
 // -----------------------------------------------------
 
@@ -338,12 +235,12 @@ legend + .control-group
 
 .alert {
 	
-	text-shadow: none;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 
 	h1, h2, h3, h4, h5, h6 {
 		color: @white;
 		font-weight: bold;
-		text-shadow: none;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 	}
 }
 
@@ -380,36 +277,3 @@ legend + .control-group
 
 // MEDIA QUERIES
 // -----------------------------------------------------
-
-
-/*BOOTSTRAP CHANGES*/
-.tab-pane active
-{
-  height: 100%;
-}
-.navbar-fixed-top .navbar-inner, .navbar-static-top .navbar-inner
-{
-  box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
-  webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
-  border:0;
-}
-.navbar .nav > li > a {
-float: none;
-padding: 5px 10px 10px;
-text-decoration: none;
-text-shadow: none;
-}
-#tabContent .tab-content
-{
-  overflow: hidden;
-}
-//fix for tabs content scrollbar being displayed in the parent div
-.tab-content > .active, .pill-content > .active
-{
-  overflow: auto;
-  height: 100%;
-  min-height: 300px;
-}
-
-
-
