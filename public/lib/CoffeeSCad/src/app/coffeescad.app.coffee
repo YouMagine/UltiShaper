@@ -13,10 +13,12 @@ define (require)->
   ProjectBrowserView = require './core/projects/projectBrowseView'
   
   ProjectManager = require './core/projects/projectManager'
+  KeyBindingsManager = require './core/keyBindingsManager'
   
   Settings = require './core/settings/settings'
   SettingsView = require './core/settings/settingsView'
    
+  
   
   class CoffeeScadApp extends Backbone.Marionette.Application
     ###
@@ -30,11 +32,15 @@ define (require)->
     constructor:(options)->
       super options
       @vent = vent
+      @showMenu = true
       
       @settings = new Settings()
       @initSettings()
       
       @projectManager = new ProjectManager
+        appSettings: @settings
+        
+      @keyBindingsManager = new KeyBindingsManager
         appSettings: @settings
       
       @editorsList = ["code","hierarchy","blockly","externalPath"]
@@ -58,13 +64,12 @@ define (require)->
       @stores["browser"] = new BrowserStore()
       @stores["YouMagine"] = new YouMagineStore()
 
-
-      
       #events
       $(window).bind('beforeunload',@onAppClosing)
       @vent.on("app:started", @onAppStarted)
       @vent.on("settings:show", @onSettingsShow)
       @vent.on("project:loaded", @onProjectLoaded)
+      @vent.on("project:created",@onProjectLoaded)
       
       #handle exporters initialization
       for name, exporter of @exporters
@@ -75,14 +80,19 @@ define (require)->
       @initLayout()
       
     initLayout:=>
-      @menuView = new MenuView
-        stores: @stores
-        exporters: @exporters
-        model : @project
-        settings: @settings
-      #@headerRegion.show @menuView
-      @menuView.render()
-      @menuView.onDomRefresh()
+      if @showMenu
+        @menuView = new MenuView
+          stores: @stores
+          exporters: @exporters
+          model : @project
+          settings: @settings
+        #@headerRegion.show @menuView
+        @menuView.render()
+        @menuView.onDomRefresh()
+      else
+        $("#header").addClass("hide")
+        $("#header").height(0)
+      
     
     initSettings:->
       setupSettingsBindings= =>
@@ -107,31 +117,7 @@ define (require)->
     
     _setupKeyboardBindings:=>
       #Setup keyBindings
-      ### 
-      @$el.bind 'keydown', 'ctrl+s', ->
-        console.log "i want to save a FILE"
-        return false
-      
-      $(document).bind "keydown", "alt+n", =>
-        @vent.trigger("project:new")
-        return false
-        
-      $(document).bind "keydown", "ctrl+s", =>
-        @vent.trigger("project:save")
-        return false
-        
-      $(document).bind "keydown", "ctrl+l", =>
-        @vent.trigger("project:load")
-        return false
-      
-      $(document).bind "keydown", "alt+c", =>
-        @vent.trigger("project:compile")
-        return false
-      
-      $(document).bind "keydown", "f4", =>
-        @vent.trigger("project:compile")
-        return false
-      ###
+      @keyBindingsManager.setup()
         
     _setupLanguage:()=>
       langCodeMap =
@@ -144,7 +130,7 @@ define (require)->
         
     onStart:()=>
       console.log "app started"
-      #@_setupKeyboardBindings()
+      @_setupKeyboardBindings()
       @visualEditor.start()
       for editorName,editorInst of @editors
         if editorInst.startWithParent
@@ -169,14 +155,12 @@ define (require)->
       modReg = new ModalRegion({elName:"settings",large:true})
       modReg.show settingsView
     
-    ### 
     onSettingsChanged:(settings, value)=> 
       for key, val of @settings.get("General").changedAttributes()
         switch key
           when "theme"
             @theme = val
-            $("#mainTheme").attr("href","assets/css/themes/#{@theme}/bootstrap.css")
-    ###
+            $("#mainTheme").attr("href","assets/css/style/#{@theme}/bootstrap.css")
     
     onProjectLoaded:(newProject)=>
       console.log "project loaded"
