@@ -134,7 +134,8 @@ Blockly.JavaScript.cursor_scale = function() {
   // todo: assemble javaScript into code variable.
   cursor_scale = [X,Y,Z];
   if(codeLanguage == 'coffeescad0.1') {
-    return 'scale=['+X+','+Y+','+Z+'];';
+      code = 'scale=[scale[0]+'+X+',scale[1]+'+Y+',scale[2]+'+Z+'];';
+    return code;// 'scale=['+X+','+Y+','+Z+'];';
   }
   if(codeLanguage == 'vol0.1')
     return '';

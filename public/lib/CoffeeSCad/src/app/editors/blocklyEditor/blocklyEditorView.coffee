@@ -109,6 +109,9 @@ define (require)->
           if str.trim().substring(0,4) == 'new '
             code += "\nnewPart = "+str.trim()
             code += "\nassembly.add(newPart)\n"
+            code += "rot=[0,0,0]\n"
+            code += "tr=[0,0,0]\n"
+            code += "scale=[1,1,1]\n"
           else 
             code += "\n"+str.trim()+"\n"
 
