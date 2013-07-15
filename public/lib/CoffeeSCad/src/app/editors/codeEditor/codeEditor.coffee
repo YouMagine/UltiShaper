@@ -28,9 +28,9 @@ define (require)->
       
       #TODO: should this be here? in the settings?
       @startWithParent = true
-      @showOnAppStart = false
-      @addMainMenuIcon = false
-      @icon = "icon-text-width" 
+      @showOnAppStart = true
+      @addMainMenuIcon = true
+      @icon = "icon-code" 
         
       @vent.on("project:loaded",@resetEditor)
       @vent.on("project:created",@resetEditor)
