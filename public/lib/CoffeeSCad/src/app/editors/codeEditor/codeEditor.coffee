@@ -27,9 +27,9 @@ define (require)->
         controller: @
       
       #TODO: should this be here? in the settings?
-      @startWithParent = true
-      @showOnAppStart = true
-      @addMainMenuIcon = true
+      @startWithParent = false
+      @showOnAppStart = false
+      @addMainMenuIcon = false
       @icon = "icon-code" 
         
       @vent.on("project:loaded",@resetEditor)

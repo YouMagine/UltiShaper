@@ -208,6 +208,11 @@ define (require)->
         project: @project
         title: '2D sketching and tracing'
         appSettings: @settings
+     
+      ParamsEditor = require './editors/paramsEditor/paramsEditor'
+      @editors['params'] = new ParamsEditor
+        project: @project
+        appSettings: @settings
                  
       @settings.fetch()
       
