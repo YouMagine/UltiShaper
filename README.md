@@ -1,6 +1,11 @@
 UltiShaper
 ==========
 
+Watch the example video to see what it is:
+[![Video on YouTube](https://img.youtube.com/vi/fCFEr9mVZoA/maxresdefault.jpg)](https://youtu.be/fCFEr9mVZoA)
+
+[Here's another video](https://www.youtube.com/watch?v=aG77wX4wFTc) showing integration with YouMagine.
+
 UltiShaper started out as an application based mostly on two projects:
 - CoffeeSCAD by Mark Moisette - see http://www.coffeescad.net/
 - Blockly by Neil Fraser - see http://blockly.googlecode.com
